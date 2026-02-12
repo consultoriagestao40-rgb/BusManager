@@ -90,7 +90,7 @@ export async function GET(request: Request) {
         let totalDuration = 0;
         let countDuration = 0;
 
-        events.forEach(event => {
+        events.forEach((event: any) => {
             if (event.status === 'CONCLUIDO' && event.started_at && event.finished_at) {
                 const duration = differenceInMinutes(new Date(event.finished_at), new Date(event.started_at));
 
