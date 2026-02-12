@@ -37,4 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: error-screens
-          path: '*.png'
+          path: |
+            *.png
+            *.log
+            *.html
