@@ -35,31 +35,58 @@ async function run() {
         await page.goto(CLIENT_URL, { waitUntil: 'domcontentloaded' }); // Faster than networkidle0
 
         // Type Agency, User, Password
+        // Wait a bit more for frames to load
+        await new Promise(r => setTimeout(r, 3000));
+
+        // Type Agency, User, Password
         console.log('P2. Filling Credentials...');
-        try {
-            const inputs = await page.$$('input[type="text"], input[type="password"]');
-            if (inputs.length >= 3) {
-                await inputs[0].type(CLIENT_AGENCY);
-                await inputs[1].type(CLIENT_USER);
-                await inputs[2].type(CLIENT_PASS);
-            } else {
-                throw new Error(`Found only ${inputs.length} inputs, expected 3`);
+
+        let targetFrame: any = page;
+        let inputs: any[] = [];
+
+        // Robust Input Discovery (Frames + Types)
+        const frames = page.frames();
+        console.log(`Analyzing ${frames.length} frames...`);
+
+        for (const frame of frames) {
+            // Look for visible input fields that aren't buttons/hidden
+            // Common types for agency/user: text, number, email, password, or no type info
+            const frameInputs = await frame.$$('input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="image"])');
+            if (frameInputs.length >= 3) {
+                console.log(`Found ${frameInputs.length} inputs in frame: ${frame.url()}`);
+                inputs = frameInputs;
+                targetFrame = frame;
+                break;
             }
+        }
+
+        if (inputs.length < 3) {
+            // Debug logging
+            const bodyHTML = await page.content();
+            console.log('Main Frame HTML Preview:', bodyHTML.substring(0, 500));
+            throw new Error(`Found only ${inputs.length} inputs in potential frames. Expected at least 3.`);
+        }
+
+        try {
+            // Heuristic: 1=Agency, 2=User, 3=Password
+            await inputs[0].type(CLIENT_AGENCY);
+            await inputs[1].type(CLIENT_USER);
+            await inputs[2].type(CLIENT_PASS);
         } catch (e) {
-            console.error('Error finding inputs:', e);
+            console.error('Error typing credentials:', e);
             throw e;
         }
 
-        // Click Login Button
+        // Click Login Button inside the same frame
         console.log('P3. Clicking Login...');
-        await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"]'));
+        await targetFrame.evaluate(() => {
+            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
             const loginBtn = buttons.find(b => {
                 const val = (b as HTMLInputElement).value || b.textContent || '';
-                return val.includes('Acessar o Sistema');
+                return val.includes('Acessar') || val.includes('Login') || val.includes('Entrar');
             });
             if (loginBtn) (loginBtn as HTMLElement).click();
-            else throw new Error('Login button not found');
+            else throw new Error('Login button not found in target frame');
         });
 
         await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
