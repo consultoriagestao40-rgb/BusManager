@@ -195,12 +195,37 @@ async function run() {
 
         if (targetElement) {
             console.log('Clicking target element...');
+
+            // Log the element we are about to click
             try {
-                // Try standard click first
-                await targetElement.click();
+                const elementHTML = await targetFrame.evaluate((el: HTMLElement) => el.outerHTML, targetElement);
+                console.log(`Target Element HTML: ${elementHTML}`);
+            } catch (e) { console.log('Could not log target HTML'); }
+
+            try {
+                // 1. Try standard click
+                await targetElement.click({ timeout: 5000 });
             } catch (e) {
-                console.log(`Standard click failed (${e}). Trying JS click...`);
-                await targetFrame.evaluate((el: HTMLElement) => el.click(), targetElement);
+                console.log(`Standard click failed (${e}). Trying fallback methods...`);
+
+                // 2. JS Click
+                try {
+                    console.log('Attempting JS Click...');
+                    await targetFrame.evaluate((el: HTMLElement) => el.click(), targetElement);
+                    await new Promise(r => setTimeout(r, 2000)); // Wait for valid reaction
+                } catch (jsErr) {
+                    console.log(`JS Click failed: ${jsErr}`);
+                }
+
+                // 3. Parent Click (in case the A tag is empty but LI/TD is clickable)
+                try {
+                    console.log('Attempting Parent Click...');
+                    await targetFrame.evaluate((el: HTMLElement) => {
+                        if (el.parentElement) el.parentElement.click();
+                    }, targetElement);
+                } catch (parentErr) {
+                    console.log(`Parent click failed: ${parentErr}`);
+                }
             }
         } else {
             console.log('Target NOT found in initial scan. Trying fallback menu...');
