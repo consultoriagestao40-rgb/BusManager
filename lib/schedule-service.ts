@@ -42,17 +42,27 @@ export async function createScheduleVersion(
         }
 
         // 3. Process Events & Deduplicate
+        // 3. Process Events & Deduplicate
         const processedEvents: any[] = [];
-        const seenKeys = new Set<string>();
+        const keyCounts = new Map<string, number>();
         const duplicates: string[] = [];
 
         for (const event of events) {
-            if (seenKeys.has(event.event_business_key)) {
-                // Duplicate in same file
-                duplicates.push(`${event.client_vehicle_number} (${event.hora_viagem})`);
-                continue;
+            let businessKey = event.event_business_key;
+
+            // Check for duplicates
+            if (keyCounts.has(businessKey)) {
+                const count = keyCounts.get(businessKey)! + 1;
+                keyCounts.set(businessKey, count);
+
+                // Append suffix to make unique in DB
+                businessKey = `${businessKey}_DUP${count}`;
+
+                // Record for reporting
+                duplicates.push(`${event.client_vehicle_number} (${event.hora_viagem}) - Importado como duplicata`);
+            } else {
+                keyCounts.set(businessKey, 1);
             }
-            seenKeys.add(event.event_business_key);
 
             // Find or Create Vehicle
             let vehicle = await tx.vehicle.findUnique({
@@ -78,6 +88,7 @@ export async function createScheduleVersion(
 
             processedEvents.push({
                 ...eventData,
+                event_business_key: businessKey, // Use the potentially suffixed key
                 hora_viagem: horaViagemDate,
                 vehicle_id: vehicle.id,
                 schedule_version_id: newVersion.id,
