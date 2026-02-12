@@ -27,6 +27,13 @@ async function run() {
         });
         page = await browser.newPage();
 
+        // Listen for alerts/popups (e.g., "Invalid Password")
+        page.on('dialog', async dialog => {
+            console.log(`⚠️ JS Alert Detected: ${dialog.message()}`);
+            await dialog.dismiss();
+        });
+
+
         // Disable navigation timeout or increase it
         page.setDefaultNavigationTimeout(60000);
 
