@@ -66,7 +66,7 @@ export async function processImport(
         // or just import at top.
         const { createScheduleVersion } = await import('../schedule-service');
 
-        await createScheduleVersion(importRecord.id, events, dataViagem);
+        const { duplicates } = await createScheduleVersion(importRecord.id, events, dataViagem);
 
         await prisma.scheduleImport.update({
             where: { id: importRecord.id },
@@ -76,7 +76,7 @@ export async function processImport(
             }
         });
 
-        return { success: true, importId: importRecord.id, count: parseResult.events.length };
+        return { success: true, importId: importRecord.id, count: parseResult.events.length, duplicates };
 
     } catch (error: any) {
         await prisma.scheduleImport.update({

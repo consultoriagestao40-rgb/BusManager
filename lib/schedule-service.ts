@@ -44,10 +44,12 @@ export async function createScheduleVersion(
         // 3. Process Events & Deduplicate
         const processedEvents: any[] = [];
         const seenKeys = new Set<string>();
+        const duplicates: string[] = [];
 
         for (const event of events) {
             if (seenKeys.has(event.event_business_key)) {
-                // Duplicate in same file - ignore or log
+                // Duplicate in same file
+                duplicates.push(`${event.client_vehicle_number} (${event.hora_viagem})`);
                 continue;
             }
             seenKeys.add(event.event_business_key);
@@ -98,7 +100,7 @@ export async function createScheduleVersion(
             await calculateDiffs(tx, previousVersion, newVersion, processedEvents);
         }
 
-        return newVersion;
+        return { version: newVersion, duplicates };
     });
 }
 

@@ -7,13 +7,14 @@ export default function FileUploader() {
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
+    const [duplicates, setDuplicates] = useState<string[]>([]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setFile(e.target.files[0]);
             setStatus('idle');
             setMessage('');
+            setDuplicates([]);
         }
     };
 
@@ -34,8 +35,11 @@ export default function FileUploader() {
 
             if (res.ok) {
                 setStatus('success');
-                setMessage(`Arquivo importado com sucesso! ${data.count ? data.count + ' registros processados.' : ''}`);
-                setFile(null); // Reset
+                setMessage(data.message || 'Arquivo importado com sucesso!');
+                if (data.duplicates && data.duplicates.length > 0) {
+                    setDuplicates(data.duplicates);
+                }
+                setFile(null); // Reset file input
             } else {
                 setStatus('error');
                 setMessage(data.error || 'Erro na importação.');
@@ -84,9 +88,25 @@ export default function FileUploader() {
                 )}
 
                 {status === 'success' && (
-                    <div className="flex items-center text-green-600 bg-green-50 p-3 rounded">
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        <span className="text-sm">{message}</span>
+                    <div className="space-y-2">
+                        <div className="flex items-center text-green-600 bg-green-50 p-3 rounded">
+                            <CheckCircle className="w-5 h-5 mr-2" />
+                            <span className="text-sm">{message}</span>
+                        </div>
+
+                        {duplicates.length > 0 && (
+                            <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+                                <div className="flex items-center text-yellow-800 mb-2">
+                                    <AlertCircle className="w-5 h-5 mr-2" />
+                                    <span className="font-bold text-sm">Atenção: {duplicates.length} Veículos Duplicados Ignorados</span>
+                                </div>
+                                <ul className="list-disc list-inside text-xs text-yellow-700 max-h-32 overflow-y-auto">
+                                    {duplicates.map((d, i) => (
+                                        <li key={i}>{d}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 )}
 
