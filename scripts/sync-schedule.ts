@@ -196,6 +196,13 @@ async function run() {
         if (targetElement) {
             console.log('Clicking target element...');
 
+            // Setup listener for new popup window BEFORE clicking
+            const newPagePromise = new Promise<any>(resolve => {
+                const listener = (target: any) => resolve(target);
+                browser.once('targetcreated', listener);
+                // Fallback: remove listener if not fired in 5s? (handled by race below)
+            });
+
             // Log the element we are about to click
             try {
                 const elementHTML = await targetFrame.evaluate((el: HTMLElement) => el.outerHTML, targetElement);
@@ -207,26 +214,59 @@ async function run() {
                 await targetElement.click({ timeout: 5000 });
             } catch (e) {
                 console.log(`Standard click failed (${e}). Trying fallback methods...`);
-
                 // 2. JS Click
                 try {
                     console.log('Attempting JS Click...');
                     await targetFrame.evaluate((el: HTMLElement) => el.click(), targetElement);
-                    await new Promise(r => setTimeout(r, 2000)); // Wait for valid reaction
                 } catch (jsErr) {
                     console.log(`JS Click failed: ${jsErr}`);
                 }
-
-                // 3. Parent Click (in case the A tag is empty but LI/TD is clickable)
-                try {
-                    console.log('Attempting Parent Click...');
-                    await targetFrame.evaluate((el: HTMLElement) => {
-                        if (el.parentElement) el.parentElement.click();
-                    }, targetElement);
-                } catch (parentErr) {
-                    console.log(`Parent click failed: ${parentErr}`);
-                }
             }
+
+            // Check if a popup was created
+            console.log('Waiting for potential popup...');
+            let reportPage = page; // Default to current page if no popup
+
+            try {
+                const newTarget = await Promise.race([
+                    newPagePromise,
+                    new Promise(r => setTimeout(r, 5000))
+                ]);
+
+                if (newTarget && newTarget.type() === 'page') {
+                    console.log('🚀 POPUP DETECTED! Switching context to new page.');
+                    const popup = await newTarget.page();
+                    if (popup) {
+                        reportPage = popup;
+                        await reportPage.bringToFront();
+                    }
+                } else {
+                    console.log('No popup detected within 5s. Assuming same-page or parent frame update.');
+                    // If no popup, we might still be on the same page, so reportPage = page is correct.
+                }
+
+                // Proceed with reportPage
+                // Note: The rest of the script needs to use 'reportPage' instead of 'page'
+                // We will return/assign this wrapper context or simply duplicate the rest here?
+                // Better to replace the subsequent code to use 'reportPage'.
+
+                // --- Update subsequent steps to use reportPage ---
+                // We'll throw an error here to force the "catch" if we want to stop, 
+                // but actually we want to CONTINUE.
+                // Since rewrite is blocked by size, I'll update the variable name in the next chunk.
+
+                // HACK: We need to make 'page' refer to the new page for the rest of the script 
+                // OR update the following lines. 
+                // Simplest way: reassign 'page' variable if possible? 
+                // 'page' is declared with 'let' at the top.
+                if (reportPage !== page) {
+                    page = reportPage;
+                }
+
+            } catch (e) {
+                console.log('Error checking for popup:', e);
+            }
+
         } else {
             console.log('Target NOT found in initial scan. Trying fallback menu...');
 
