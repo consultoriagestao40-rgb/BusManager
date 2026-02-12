@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyPassword, signJWT } from '@/lib/auth';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 const loginSchema = z.object({
     email: z.string().email(),
@@ -63,8 +63,8 @@ export async function POST(request: Request) {
 
         return response;
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: error.errors }, { status: 400 });
+        if (error instanceof ZodError) {
+            return NextResponse.json({ error: error.issues }, { status: 400 });
         }
         console.error('Login error:', error);
         return NextResponse.json(
