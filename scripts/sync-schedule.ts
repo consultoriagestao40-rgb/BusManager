@@ -163,10 +163,18 @@ async function run() {
 
         const linkFound = await page.evaluate(() => {
             // Re-query links after potential menu click
-            const links = Array.from(document.querySelectorAll('a'));
-            const target = links.find(l => l.textContent?.includes('Escala Programada'));
-            if (target) {
-                target.click();
+            // Broad search for any clickable element with the text
+            const elements = Array.from(document.querySelectorAll('a, span, div, td, li'));
+            const target = elements.find(el => el.textContent?.includes('Escala Programada') && (el.tagName === 'A' || el.style.cursor === 'pointer' || (el as HTMLElement).onclick));
+
+            // Fallback: just look for the text if it's unique enough
+            const anyTarget = elements.find(el => el.textContent?.includes('Escala Programada') && el.children.length === 0);
+
+            const finalTarget = target || anyTarget;
+
+            if (finalTarget) {
+                console.log(`Found target element: ${finalTarget.tagName}, Text: ${finalTarget.textContent}`);
+                (finalTarget as HTMLElement).click();
                 return true;
             }
             return false;
@@ -180,10 +188,13 @@ async function run() {
             const frames = page.frames();
             for (const frame of frames) {
                 const frameLinkFound = await frame.evaluate(() => {
-                    const links = Array.from(document.querySelectorAll('a'));
-                    const target = links.find(l => l.textContent?.includes('Escala Programada'));
+                    const elements = Array.from(document.querySelectorAll('a, span, div, td, li'));
+                    // Broad search inside frame
+                    const target = elements.find(el => el.textContent?.includes('Escala Programada'));
+
                     if (target) {
-                        target.click();
+                        console.log(`Found target in frame: ${target.tagName}, Text: ${target.textContent}`);
+                        (target as HTMLElement).click();
                         return true;
                     }
                     return false;
