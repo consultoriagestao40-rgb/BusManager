@@ -122,7 +122,7 @@ async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEven
             });
         } else {
             // Check for CHANGES (Informational)
-            const oldEvent = oldEventsMap.get(newEvent.event_business_key);
+            const oldEvent = oldEventsMap.get(newEvent.event_business_key) as any;
             // Compare specific fields
             const hasChanged =
                 oldEvent.numero_servico !== newEvent.numero_servico ||
