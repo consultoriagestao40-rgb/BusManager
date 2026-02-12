@@ -35,6 +35,7 @@ export async function POST(request: Request) {
             importId: result.importId,
             count: result.count,
             duplicates: result.duplicates,
+            parseErrors: result.parseErrors,
             message: result.duplicate ? 'Arquivo já importado anteriormente.' : 'Importação concluída com sucesso.'
         });
 

@@ -76,7 +76,13 @@ export async function processImport(
             }
         });
 
-        return { success: true, importId: importRecord.id, count: parseResult.events.length, duplicates };
+        return {
+            success: true,
+            importId: importRecord.id,
+            count: parseResult.events.length,
+            duplicates,
+            parseErrors: parseResult.errors
+        };
 
     } catch (error: any) {
         await prisma.scheduleImport.update({

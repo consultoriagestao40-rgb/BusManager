@@ -9,6 +9,7 @@ export default function FileUploader() {
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
     const [duplicates, setDuplicates] = useState<string[]>([]);
+    const [parseErrors, setParseErrors] = useState<string[]>([]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -16,6 +17,7 @@ export default function FileUploader() {
             setStatus('idle');
             setMessage('');
             setDuplicates([]);
+            setParseErrors([]);
         }
     };
 
@@ -39,6 +41,9 @@ export default function FileUploader() {
                 setMessage(data.message || 'Arquivo importado com sucesso!');
                 if (data.duplicates && data.duplicates.length > 0) {
                     setDuplicates(data.duplicates);
+                }
+                if (data.parseErrors && data.parseErrors.length > 0) {
+                    setParseErrors(data.parseErrors);
                 }
                 setFile(null); // Reset file input
             } else {
@@ -104,6 +109,20 @@ export default function FileUploader() {
                                 <ul className="list-disc list-inside text-xs text-yellow-700 max-h-32 overflow-y-auto">
                                     {duplicates.map((d, i) => (
                                         <li key={i}>{d}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {parseErrors.length > 0 && (
+                            <div className="bg-orange-50 p-3 rounded border border-orange-200">
+                                <div className="flex items-center text-orange-800 mb-2">
+                                    <AlertCircle className="w-5 h-5 mr-2" />
+                                    <span className="font-bold text-sm">Atenção: {parseErrors.length} Linhas com Erro de Leitura</span>
+                                </div>
+                                <ul className="list-disc list-inside text-xs text-orange-700 max-h-32 overflow-y-auto">
+                                    {parseErrors.map((e, i) => (
+                                        <li key={i}>{e}</li>
                                     ))}
                                 </ul>
                             </div>
