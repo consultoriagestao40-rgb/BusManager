@@ -79,13 +79,26 @@ async function run() {
             await inputs[0].type(CLIENT_AGENCY);
             await inputs[1].type(CLIENT_USER);
             await inputs[2].type(CLIENT_PASS);
+
+            // Try submitting via Enter key first (often more reliable)
+            console.log('P2.1 Pressing Enter...');
+            await inputs[2].press('Enter');
+
         } catch (e) {
             console.error('Error typing credentials:', e);
             throw e;
         }
 
-        // Click Login Button inside the same frame
-        console.log('P3. Clicking Login...');
+        // Wait potential navigation from Enter
+        try {
+            await Promise.race([
+                targetFrame.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 5000 }),
+                new Promise(r => setTimeout(r, 2000))
+            ]);
+        } catch (e) { }
+
+        // Click Login Button inside the same frame (Backup)
+        console.log('P3. Clicking Login (Backup)...');
         await targetFrame.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
             const loginBtn = buttons.find(b => {
