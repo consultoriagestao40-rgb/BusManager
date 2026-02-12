@@ -1,9 +1,9 @@
-
 import puppeteer from 'puppeteer';
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
+import { log } from './logger';
 
 // Configs (Load from ENV)
 const CLIENT_URL = 'https://rip.nspenha.com.br/retaguarda/index.phtml';
@@ -16,9 +16,10 @@ const APP_EMAIL = process.env.APP_EMAIL || 'admin@busmanager.com'; // User to pe
 const APP_PASSWORD = process.env.APP_PASSWORD || 'admin123';
 
 async function run() {
-    console.log('🚀 Starting Schedule Sync Bot...');
+    log('🚀 Starting Schedule Sync Bot (Enhanced Debugging)...');
     let browser;
     let page;
+
 
     try {
         browser = await puppeteer.launch({
@@ -141,7 +142,7 @@ async function run() {
         console.log(`Found ${debugFrames.length} frames.`);
 
         let targetElement: any = null;
-        let targetFrame: any = null;
+        targetFrame = null;
 
         for (const frame of debugFrames) {
             console.log(`Frame URL: ${frame.url()}`);
@@ -332,19 +333,19 @@ async function run() {
         await browser.close();
 
     } catch (error) {
-        console.error('Fatal Error:', error);
+        log(`Fatal Error: ${error}`);
         if (page) {
             try {
                 await page.screenshot({ path: 'error-state.png', fullPage: true });
-                console.log('Screenshot saved to error-state.png');
+                log('Screenshot saved to error-state.png');
             } catch (screenErr) {
-                console.error('Failed to take screenshot', screenErr);
+                log(`Failed to take screenshot: ${screenErr}`);
             }
 
-            // Dump HTML for debugging
             try {
                 const html = await page.content();
                 fs.writeFileSync('error-page.html', html);
+                log('HTML dump saved to error-page.html');
             } catch (htmlErr) { }
         }
         if (browser) await browser.close();
