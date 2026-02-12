@@ -379,11 +379,40 @@ async function run() {
             if (bodyText.includes('Pesquisar') || bodyText.includes('Imprimir')) {
                 reportFrame = page;
             } else {
-                // Debug
-                const frames = page.frames();
-                console.log(`Debug: Report not found. Total frames: ${frames.length}`);
-                frames.forEach(f => console.log(`- Frame: ${f.url()}`));
-                throw new Error('Report page (Pesquisar/Imprimir) not found in any frame.');
+                console.log('Report verify failed. Attempting DIRECT NAVIGATION fallback...');
+                // Direct URL to the report based on confirmed onclick logs
+                const reportUrl = 'https://rip.nspenha.com.br/retaguarda/php/html/frota/cadEscalaProgramada.php?nivel=1';
+
+                try {
+                    console.log(`Navigating directly to: ${reportUrl}`);
+                    await page.goto(reportUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+                    // After navigation, the main page SHOULD be the report frame content
+                    reportFrame = page;
+
+                    // Short wait for render
+                    await new Promise(r => setTimeout(r, 2000));
+
+                    // Verify again
+                    const fallbackBody = await page.evaluate(() => document.body.innerText);
+                    if (!fallbackBody.includes('Pesquisar') && !fallbackBody.includes('Imprimir')) {
+                        console.error('Direct navigation finished but content verification failed.');
+                        // Dump HTML for debugging
+                        const html = await page.content();
+                        console.log('Fallback Page HTML Preview:', html.substring(0, 500));
+                        throw new Error('Report page content not found even after direct navigation.');
+                    } else {
+                        console.log('Direct navigation successful! Content verified.');
+                    }
+                } catch (navErr) {
+                    console.error(`Direct navigation failed: ${navErr}`);
+
+                    // Debug details
+                    const frames = page.frames();
+                    console.log(`Debug: Report not found. Total frames: ${frames.length}`);
+                    frames.forEach(f => console.log(`- Frame: ${f.url()}`));
+                    throw new Error('Report page (Pesquisar/Imprimir) not found in any frame or via direct navigation.');
+                }
             }
         }
 
