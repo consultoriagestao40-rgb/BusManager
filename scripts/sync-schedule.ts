@@ -119,6 +119,8 @@ async function run() {
             await Promise.race([
                 page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
                 targetFrame.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+                // Check for successful login indicators
+                page.waitForFunction(() => document.body.innerText.includes('Menus Disponíveis') || document.body.innerText.includes('Escala Programada'), { timeout: 15000 }),
                 new Promise(r => setTimeout(r, 5000)) // Fallback wait
             ]);
         } catch (e) {
@@ -130,7 +132,37 @@ async function run() {
         // --- 2. Navigate to "Escala Programada" ---
         console.log('P3. Navigating to Report...');
 
+        // Take a screenshot of the dashboard to see what we have
+        await page.screenshot({ path: 'dashboard.png', fullPage: true });
+
+        // Check if we need to open a menu first
+        // Look for "Menus Disponíveis do Sistema"
+        const menuClicked = await page.evaluate(() => {
+            const buttons = Array.from(document.querySelectorAll('button, input[type="button"], div, span, a'));
+            const menuBtn = buttons.find(b => {
+                const val = b.textContent || (b as HTMLInputElement).value || '';
+                return val.includes('Menus Disponíveis do Sistema');
+            });
+
+            // Should we click it? Only if "Escala Programada" is NOT visible
+            const reportLink = Array.from(document.querySelectorAll('a')).find(l => l.textContent?.includes('Escala Programada'));
+
+            if (!reportLink && menuBtn) {
+                console.log('Clicking "Menus Disponíveis do Sistema"...');
+                (menuBtn as HTMLElement).click();
+                return true;
+            }
+            return false;
+        });
+
+        if (menuClicked) {
+            console.log('Menu clicked, waiting for expansion...');
+            await new Promise(r => setTimeout(r, 2000));
+            await page.screenshot({ path: 'menu-expanded.png' });
+        }
+
         const linkFound = await page.evaluate(() => {
+            // Re-query links after potential menu click
             const links = Array.from(document.querySelectorAll('a'));
             const target = links.find(l => l.textContent?.includes('Escala Programada'));
             if (target) {
@@ -142,8 +174,31 @@ async function run() {
 
         if (!linkFound) {
             // Check frame?
-            console.log('Link not found in top frame. Taking screenshot.');
-            throw new Error('Link "Escala Programada" not found');
+            console.log('Link not found in top frame. Checking frames...');
+            // Recursive check in frames just in case
+            let foundInFrame = false;
+            const frames = page.frames();
+            for (const frame of frames) {
+                const frameLinkFound = await frame.evaluate(() => {
+                    const links = Array.from(document.querySelectorAll('a'));
+                    const target = links.find(l => l.textContent?.includes('Escala Programada'));
+                    if (target) {
+                        target.click();
+                        return true;
+                    }
+                    return false;
+                });
+                if (frameLinkFound) {
+                    foundInFrame = true;
+                    break;
+                }
+            }
+
+            if (!foundInFrame) {
+                console.log('Link not found in any frame. taking screenshot.');
+                await page.screenshot({ path: 'error-missing-link.png', fullPage: true });
+                throw new Error('Link "Escala Programada" not found');
+            }
         }
 
         // Wait for the specific report page to load
