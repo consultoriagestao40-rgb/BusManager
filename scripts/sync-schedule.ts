@@ -182,6 +182,10 @@ async function run() {
 
     } catch (error) {
         console.error('Fatal Error:', error);
+        if (typeof page !== 'undefined') {
+            await page.screenshot({ path: 'error-state.png', fullPage: true });
+            console.log('Screenshot saved to error-state.png');
+        }
         await browser.close();
         process.exit(1);
     }

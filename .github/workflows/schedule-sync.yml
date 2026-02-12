@@ -31,3 +31,10 @@ jobs:
           APP_EMAIL: ${{ secrets.APP_EMAIL }}
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
         run: npx tsx scripts/sync-schedule.ts
+
+      - name: Upload Error Screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-screens
+          path: '*.png'
