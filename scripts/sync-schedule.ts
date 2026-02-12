@@ -85,12 +85,27 @@ async function run() {
                 const val = (b as HTMLInputElement).value || b.textContent || '';
                 return val.includes('Acessar') || val.includes('Login') || val.includes('Entrar');
             });
-            if (loginBtn) (loginBtn as HTMLElement).click();
-            else throw new Error('Login button not found in target frame');
+            if (loginBtn) {
+                console.log('Login button found, clicking...');
+                (loginBtn as HTMLElement).click();
+            } else {
+                throw new Error('Login button not found in target frame');
+            }
         });
 
-        await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
-        console.log('Login successful (assumed).');
+        // Wait for navigation - handle case where it might be a frame navigation or top navigation
+        console.log('P3.1 Waiting for navigation...');
+        try {
+            await Promise.race([
+                page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+                targetFrame.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+                new Promise(r => setTimeout(r, 5000)) // Fallback wait
+            ]);
+        } catch (e) {
+            console.log('Navigation wait timeout (might be partial update), continuing...');
+        }
+
+        console.log('Login action completed. Checking for report link...');
 
         // --- 2. Navigate to "Escala Programada" ---
         console.log('P3. Navigating to Report...');
