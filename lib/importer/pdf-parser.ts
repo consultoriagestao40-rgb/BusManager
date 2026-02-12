@@ -25,8 +25,6 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
             rawBuffer: string[];
         } | null = null;
 
-        const eventStartRegex = /^(\d{4,6})(\d{2}\/\d{2}\/\d{4})(\d{2}:\d{2})(.*)$/;
-
         const processBuffer = (evt: typeof currentEventStr) => {
             if (!evt) return;
 
@@ -118,6 +116,11 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
             }
         };
 
+        // Relaxed Regex: Allow 1-10 digits for vehicle (covers 3-digit small buses), and be more permissive
+        const eventStartRegex = /^(\d{1,10})(\d{2}\/\d{2}\/\d{4})(\d{2}:\d{2})(.*)$/;
+        // Regex to detect lines that look like events but failed the strict check (for debugging)
+        const datePattern = /\d{2}\/\d{2}\/\d{4}/;
+
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const match = line.match(eventStartRegex);
@@ -137,6 +140,15 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                     rawBuffer: []
                 };
             } else {
+                // If line has a date but didn't match startRegex, it might be a malformed event line
+                if (datePattern.test(line)) {
+                    // Check if it's not just a header or metadata line
+                    // Heuristic: If it starts with digits, it's likely a skipped event
+                    if (/^\d/.test(line)) {
+                        errors.push(`Linha ignorada (possível erro de formato): "${line}"`);
+                    }
+                }
+
                 if (currentEventStr) {
                     currentEventStr.rawBuffer.push(line);
                 }
