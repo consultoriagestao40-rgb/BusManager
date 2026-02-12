@@ -98,21 +98,33 @@ async function run() {
             ]);
         } catch (e) { }
 
-        // Click Login Button inside the same frame (Backup)
-        console.log('P3. Clicking Login (Backup)...');
-        await targetFrame.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
-            const loginBtn = buttons.find(b => {
-                const val = (b as HTMLInputElement).value || b.textContent || '';
-                return val.includes('Acessar') || val.includes('Login') || val.includes('Entrar');
-            });
-            if (loginBtn) {
-                console.log('Login button found, clicking...');
-                (loginBtn as HTMLElement).click();
-            } else {
-                throw new Error('Login button not found in target frame');
-            }
+        // Check if we are already logged in (Enter might have worked)
+        const loggedIn = await page.evaluate(() => {
+            return document.body.innerText.includes('Menus Disponíveis') || document.body.innerText.includes('Escala Programada') || document.body.innerText.includes('Encerrar Sessão');
         });
+
+        if (loggedIn) {
+            console.log('Login successful via Enter key.');
+        } else {
+            // Click Login Button inside the same frame (Backup)
+            console.log('P3. Clicking Login (Backup)...');
+            await targetFrame.evaluate(() => {
+                const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a, div[onclick], span[onclick]'));
+                const loginBtn = buttons.find(b => {
+                    const val = (b as HTMLInputElement).value || b.textContent || '';
+                    return val.toLowerCase().includes('acessar') || val.toLowerCase().includes('login') || val.toLowerCase().includes('entrar');
+                });
+                if (loginBtn) {
+                    console.log('Login button found, clicking...');
+                    (loginBtn as HTMLElement).click();
+                } else {
+                    // Log what we found to debug
+                    const buttonTexts = buttons.map(b => (b as HTMLInputElement).value || b.textContent || b.tagName).slice(0, 10);
+                    console.warn('Login button not found in target frame. Available buttons:', buttonTexts);
+                    // Do not throw error yet, maybe navigation is just slow
+                }
+            });
+        }
 
         // Wait for navigation - handle case where it might be a frame navigation or top navigation
         console.log('P3.1 Waiting for navigation...');
