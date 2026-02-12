@@ -181,7 +181,10 @@ async function run() {
                     // We need to re-select it in the handle context to click
                     targetElement = await frame.evaluateHandle(() => {
                         const all = Array.from(document.querySelectorAll('a'));
-                        return all.find(a => (a.innerText || '').includes('Escala Programada') || (a.innerText || '').includes('532'));
+                        return all.find(a => {
+                            const t = a.innerText || a.textContent || '';
+                            return t.includes('Escala Programada') || t.includes('532');
+                        });
                     });
                     break;
                 }
@@ -192,7 +195,13 @@ async function run() {
 
         if (targetElement) {
             console.log('Clicking target element...');
-            await targetElement.click();
+            try {
+                // Try standard click first
+                await targetElement.click();
+            } catch (e) {
+                console.log(`Standard click failed (${e}). Trying JS click...`);
+                await targetFrame.evaluate((el: HTMLElement) => el.click(), targetElement);
+            }
         } else {
             console.log('Target NOT found in initial scan. Trying fallback menu...');
 
