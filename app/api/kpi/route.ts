@@ -124,7 +124,7 @@ export async function GET(request: Request) {
         // Ideally specific query for monthly, but let's reuse for now if range allows.
 
         const monthlyMap = new Map();
-        events.forEach(event => {
+        events.forEach((event: any) => {
             if (event.status === 'CONCLUIDO') {
                 const monthKey = format(new Date(event.data_viagem), 'yyyy-MM');
                 monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + 1);
