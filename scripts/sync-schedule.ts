@@ -157,9 +157,28 @@ async function run() {
 
         if (menuClicked) {
             console.log('Menu clicked, waiting for expansion...');
-            await new Promise(r => setTimeout(r, 2000));
+            await new Promise(r => setTimeout(r, 3000));
             await page.screenshot({ path: 'menu-expanded.png' });
         }
+
+        // Wait for "Escala Programada" to appear in any frame
+        console.log('P3.2 Waiting for "Escala Programada" text...');
+        try {
+            await page.waitForFunction(() => {
+                // Check top frame
+                if (document.body.innerText.includes('Escala Programada')) return true;
+                // Check iframes
+                for (const frame of window.frames) {
+                    try {
+                        if (frame.document.body.innerText.includes('Escala Programada')) return true;
+                    } catch (e) { }
+                }
+                return false;
+            }, { timeout: 10000 });
+        } catch (e) {
+            console.log('Timeout waiting for "Escala Programada" text. Proceeding to search anyway...');
+        }
+
 
         // Check all pages (tabs/popups)
         const pages = await browser.pages();
