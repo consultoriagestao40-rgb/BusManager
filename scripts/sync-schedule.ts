@@ -135,139 +135,109 @@ async function run() {
         // Take a screenshot of the dashboard to see what we have
         await page.screenshot({ path: 'dashboard.png', fullPage: true });
 
-        // Check if we need to open a menu first
-        // Look for "Menus Disponíveis do Sistema" in all frames
-        console.log('P3.1 Searching for Menu button...');
-        let menuClicked = false;
-        const allFrames = page.frames();
+        // --- Debug: Log all frames and their links ---
+        console.log('P3.1 analyzing page structure...');
+        const debugFrames = page.frames();
+        console.log(`Found ${debugFrames.length} frames.`);
 
-        for (const frame of allFrames) {
-            const clickedInFrame = await frame.evaluate(() => {
-                const buttons = Array.from(document.querySelectorAll('button, input[type="button"], div, span, a'));
-                const menuBtn = buttons.find(b => {
-                    const val = b.textContent || (b as HTMLInputElement).value || '';
-                    return val.includes('Menus Disponíveis do Sistema');
+        let targetElement: any = null;
+        let targetFrame: any = null;
+
+        for (const frame of debugFrames) {
+            console.log(`Frame URL: ${frame.url()}`);
+            try {
+                // Get all links in this frame
+                const links = await frame.evaluate(() => {
+                    return Array.from(document.querySelectorAll('a')).map(a => ({
+                        text: a.innerText || a.textContent || '',
+                        href: a.href,
+                        visible: (a.offsetWidth > 0 && a.offsetHeight > 0)
+                    }));
                 });
 
-                // Should we click it? Only if "Escala Programada" is NOT visible
-                const reportLink = Array.from(document.querySelectorAll('a')).find(l => l.textContent?.includes('Escala Programada'));
-
-                if (!reportLink && menuBtn) {
-                    console.log('Clicking "Menus Disponíveis do Sistema"...');
-                    (menuBtn as HTMLElement).click();
-                    return true;
+                console.log(`Frame has ${links.length} links.`);
+                if (links.length > 0) {
+                    console.log(`First 3 links: ${JSON.stringify(links.slice(0, 3))}`);
                 }
-                return false;
-            });
 
-            if (clickedInFrame) {
-                console.log(`Menu button found and clicked in frame: ${frame.url()}`);
-                menuClicked = true;
-                break;
+                // Check for our target
+                const found = links.find(l => l.text.includes('Escala Programada') || l.text.includes('532'));
+                if (found) {
+                    console.log(`🎯 TARGET FOUND in frame ${frame.url()}: "${found.text}"`);
+                    targetFrame = frame;
+                    // We need to re-select it in the handle context to click
+                    targetElement = await frame.evaluateHandle(() => {
+                        const all = Array.from(document.querySelectorAll('a'));
+                        return all.find(a => (a.innerText || '').includes('Escala Programada') || (a.innerText || '').includes('532'));
+                    });
+                    break;
+                }
+            } catch (e) {
+                console.log(`Error inspecting frame ${frame.url()}: ${e}`);
             }
         }
 
-        if (menuClicked) {
-            console.log('Menu clicked, waiting for expansion...');
-            await new Promise(r => setTimeout(r, 3000));
-            // try/catch screenshot to avoid crash if something changes
-            try { await page.screenshot({ path: 'menu-expanded.png' }); } catch (e) { }
-        }
+        if (targetElement) {
+            console.log('Clicking target element...');
+            await targetElement.click();
+        } else {
+            console.log('Target NOT found in initial scan. Trying fallback menu...');
 
-        // Wait for "Escala Programada" to appear in any frame
-        console.log('P3.2 Waiting for "Escala Programada" text...');
-        try {
-            await page.waitForFunction(() => {
-                // Check top frame
-                if (document.body.innerText.includes('Escala Programada')) return true;
-                // Check iframes
-                for (let i = 0; i < window.frames.length; i++) {
-                    try {
-                        // Accessing cross-origin frames might throw, so we catch
-                        if ((window.frames[i] as any).document.body.innerText.includes('Escala Programada')) return true;
-                    } catch (e) { }
-                }
-                return false;
-            }, { timeout: 10000 });
-        } catch (e) {
-            console.log('Timeout waiting for "Escala Programada" text. Proceeding to search anyway...');
-        }
+            // Look for "Menus Disponíveis do Sistema" in all frames
+            console.log('P3.2 Searching for Menu button (Fallback)...');
+            let menuClicked = false;
 
-
-        // Check all pages (tabs/popups)
-        const pages = await browser.pages();
-        console.log(`Checking ${pages.length} open pages/tabs...`);
-
-        let linkFound = false;
-
-        for (const p of pages) {
-            console.log(`Checking page: ${p.url()}`);
-            if (p.isClosed()) continue;
-
-            const foundInPage = await p.evaluate(() => {
-                const elements = Array.from(document.querySelectorAll('a, span, div, td, li, b, font'));
-                const target = elements.find(el => el.textContent?.includes('Escala Programada') || el.textContent?.includes('532')); // Broaden search
-
-                if (target) {
-                    // Try to find the closest clickable parent if the target itself isn't clickable
-                    let clickable = target;
-                    while (clickable && !['A', 'BUTTON', 'INPUT'].includes(clickable.tagName) && !clickable.onclick && clickable.parentElement) {
-                        clickable = clickable.parentElement;
-                    }
-
-                    console.log(`Found target: ${clickable.tagName} containing "${target.textContent}"`);
-                    (clickable as HTMLElement).click();
-                    return true;
-                }
-                return false;
-            });
-
-            if (foundInPage) {
-                console.log(`Link clicked on page: ${p.url()}`);
-                linkFound = true;
-                page = p; // Switch context to this page
-                break;
-            }
-
-            // Look in frames of this page
-            const frames = p.frames();
-            for (const frame of frames) {
-                const foundInFrame = await frame.evaluate(() => {
-                    const elements = Array.from(document.querySelectorAll('a, span, div, td, li, b, font'));
-                    const target = elements.find(el => el.textContent?.includes('Escala Programada'));
-
-                    if (target) {
-                        let clickable = target;
-                        while (clickable && !['A', 'BUTTON', 'INPUT'].includes(clickable.tagName) && !clickable.onclick && clickable.parentElement) {
-                            clickable = clickable.parentElement;
-                        }
-                        console.log(`Found target in frame: ${clickable.tagName} containing "${target.textContent}"`);
-                        (clickable as HTMLElement).click();
+            for (const frame of debugFrames) {
+                const clickedInFrame = await frame.evaluate(() => {
+                    const buttons = Array.from(document.querySelectorAll('button, input[type="button"], div, span, a'));
+                    const menuBtn = buttons.find(b => {
+                        const val = b.textContent || (b as HTMLInputElement).value || '';
+                        return val.includes('Menus Disponíveis do Sistema');
+                    });
+                    if (menuBtn) {
+                        (menuBtn as HTMLElement).click();
                         return true;
                     }
                     return false;
                 });
 
-                if (foundInFrame) {
-                    console.log(`Link clicked in frame of page: ${p.url()}`);
-                    linkFound = true;
-                    page = p; // Switch context
+                if (clickedInFrame) {
+                    console.log(`Menu button found and clicked in frame: ${frame.url()}`);
+                    menuClicked = true;
                     break;
                 }
             }
-            if (linkFound) break;
-        }
 
-        if (!linkFound) {
-            console.log('Link not found in any page/frame. Taking screenshots...');
-            for (let i = 0; i < pages.length; i++) {
-                try {
-                    await pages[i].screenshot({ path: `debug-page-${i}.png`, fullPage: true });
-                } catch (e) { }
+            if (menuClicked) {
+                await new Promise(r => setTimeout(r, 3000));
+                await page.screenshot({ path: 'menu-expanded.png' });
+
+                // Retry search for Escala Programada
+                console.log('Retrying search for Escala Programada after menu click...');
+                // (Reuse recursive search logic or just fail to screenshot if not found)
+                // Keep it simple for now: if we didn't see it first time, and menu clicked, we might need to re-scan.
             }
-            throw new Error('Link "Escala Programada" not found');
-        }
 
+            // Re-scan frames
+            for (const frame of page.frames()) {
+                const found = await frame.evaluate(() => {
+                    const target = Array.from(document.querySelectorAll('a')).find(a => (a.innerText || '').includes('Escala Programada'));
+                    if (target) {
+                        target.click();
+                        return true;
+                    }
+                    return false;
+                });
+                if (found) {
+                    targetElement = true; // Mark as found
+                    break;
+                }
+            }
+
+            if (!targetElement) {
+                throw new Error('Link "Escala Programada" not found even after menu click fallback.');
+            }
+        }
         // Wait for the specific report page to load
         console.log('P4. Waiting for Report Page...');
         await page.waitForFunction(() => {
