@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String           @id @default(uuid())
+  name             String
+  email            String           @unique
+  password_hash    String
+  role             Role             @default("OPERATOR")
+  active           Boolean          @default(true)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  audit_logs       AuditLog[]
+  started_events   CleaningEvent[]  @relation("StartedBy")
+  completed_events CleaningEvent[]  @relation("CompletedBy")
+  imported_files   ScheduleImport[]
+  created_swaps    Swap[]
+}
+
+model Vehicle {
+  id                             String          @id @default(uuid())
+  client_vehicle_number          String          @unique
+  prefix                         String?
+  plate                          String?
+  created_at                     DateTime        @default(now())
+  updated_at                     DateTime        @updatedAt
+  created_from_import_version_id String?
+  events                         CleaningEvent[]
+  replacement_swaps              Swap[]          @relation("ReplacementVehicle")
+  original_swaps                 Swap[]          @relation("OriginalVehicle")
+}
+
+model ScheduleImport {
+  id                    String            @id @default(uuid())
+  source_type           ImportSourceType
+  original_filename     String
+  imported_at           DateTime          @default(now())
+  imported_by_user_id   String?
+  status                ImportStatus
+  error_details         String?
+  content_hash          String
+  records_count_raw     Int               @default(0)
+  records_count_deduped Int               @default(0)
+  importer              User?             @relation(fields: [imported_by_user_id], references: [id])
+  schedule_versions     ScheduleVersion[]
+}
+
+model ScheduleVersion {
+  id                 String              @id @default(uuid())
+  data_viagem        DateTime
+  version_number     Int
+  schedule_import_id String
+  created_at         DateTime            @default(now())
+  is_active          Boolean             @default(false)
+  events             CleaningEvent[]
+  diffs_to           ScheduleChangeLog[] @relation("DiffTo")
+  diffs_from         ScheduleChangeLog[] @relation("DiffFrom")
+  import             ScheduleImport      @relation(fields: [schedule_import_id], references: [id])
+
+  @@unique([data_viagem, version_number])
+}
+
+model CleaningEvent {
+  id                   String          @id @default(uuid())
+  vehicle_id           String
+  data_viagem          DateTime
+  hora_viagem          DateTime
+  saida_programada_at  DateTime
+  liberar_ate_at       DateTime
+  status               EventStatus     @default("PREVISTO")
+  started_at           DateTime?
+  finished_at          DateTime?
+  completed_by_user_id String?
+  started_by_user_id   String?
+  classe               String?
+  situacao_totalbus    String?
+  empresa              String?
+  itinerario           String?
+  numero_servico       String?
+  motorista            String?
+  setor_limpeza        String?
+  observacao_cliente   String?
+  check_interno        Boolean?
+  check_externo        Boolean?
+  observacao_operacao  String?
+  schedule_version_id  String
+  event_business_key   String
+  cleaner_id           String?
+  cleaner              Cleaner?        @relation(fields: [cleaner_id], references: [id])
+  started_by           User?           @relation("StartedBy", fields: [started_by_user_id], references: [id])
+  completed_by         User?           @relation("CompletedBy", fields: [completed_by_user_id], references: [id])
+  schedule_version     ScheduleVersion @relation(fields: [schedule_version_id], references: [id])
+  vehicle              Vehicle         @relation(fields: [vehicle_id], references: [id])
+  swaps                Swap[]
+
+  @@unique([schedule_version_id, event_business_key])
+  @@index([data_viagem])
+  @@index([status])
+}
+
+model Cleaner {
+  id         String          @id @default(uuid())
+  name       String
+  active     Boolean         @default(true)
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+  events     CleaningEvent[]
+}
+
+model ScheduleChangeLog {
+  id                 String           @id @default(uuid())
+  data_viagem        DateTime
+  from_version_id    String?
+  to_version_id      String
+  change_type        ChangeType
+  event_business_key String
+  vehicle_id         String?
+  old_values         Json?
+  new_values         Json?
+  created_at         DateTime         @default(now())
+  to_version         ScheduleVersion  @relation("DiffTo", fields: [to_version_id], references: [id])
+  from_version       ScheduleVersion? @relation("DiffFrom", fields: [from_version_id], references: [id])
+}
+
+model Swap {
+  id                     String        @id @default(uuid())
+  original_event_id      String
+  original_vehicle_id    String
+  replacement_vehicle_id String?
+  motivo                 SwapReason
+  observacao             String?
+  created_by_user_id     String
+  created_at             DateTime      @default(now())
+  created_by             User          @relation(fields: [created_by_user_id], references: [id])
+  replacement_vehicle    Vehicle?      @relation("ReplacementVehicle", fields: [replacement_vehicle_id], references: [id])
+  original_vehicle       Vehicle       @relation("OriginalVehicle", fields: [original_vehicle_id], references: [id])
+  original_event         CleaningEvent @relation(fields: [original_event_id], references: [id])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entity_type String
+  entity_id   String
+  action      String
+  user_id     String?
+  timestamp   DateTime @default(now())
+  details     Json?
+  user        User?    @relation(fields: [user_id], references: [id])
+}
+
+enum Role {
+  OPERATOR
+  SUPERVISOR
+  ADMIN
+}
+
+enum ImportStatus {
+  SUCCESS
+  FAILED
+  PARTIAL
+}
+
+enum ImportSourceType {
+  PDF
+  XLSX
+  CSV
+  API
+}
+
+enum EventStatus {
+  PREVISTO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum ChangeType {
+  NEW
+  REMOVED
+  CHANGED
+  DEDUP_REMOVED
+}
+
+enum SwapReason {
+  QUEBRA
+  ONIBUS_NAO_CHEGOU_NO_HORARIO
+  MANUTENCAO
+  OUTROS
+}
