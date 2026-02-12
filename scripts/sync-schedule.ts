@@ -379,39 +379,57 @@ async function run() {
             if (bodyText.includes('Pesquisar') || bodyText.includes('Imprimir')) {
                 reportFrame = page;
             } else {
-                console.log('Report verify failed. Attempting DIRECT NAVIGATION fallback...');
-                // Direct URL to the report based on confirmed onclick logs
-                const reportUrl = 'https://rip.nspenha.com.br/retaguarda/php/html/frota/cadEscalaProgramada.php?nivel=1';
+                console.log('Report verify failed. Attempting JS EXECUTION fallback...');
 
                 try {
-                    console.log(`Navigating directly to: ${reportUrl}`);
-                    await page.goto(reportUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                    // Execute the onclick function directly in the context of the frame where the link was found
+                    if (targetFrame) {
+                        console.log('Executing montaJanelaNova via JS in target frame...');
+                        await targetFrame.evaluate(() => {
+                            // @ts-ignore
+                            if (typeof montaJanelaNova === 'function') {
+                                // @ts-ignore
+                                montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600);
+                            } else {
+                                throw new Error('montaJanelaNova function not found in target frame');
+                            }
+                        });
 
-                    // After navigation, the main page SHOULD be the report frame content
-                    reportFrame = page;
+                        // Wait for content to load
+                        await new Promise(r => setTimeout(r, 5000));
 
-                    // Short wait for render
-                    await new Promise(r => setTimeout(r, 2000));
-
-                    // Verify again
-                    const fallbackBody = await page.evaluate(() => document.body.innerText);
-                    if (!fallbackBody.includes('Pesquisar') && !fallbackBody.includes('Imprimir')) {
-                        console.error('Direct navigation finished but content verification failed.');
-                        // Dump HTML for debugging
-                        const html = await page.content();
-                        console.log('Fallback Page HTML Preview:', html.substring(0, 500));
-                        throw new Error('Report page content not found even after direct navigation.');
-                    } else {
-                        console.log('Direct navigation successful! Content verified.');
+                        // Re-scan frames
+                        for (const frame of page.frames()) {
+                            try {
+                                const content = await frame.content();
+                                if (content.includes('Pesquisar')) {
+                                    reportFrame = frame;
+                                    console.log(`Report found in frame after JS execution: ${frame.url()}`);
+                                    break;
+                                }
+                            } catch (e) { }
+                        }
                     }
-                } catch (navErr) {
-                    console.error(`Direct navigation failed: ${navErr}`);
+                } catch (jsExecErr) {
+                    console.error(`JS Execution failed: ${jsExecErr}`);
+                }
 
+                if (!reportFrame) {
                     // Debug details
                     const frames = page.frames();
                     console.log(`Debug: Report not found. Total frames: ${frames.length}`);
                     frames.forEach(f => console.log(`- Frame: ${f.url()}`));
-                    throw new Error('Report page (Pesquisar/Imprimir) not found in any frame or via direct navigation.');
+
+                    // Final dump
+                    try {
+                        const html = await page.content();
+                        fs.writeFileSync('error-page-final.html', html);
+                        await page.screenshot({ path: 'error-state-final.png', fullPage: true });
+                    } catch (e) { }
+
+                    throw new Error('Report page (Pesquisar/Imprimir) not found in any frame even after JS execution fallback.');
+                } else {
+                    console.log('JS Execution successful! Content verified.');
                 }
             }
         }
