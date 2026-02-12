@@ -136,29 +136,42 @@ async function run() {
         await page.screenshot({ path: 'dashboard.png', fullPage: true });
 
         // Check if we need to open a menu first
-        // Look for "Menus Disponíveis do Sistema"
-        const menuClicked = await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('button, input[type="button"], div, span, a'));
-            const menuBtn = buttons.find(b => {
-                const val = b.textContent || (b as HTMLInputElement).value || '';
-                return val.includes('Menus Disponíveis do Sistema');
+        // Look for "Menus Disponíveis do Sistema" in all frames
+        console.log('P3.1 Searching for Menu button...');
+        let menuClicked = false;
+        const allFrames = page.frames();
+
+        for (const frame of allFrames) {
+            const clickedInFrame = await frame.evaluate(() => {
+                const buttons = Array.from(document.querySelectorAll('button, input[type="button"], div, span, a'));
+                const menuBtn = buttons.find(b => {
+                    const val = b.textContent || (b as HTMLInputElement).value || '';
+                    return val.includes('Menus Disponíveis do Sistema');
+                });
+
+                // Should we click it? Only if "Escala Programada" is NOT visible
+                const reportLink = Array.from(document.querySelectorAll('a')).find(l => l.textContent?.includes('Escala Programada'));
+
+                if (!reportLink && menuBtn) {
+                    console.log('Clicking "Menus Disponíveis do Sistema"...');
+                    (menuBtn as HTMLElement).click();
+                    return true;
+                }
+                return false;
             });
 
-            // Should we click it? Only if "Escala Programada" is NOT visible
-            const reportLink = Array.from(document.querySelectorAll('a')).find(l => l.textContent?.includes('Escala Programada'));
-
-            if (!reportLink && menuBtn) {
-                console.log('Clicking "Menus Disponíveis do Sistema"...');
-                (menuBtn as HTMLElement).click();
-                return true;
+            if (clickedInFrame) {
+                console.log(`Menu button found and clicked in frame: ${frame.url()}`);
+                menuClicked = true;
+                break;
             }
-            return false;
-        });
+        }
 
         if (menuClicked) {
             console.log('Menu clicked, waiting for expansion...');
             await new Promise(r => setTimeout(r, 3000));
-            await page.screenshot({ path: 'menu-expanded.png' });
+            // try/catch screenshot to avoid crash if something changes
+            try { await page.screenshot({ path: 'menu-expanded.png' }); } catch (e) { }
         }
 
         // Wait for "Escala Programada" to appear in any frame
@@ -168,9 +181,10 @@ async function run() {
                 // Check top frame
                 if (document.body.innerText.includes('Escala Programada')) return true;
                 // Check iframes
-                for (const frame of window.frames) {
+                for (let i = 0; i < window.frames.length; i++) {
                     try {
-                        if (frame.document.body.innerText.includes('Escala Programada')) return true;
+                        // Accessing cross-origin frames might throw, so we catch
+                        if ((window.frames[i] as any).document.body.innerText.includes('Escala Programada')) return true;
                     } catch (e) { }
                 }
                 return false;
