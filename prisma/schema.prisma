@@ -89,6 +89,7 @@ model CleaningEvent {
   observacao_cliente   String?
   check_interno        Boolean?
   check_externo        Boolean?
+  check_pneus          Boolean?
   observacao_operacao  String?
   schedule_version_id  String
   event_business_key   String

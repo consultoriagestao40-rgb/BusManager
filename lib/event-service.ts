@@ -18,14 +18,17 @@ export async function completeEvent(
     data: {
         check_interno: boolean;
         check_externo: boolean;
+        check_pneus: boolean;
         observacao_operacao?: string;
     }
 ) {
-    // Business Rule: If checks are not both true, observation is mandatory
-    if (!data.check_interno || !data.check_externo) {
+    // Business Rule: If checks are not ALL true, observation is mandatory
+    const allChecksPassed = data.check_interno && data.check_externo && data.check_pneus;
+
+    if (!allChecksPassed) {
         // This check should ideally happen at API/Validation layer too, but double check here.
         if (!data.observacao_operacao?.trim()) {
-            throw new Error('Observação é obrigatória quando o checklist não está completo.');
+            throw new Error('Observação é obrigatória quando o checklist não está completo (todos os 3 itens).');
         }
     }
 
@@ -37,6 +40,7 @@ export async function completeEvent(
             completed_by_user_id: userId,
             check_interno: data.check_interno,
             check_externo: data.check_externo,
+            check_pneus: data.check_pneus,
             observacao_operacao: data.observacao_operacao
         }
     });

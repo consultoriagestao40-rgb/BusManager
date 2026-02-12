@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { completeEvent } from '@/lib/event-service';
 
 export async function POST(
     request: Request,
@@ -29,13 +30,14 @@ export async function POST(
             return NextResponse.json({ error: 'Event already completed' }, { status: 400 });
         }
 
-        const updatedEvent = await prisma.cleaningEvent.update({
-            where: { id },
-            data: {
-                status: 'CONCLUIDO',
-                finished_at: new Date(),
-                completed_by_user_id: user.id
-            }
+        const body = await request.json();
+        const { check_interno, check_externo, check_pneus, observacao_operacao } = body;
+
+        const updatedEvent = await completeEvent(id, user.id, {
+            check_interno,
+            check_externo,
+            check_pneus,
+            observacao_operacao
         });
 
         return NextResponse.json({ event: updatedEvent });

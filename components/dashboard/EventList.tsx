@@ -23,6 +23,13 @@ export default function EventList({ events }: { events: Event[] }) {
     const [swapObs, setSwapObs] = useState('');
     const [processing, setProcessing] = useState(false);
 
+    // Finish Modal State
+    const [finishModalOpen, setFinishModalOpen] = useState(false);
+    const [checkInterno, setCheckInterno] = useState(false);
+    const [checkExterno, setCheckExterno] = useState(false);
+    const [checkPneus, setCheckPneus] = useState(false);
+    const [finishObs, setFinishObs] = useState('');
+
     const [startModalOpen, setStartModalOpen] = useState(false);
     const [cleaners, setCleaners] = useState<any[]>([]);
     const [selectedCleaner, setSelectedCleaner] = useState('');
@@ -55,6 +62,19 @@ export default function EventList({ events }: { events: Event[] }) {
             return;
         }
 
+        if (action === 'finish') {
+            const event = events.find(e => e.id === eventId);
+            if (event) {
+                setSelectedEvent(event);
+                setCheckInterno(false);
+                setCheckExterno(false);
+                setCheckPneus(false);
+                setFinishObs('');
+                setFinishModalOpen(true);
+            }
+            return;
+        }
+
         if (processing) return;
         setProcessing(true);
         try {
@@ -63,6 +83,44 @@ export default function EventList({ events }: { events: Event[] }) {
                 window.location.reload();
             } else {
                 alert('Erro ao processar ação');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleFinishSubmit = async () => {
+        if (!selectedEvent) return;
+
+        // Validation: If NOT all checks are true, obs is required
+        const allChecks = checkInterno && checkExterno && checkPneus;
+        if (!allChecks && !finishObs.trim()) {
+            alert('Se algum item não foi verificado, é OBRIGATÓRIO informar o motivo na observação.');
+            return;
+        }
+
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/events/${selectedEvent.id}/finish`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    check_interno: checkInterno,
+                    check_externo: checkExterno,
+                    check_pneus: checkPneus,
+                    observacao_operacao: finishObs
+                })
+            });
+
+            if (res.ok) {
+                setFinishModalOpen(false);
+                window.location.reload();
+            } else {
+                const err = await res.json();
+                alert('Erro ao finalizar: ' + (err.error || 'Desconhecido'));
             }
         } catch (e) {
             console.error(e);
@@ -352,6 +410,66 @@ export default function EventList({ events }: { events: Event[] }) {
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                             >
                                 {processing ? 'Salvando...' : 'Confirmar Troca'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {finishModalOpen && selectedEvent && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                        <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+                        <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                        <div className="space-y-4 mb-6">
+                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckExterno(!checkExterno)}>
+                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkExterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                    {checkExterno && <CheckCircle className="w-4 h-4" />}
+                                </div>
+                                <span className="text-gray-700 font-medium select-none">Limpeza Externa</span>
+                            </div>
+
+                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckInterno(!checkInterno)}>
+                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkInterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                    {checkInterno && <CheckCircle className="w-4 h-4" />}
+                                </div>
+                                <span className="text-gray-700 font-medium select-none">Limpeza Interna</span>
+                            </div>
+
+                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckPneus(!checkPneus)}>
+                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkPneus ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                    {checkPneus && <CheckCircle className="w-4 h-4" />}
+                                </div>
+                                <span className="text-gray-700 font-medium select-none">Pretinho nos Pneus</span>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Observação {(checkInterno && checkExterno && checkPneus) ? '(Opcional)' : <span className="text-red-600 font-bold">(Obrigatório)</span>}
+                                </label>
+                                <textarea
+                                    className={`w-full rounded-md shadow-sm p-2 border ${(!checkInterno || !checkExterno || !checkPneus) && !finishObs.trim() ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'}`}
+                                    rows={3}
+                                    placeholder={(!checkInterno || !checkExterno || !checkPneus) ? "Justifique o item não realizado..." : "Alguma observação adicional?"}
+                                    value={finishObs}
+                                    onChange={(e) => setFinishObs(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setFinishModalOpen(false)}
+                                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleFinishSubmit}
+                                disabled={processing}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                            >
+                                {processing ? 'Salvando...' : 'Concluir Serviço'}
                             </button>
                         </div>
                     </div>
