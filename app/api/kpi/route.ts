@@ -45,7 +45,7 @@ export async function GET(request: Request) {
         // 2. Aggregate Daily Stats
         const dailyMap = new Map();
 
-        events.forEach(event => {
+        events.forEach((event: any) => {
             const dateKey = format(new Date(event.data_viagem), 'yyyy-MM-dd');
 
             if (!dailyMap.has(dateKey)) {
