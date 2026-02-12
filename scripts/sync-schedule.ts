@@ -17,37 +17,41 @@ const APP_PASSWORD = process.env.APP_PASSWORD || 'admin123';
 
 async function run() {
     console.log('🚀 Starting Schedule Sync Bot...');
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    const page = await browser.newPage();
+    let browser;
+    let page;
 
     try {
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        page = await browser.newPage();
+
+        // Disable navigation timeout or increase it
+        page.setDefaultNavigationTimeout(60000);
+
         // --- 1. Login to Client Portal ---
         console.log(`P1. Navigation to ${CLIENT_URL}...`);
-        await page.goto(CLIENT_URL, { waitUntil: 'networkidle0' });
-
-        // Selectors based on Screenshot analysis (Assumptions, might need adjustment if IDs differ)
-        // Usually these inputs have specific names/ids. I'll try common guesses or TAB navigation if needed.
-        // Assuming inputs are straightforward names based on label.
-
-        // Wait for login form
-        // Using explicit focus/type if selectors are tricky, but let's try broader selectors
-        console.log('P2. Logging in...');
+        await page.goto(CLIENT_URL, { waitUntil: 'domcontentloaded' }); // Faster than networkidle0
 
         // Type Agency, User, Password
-        // Heuristic: Appears to be Agency, User, Password in order
-        const inputs = await page.$$('input[type="text"], input[type="password"]');
-        if (inputs.length >= 3) {
-            await inputs[0].type(CLIENT_AGENCY);
-            await inputs[1].type(CLIENT_USER);
-            await inputs[2].type(CLIENT_PASS);
-        } else {
-            console.error('Could not find enough input fields!');
+        console.log('P2. Filling Credentials...');
+        try {
+            const inputs = await page.$$('input[type="text"], input[type="password"]');
+            if (inputs.length >= 3) {
+                await inputs[0].type(CLIENT_AGENCY);
+                await inputs[1].type(CLIENT_USER);
+                await inputs[2].type(CLIENT_PASS);
+            } else {
+                throw new Error(`Found only ${inputs.length} inputs, expected 3`);
+            }
+        } catch (e) {
+            console.error('Error finding inputs:', e);
+            throw e;
         }
 
-        // Click Login Button - Find by value or text
+        // Click Login Button
+        console.log('P3. Clicking Login...');
         await page.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"]'));
             const loginBtn = buttons.find(b => {
@@ -55,26 +59,37 @@ async function run() {
                 return val.includes('Acessar o Sistema');
             });
             if (loginBtn) (loginBtn as HTMLElement).click();
+            else throw new Error('Login button not found');
         });
 
-        await page.waitForNavigation({ waitUntil: 'networkidle0' });
+        await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
         console.log('Login successful (assumed).');
 
         // --- 2. Navigate to "Escala Programada" ---
         console.log('P3. Navigating to Report...');
 
-        // Find link by text "Escala Programada"
-        await page.evaluate(() => {
+        const linkFound = await page.evaluate(() => {
             const links = Array.from(document.querySelectorAll('a'));
             const target = links.find(l => l.textContent?.includes('Escala Programada'));
-            if (target) target.click();
+            if (target) {
+                target.click();
+                return true;
+            }
+            return false;
         });
 
-        // Wait for the specific report page to load (look for "Pesquisar" button)
+        if (!linkFound) {
+            // Check frame?
+            console.log('Link not found in top frame. Taking screenshot.');
+            throw new Error('Link "Escala Programada" not found');
+        }
+
+        // Wait for the specific report page to load
+        console.log('P4. Waiting for Report Page...');
         await page.waitForFunction(() => {
             const bodyText = document.body.innerText;
             return bodyText.includes('Pesquisar') || bodyText.includes('Imprimir');
-        }, { timeout: 15000 });
+        }, { timeout: 30000 });
 
         // --- 3. Execute Search ---
         console.log('P4. Executing Search...');
@@ -89,18 +104,12 @@ async function run() {
         });
 
         // Wait for results
-        try {
-            await page.waitForNetworkIdle({ timeout: 5000 });
-        } catch (e) {
-            console.log('Network idle timeout, assuming results loaded.');
-        }
-        await new Promise(r => setTimeout(r, 2000)); // Grace period
+        await new Promise(r => setTimeout(r, 5000));
 
         // --- 4. Print/Export ---
         console.log('P5. Exporting PDF...');
 
-        // Click "Imprimir"
-        // This likely opens a popup. We need to catch it.
+        // Handle Print Popup
         const newTargetPromise = browser.waitForTarget(target => target.opener() === page.target());
 
         const printClicked = await page.evaluate(() => {
@@ -116,36 +125,27 @@ async function run() {
             return false;
         });
 
-        if (!printClicked) {
-            console.error('Print button not found.');
-            // Capture screenshot for debugging
-            await page.screenshot({ path: 'debug-error.png' });
-            throw new Error('Print button not found');
-        }
+        if (!printClicked) throw new Error('Print button not found');
 
         const newTarget = await newTargetPromise;
         const printPage = await newTarget.page();
 
-        if (!printPage) {
-            throw new Error('Print popup captured but page object is null.');
-        }
+        if (!printPage) throw new Error('Print popup captured but page object is null.');
 
         await printPage.bringToFront();
-        await printPage.waitForNetworkIdle();
+        // Wait for PDF content to render
+        await new Promise(r => setTimeout(r, 3000));
 
-        const pdfPath = path.join(__dirname, 'schedule.pdf');
+        const pdfPath = path.join(process.cwd(), 'schedule.pdf');
 
-        // Generate PDF from the print page
         await printPage.pdf({
             path: pdfPath,
             format: 'A4',
             printBackground: true,
-            landscape: true // Reports are often landscape
+            landscape: true
         });
 
         console.log(`PDF Generated at ${pdfPath}`);
-
-        await browser.close();
 
         // --- 5. Upload to BusManager ---
         console.log('P6. Uploading to BusManager...');
@@ -157,11 +157,6 @@ async function run() {
         });
 
         // Extract token from cookie or response
-        // Our API sets a cookie 'auth_token'. Axios might not auto-store it for next request unless configured with jar.
-        // But the login route also returns user data. 
-        // NOTE: The `auth/login` route in this project sets a HTTP-Only cookie. 
-        // We cannot read it from `authRes.headers['set-cookie']` easily in client-side code, BUT in Node we CAN.
-
         const cookies = authRes.headers['set-cookie'];
         if (!cookies) throw new Error('Failed to retrieve auth cookie from BusManager login.');
 
@@ -180,13 +175,25 @@ async function run() {
 
         console.log('Upload Success:', uploadRes.data);
 
+        await browser.close();
+
     } catch (error) {
         console.error('Fatal Error:', error);
-        if (typeof page !== 'undefined') {
-            await page.screenshot({ path: 'error-state.png', fullPage: true });
-            console.log('Screenshot saved to error-state.png');
+        if (page) {
+            try {
+                await page.screenshot({ path: 'error-state.png', fullPage: true });
+                console.log('Screenshot saved to error-state.png');
+            } catch (screenErr) {
+                console.error('Failed to take screenshot', screenErr);
+            }
+
+            // Dump HTML for debugging
+            try {
+                const html = await page.content();
+                fs.writeFileSync('error-page.html', html);
+            } catch (htmlErr) { }
         }
-        await browser.close();
+        if (browser) await browser.close();
         process.exit(1);
     }
 }
