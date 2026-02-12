@@ -13,7 +13,7 @@ model User {
   name             String
   email            String           @unique
   password_hash    String
-  role             Role             @default("OPERATOR")
+  role             Role             @default(OPERATOR)
   active           Boolean          @default(true)
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
@@ -74,7 +74,7 @@ model CleaningEvent {
   hora_viagem          DateTime
   saida_programada_at  DateTime
   liberar_ate_at       DateTime
-  status               EventStatus     @default("PREVISTO")
+  status               EventStatus     @default(PREVISTO)
   started_at           DateTime?
   finished_at          DateTime?
   completed_by_user_id String?
