@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         const endDateParam = searchParams.get('endDate');
 
         const end = endDateParam ? endOfDay(parseISO(endDateParam)) : endOfDay(new Date());
-        const start = startDateParam ? startOfDay(parseISO(startDateParam)) : startOfDay(subDays(new Time(), 30));
+        const start = startDateParam ? startOfDay(parseISO(startDateParam)) : startOfDay(subDays(new Date(), 30));
 
         // 1. Fetch all relevant events for the period
         // It's often easier to fetch raw data and aggregate in code for complex logic like "delays" 
