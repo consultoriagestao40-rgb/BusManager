@@ -330,22 +330,80 @@ async function run() {
             }
         }
         // Wait for the specific report page to load
-        console.log('P4. Waiting for Report Page...');
-        await page.waitForFunction(() => {
-            const bodyText = document.body.innerText;
-            return bodyText.includes('Pesquisar') || bodyText.includes('Imprimir');
-        }, { timeout: 30000 });
+
+        // Wait for the specific report page to load (Check all frames)
+        console.log('P4. Waiting for Report Page (Scanning all frames)...');
+
+        // Helper to find frame with specific text
+        const findFrameWithText = async (text: string) => {
+            for (const frame of page.frames()) {
+                try {
+                    const content = await frame.content();
+                    if (content.includes(text)) return frame;
+                } catch (e) { }
+            }
+            return null;
+        };
+
+        let reportFrame: any = null;
+        try {
+            await page.waitForFunction(async () => {
+                const frames = document.querySelectorAll('iframe, frame');
+                // We can't easily check cross-origin frames from main context in waitForFunction
+                // So we use the node checking loop below instead of just this one.
+                return true;
+            }, { timeout: 1000 }); // Dummy wait to start loop
+
+            // Polling loop for frames
+            const startTime = Date.now();
+            while (Date.now() - startTime < 30000) {
+                reportFrame = await findFrameWithText('Pesquisar');
+                if (reportFrame) {
+                    console.log(`Report found in frame: ${reportFrame.url()}`);
+                    break;
+                }
+                if (!reportFrame) reportFrame = await findFrameWithText('Imprimir');
+                if (reportFrame) {
+                    console.log(`Report found in frame (Imprimir): ${reportFrame.url()}`);
+                    break;
+                }
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        } catch (e) {
+            console.log('Error waiting for report frames:', e);
+        }
+
+        if (!reportFrame) {
+            // Fallback: Check main page again
+            const bodyText = await page.evaluate(() => document.body.innerText);
+            if (bodyText.includes('Pesquisar') || bodyText.includes('Imprimir')) {
+                reportFrame = page;
+            } else {
+                // Debug
+                const frames = page.frames();
+                console.log(`Debug: Report not found. Total frames: ${frames.length}`);
+                frames.forEach(f => console.log(`- Frame: ${f.url()}`));
+                throw new Error('Report page (Pesquisar/Imprimir) not found in any frame.');
+            }
+        }
+
 
         // --- 3. Execute Search ---
         console.log('P4. Executing Search...');
 
-        await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"]'));
+        // Click "Pesquisar" in the correct frame
+        await reportFrame.evaluate(() => {
+            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
             const searchBtn = buttons.find(b => {
                 const val = (b as HTMLInputElement).value || b.textContent || '';
                 return val.includes('Pesquisar');
             });
-            if (searchBtn) (searchBtn as HTMLElement).click();
+            if (searchBtn) {
+                console.log('Clicking Pesquisar...');
+                (searchBtn as HTMLElement).click();
+            } else {
+                console.warn('Pesquisar button not found in report frame');
+            }
         });
 
         // Wait for results
