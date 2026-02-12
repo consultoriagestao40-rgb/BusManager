@@ -161,55 +161,78 @@ async function run() {
             await page.screenshot({ path: 'menu-expanded.png' });
         }
 
-        const linkFound = await page.evaluate(() => {
-            // Re-query links after potential menu click
-            // Broad search for any clickable element with the text
-            const elements = Array.from(document.querySelectorAll('a, span, div, td, li'));
-            const target = elements.find(el => el.textContent?.includes('Escala Programada') && (el.tagName === 'A' || el.style.cursor === 'pointer' || (el as HTMLElement).onclick));
+        // Check all pages (tabs/popups)
+        const pages = await browser.pages();
+        console.log(`Checking ${pages.length} open pages/tabs...`);
 
-            // Fallback: just look for the text if it's unique enough
-            const anyTarget = elements.find(el => el.textContent?.includes('Escala Programada') && el.children.length === 0);
+        let linkFound = false;
 
-            const finalTarget = target || anyTarget;
+        for (const p of pages) {
+            console.log(`Checking page: ${p.url()}`);
+            if (p.isClosed()) continue;
 
-            if (finalTarget) {
-                console.log(`Found target element: ${finalTarget.tagName}, Text: ${finalTarget.textContent}`);
-                (finalTarget as HTMLElement).click();
-                return true;
+            const foundInPage = await p.evaluate(() => {
+                const elements = Array.from(document.querySelectorAll('a, span, div, td, li, b, font'));
+                const target = elements.find(el => el.textContent?.includes('Escala Programada') || el.textContent?.includes('532')); // Broaden search
+
+                if (target) {
+                    // Try to find the closest clickable parent if the target itself isn't clickable
+                    let clickable = target;
+                    while (clickable && !['A', 'BUTTON', 'INPUT'].includes(clickable.tagName) && !clickable.onclick && clickable.parentElement) {
+                        clickable = clickable.parentElement;
+                    }
+
+                    console.log(`Found target: ${clickable.tagName} containing "${target.textContent}"`);
+                    (clickable as HTMLElement).click();
+                    return true;
+                }
+                return false;
+            });
+
+            if (foundInPage) {
+                console.log(`Link clicked on page: ${p.url()}`);
+                linkFound = true;
+                page = p; // Switch context to this page
+                break;
             }
-            return false;
-        });
 
-        if (!linkFound) {
-            // Check frame?
-            console.log('Link not found in top frame. Checking frames...');
-            // Recursive check in frames just in case
-            let foundInFrame = false;
-            const frames = page.frames();
+            // Look in frames of this page
+            const frames = p.frames();
             for (const frame of frames) {
-                const frameLinkFound = await frame.evaluate(() => {
-                    const elements = Array.from(document.querySelectorAll('a, span, div, td, li'));
-                    // Broad search inside frame
+                const foundInFrame = await frame.evaluate(() => {
+                    const elements = Array.from(document.querySelectorAll('a, span, div, td, li, b, font'));
                     const target = elements.find(el => el.textContent?.includes('Escala Programada'));
 
                     if (target) {
-                        console.log(`Found target in frame: ${target.tagName}, Text: ${target.textContent}`);
-                        (target as HTMLElement).click();
+                        let clickable = target;
+                        while (clickable && !['A', 'BUTTON', 'INPUT'].includes(clickable.tagName) && !clickable.onclick && clickable.parentElement) {
+                            clickable = clickable.parentElement;
+                        }
+                        console.log(`Found target in frame: ${clickable.tagName} containing "${target.textContent}"`);
+                        (clickable as HTMLElement).click();
                         return true;
                     }
                     return false;
                 });
-                if (frameLinkFound) {
-                    foundInFrame = true;
+
+                if (foundInFrame) {
+                    console.log(`Link clicked in frame of page: ${p.url()}`);
+                    linkFound = true;
+                    page = p; // Switch context
                     break;
                 }
             }
+            if (linkFound) break;
+        }
 
-            if (!foundInFrame) {
-                console.log('Link not found in any frame. taking screenshot.');
-                await page.screenshot({ path: 'error-missing-link.png', fullPage: true });
-                throw new Error('Link "Escala Programada" not found');
+        if (!linkFound) {
+            console.log('Link not found in any page/frame. Taking screenshots...');
+            for (let i = 0; i < pages.length; i++) {
+                try {
+                    await pages[i].screenshot({ path: `debug-page-${i}.png`, fullPage: true });
+                } catch (e) { }
             }
+            throw new Error('Link "Escala Programada" not found');
         }
 
         // Wait for the specific report page to load
