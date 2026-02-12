@@ -22,7 +22,7 @@ export async function completeEvent(
     }
 ) {
     // Business Rule: If checks are not both true, observation is mandatory
-    if ((!data.check_interno || !data.check_externo) && !data.check_observacao) {
+    if (!data.check_interno || !data.check_externo) {
         // This check should ideally happen at API/Validation layer too, but double check here.
         if (!data.observacao_operacao?.trim()) {
             throw new Error('Observação é obrigatória quando o checklist não está completo.');
