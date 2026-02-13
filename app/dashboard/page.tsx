@@ -176,7 +176,8 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* Hide date navigation and import button on mobile */}
+            <div className="hidden md:flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center bg-white rounded-lg shadow p-1">
                         <button
@@ -226,8 +227,8 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Basic Stats Stub (Dynamic data to be added later if needed) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
+            {/* Hide metric cards on mobile */}
+            <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
                 <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-gray-500 text-sm">Total</h3>
                     <p className="text-2xl font-bold">{events.length}</p>
