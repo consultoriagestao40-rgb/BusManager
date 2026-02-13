@@ -49,6 +49,7 @@ export default function DashboardPage() {
 
     const [showSwapsModal, setShowSwapsModal] = useState(false);
     const [showInProgressModal, setShowInProgressModal] = useState(false);
+    const [showCancelledModal, setShowCancelledModal] = useState(false);
 
     // Helper to extract all swaps
     const getAllSwaps = () => {
@@ -62,6 +63,7 @@ export default function DashboardPage() {
 
     const swapsList = getAllSwaps();
     const inProgressList = events.filter((e: any) => e.status === 'EM_ANDAMENTO');
+    const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
 
     return (
         <div className="space-y-6">
@@ -116,7 +118,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Basic Stats Stub (Dynamic data to be added later if needed) */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-gray-500 text-sm">Previstos</h3>
                     <p className="text-2xl font-bold">{events.length}</p>
@@ -134,6 +136,15 @@ export default function DashboardPage() {
                     <h3 className="text-gray-500 text-sm">Concluídos</h3>
                     <p className="text-2xl font-bold text-green-600">
                         {events.filter((e: any) => e.status === 'CONCLUIDO').length}
+                    </p>
+                </div>
+                <div
+                    className="bg-white p-4 rounded shadow cursor-pointer hover:bg-red-50 transition-colors border border-transparent hover:border-red-200"
+                    onClick={() => setShowCancelledModal(true)}
+                >
+                    <h3 className="text-gray-500 text-sm">Cancelados</h3>
+                    <p className="text-2xl font-bold text-red-600">
+                        {events.filter((e: any) => e.status === 'CANCELADO').length}
                     </p>
                 </div>
                 <div
@@ -286,6 +297,70 @@ export default function DashboardPage() {
                         <div className="mt-6 flex justify-end">
                             <button
                                 onClick={() => setShowInProgressModal(false)}
+                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showCancelledModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold text-gray-800">Veículos Cancelados</h3>
+                            <button
+                                onClick={() => setShowCancelledModal(false)}
+                                className="text-gray-500 hover:text-gray-700 font-bold text-xl"
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        {cancelledList.length === 0 ? (
+                            <p className="text-center text-gray-500 py-8">Nenhum veículo cancelado hoje.</p>
+                        ) : (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora Prevista</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saída</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {cancelledList.map((event: any) => (
+                                        <tr key={event.id}>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
+                                                {event.vehicle.client_vehicle_number}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                                {format(new Date(event.hora_viagem), 'HH:mm')}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                {format(new Date(event.saida_programada_at), 'HH:mm')}
+                                            </td>
+                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">
+                                                {event.empresa || '-'}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    Cancelado
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                onClick={() => setShowCancelledModal(false)}
                                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
                             >
                                 Fechar
