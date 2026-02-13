@@ -54,9 +54,11 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 // This means we need to ADD 3 hours.
 
                 let scheduleDate = addMinutes(addHours(baseDate, hours), minutes);
+                console.log(`[DEBUG] Vehicle ${evt.vehicleId}: Input Time ${evt.timeStr} -> Initial Date (UTC?): ${scheduleDate.toISOString()}`);
 
                 // FIX: Add 3 hours to compensate for UTC-3 input being treated as UTC
                 scheduleDate = addHours(scheduleDate, 3);
+                console.log(`[DEBUG] Vehicle ${evt.vehicleId}: Output Date (+3h): ${scheduleDate.toISOString()}`);
 
                 // Extract Metadata from Buffer
                 let driverName: string | undefined;
