@@ -300,7 +300,7 @@ export default function DashboardPage() {
                         <div className="flex gap-2 sm:gap-3">
                             <button
                                 onClick={exportMainToPDF}
-                                className="flex-1 sm:flex-initial px-3 md:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center justify-center gap-2 text-sm md:text-base"
+                                className="flex-1 sm:flex-initial px-4 md:px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 font-bold flex items-center justify-center gap-2 text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                             </button>
                             <button
                                 onClick={exportMainToExcel}
-                                className="flex-1 sm:flex-initial px-3 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 text-sm md:text-base"
+                                className="flex-1 sm:flex-initial px-4 md:px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-bold flex items-center justify-center gap-2 text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
