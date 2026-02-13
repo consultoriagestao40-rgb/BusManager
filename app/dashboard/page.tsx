@@ -163,11 +163,7 @@ export default function DashboardPage() {
                     <h2 className="font-semibold text-gray-700">Escala de Limpeza</h2>
                 </div>
 
-                {loading ? (
-                    <div className="p-12 flex justify-center">
-                        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
-                    </div>
-                ) : events.length === 0 ? (
+                {events.length === 0 ? (
                     <div className="p-8 text-center text-gray-500">
                         Nenhum evento importado para hoje.
                     </div>
