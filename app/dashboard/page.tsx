@@ -323,26 +323,26 @@ export default function DashboardPage() {
 
             <div className="bg-white rounded shadow overflow-hidden">
                 {/* Mobile: Title with inline search/filter */}
-                <div className="p-3 border-b md:p-4">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                        <h2 className="font-semibold text-gray-700 text-lg">Escala de Limpeza</h2>
-                        {/* Mobile-only search and filter */}
-                        <div className="flex md:hidden flex-col gap-2">
+                <div className="sticky top-0 z-20 bg-white p-2 border-b md:p-4">
+                    <div className="flex items-center gap-2 justify-between">
+                        <h2 className="font-semibold text-gray-700 text-base md:text-lg whitespace-nowrap">Escala de Limpeza</h2>
+                        {/* Mobile: horizontal search and filter */}
+                        <div className="flex md:hidden gap-2 flex-1">
                             <input
                                 type="text"
                                 placeholder="Pesquisar..."
                                 value={mainSearch}
                                 onChange={(e) => setMainSearch(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
                             />
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                                className="px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-xs"
                             >
-                                <option value="TODOS">Todos Status</option>
+                                <option value="TODOS">Todos</option>
                                 <option value="PREVISTO">Previsto</option>
-                                <option value="EM_ANDAMENTO">Em Andamento</option>
+                                <option value="EM_ANDAMENTO">Andamento</option>
                                 <option value="CONCLUIDO">Concluído</option>
                                 <option value="CANCELADO">Cancelado</option>
                                 <option value="ESTURADO">Esturado</option>
