@@ -105,24 +105,10 @@ export default function EventList({ events }: EventListProps) {
         return 'normal';
     };
 
-    const getRowBackgroundColor = (sla: string, status: string) => {
-        if (status === 'CANCELADO') return 'bg-gray-50 opacity-60';
-        if (status === 'CONCLUIDO') return 'bg-green-50';
-        if (status === 'EM_ANDAMENTO') return 'bg-blue-50';
-        if (sla === 'expired') return 'bg-red-50 border-l-4 border-red-500';
-        if (sla === 'critical') return 'bg-orange-50 border-l-4 border-orange-500';
-        if (sla === 'warning') return 'bg-yellow-50 border-l-4 border-yellow-400';
+    // Clean design - white backgrounds only, minimal visual noise
+    const getRowBackgroundColor = (status: string) => {
+        if (status === 'CANCELADO') return 'bg-gray-50';
         return 'bg-white hover:bg-gray-50';
-    };
-
-    const getStatusBadge = (status: string) => {
-        const styles = {
-            'CONCLUIDO': 'bg-green-100 text-green-800',
-            'EM_ANDAMENTO': 'bg-blue-100 text-blue-800',
-            'CANCELADO': 'bg-gray-100 text-gray-500 line-through',
-            'PREVISTO': 'bg-gray-100 text-gray-700'
-        };
-        return styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-700';
     };
 
     const handleAction = async (event: Event, action: 'start' | 'finish' | 'swap' | 'addColaborador') => {
@@ -289,59 +275,59 @@ export default function EventList({ events }: EventListProps) {
                             return (
                                 <tr
                                     key={event.id}
-                                    className={`${getRowBackgroundColor(sla, event.status)} transition-colors border-b`}
+                                    className={`${getRowBackgroundColor(event.status)} transition-colors border-b border-gray-100`}
                                 >
                                     {/* Número do Carro */}
-                                    <td className="py-4 px-3 md:px-4">
+                                    <td className="py-3 md:py-4 px-3 md:px-4">
                                         <div className="flex flex-col">
-                                            <span className={`text-base md:text-lg font-bold ${event.status === 'CANCELADO' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+                                            <span className={`text-base md:text-lg font-semibold ${event.status === 'CANCELADO' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
                                                 {event.vehicle.client_vehicle_number}
                                             </span>
                                             {event.vehicle.prefix && (
-                                                <span className="text-xs text-gray-500 mt-1">{event.vehicle.prefix}</span>
+                                                <span className="text-xs text-gray-500 mt-0.5">{event.vehicle.prefix}</span>
                                             )}
                                         </div>
                                     </td>
 
                                     {/* Hora de Saída */}
-                                    <td className="py-4 px-3 md:px-4">
-                                        <span className="text-sm md:text-base text-gray-700 font-medium">
+                                    <td className="py-3 md:py-4 px-3 md:px-4">
+                                        <span className="text-sm md:text-base text-gray-700">
                                             {format(new Date(event.saida_programada_at), 'HH:mm')}
                                         </span>
                                     </td>
 
                                     {/* Meta H-1 */}
-                                    <td className="py-4 px-3 md:px-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm md:text-base text-gray-700 font-medium">
+                                    <td className="py-3 md:py-4 px-3 md:px-4">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="text-sm md:text-base text-gray-900 font-medium">
                                                 {format(new Date(event.liberar_ate_at), 'HH:mm')}
                                             </span>
-                                            {sla === 'expired' && event.status !== 'CONCLUIDO' && (
-                                                <span className="text-xs text-red-600 font-bold mt-1">ESTOURADO</span>
+                                            {sla === 'expired' && event.status !== 'CONCLUIDO' && event.status !== 'CANCELADO' && (
+                                                <span className="text-xs text-red-600 font-bold uppercase">Estourado</span>
                                             )}
                                         </div>
                                     </td>
 
                                     {/* Ações - Bus Icon with Popover */}
-                                    <td className="py-4 px-3 md:px-4 text-center relative">
+                                    <td className="py-3 md:py-4 px-3 md:px-4 text-center relative">
                                         {event.status !== 'CANCELADO' && (
                                             <div className="relative inline-block">
                                                 <button
                                                     onClick={() => setShowMenu(showMenu === event.id ? null : event.id)}
-                                                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                                                    className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Ações"
                                                 >
-                                                    <Bus className="w-6 h-6 md:w-7 md:h-7 text-blue-600" />
+                                                    <Bus className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                                                 </button>
 
                                                 {/* Popover Menu */}
                                                 {showMenu === event.id && (
-                                                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                                                        <div className="py-2">
+                                                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                                        <div className="py-1">
                                                             {event.status === 'PREVISTO' && (
                                                                 <button
                                                                     onClick={() => handleAction(event, 'start')}
-                                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 text-sm font-medium text-gray-700 flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2.5 hover:bg-blue-50 text-sm font-medium text-gray-700 flex items-center gap-2"
                                                                 >
                                                                     <span className="text-blue-600">▶</span> Iniciar
                                                                 </button>
@@ -349,7 +335,7 @@ export default function EventList({ events }: EventListProps) {
                                                             {event.status === 'EM_ANDAMENTO' && (
                                                                 <button
                                                                     onClick={() => handleAction(event, 'finish')}
-                                                                    className="w-full text-left px-4 py-3 hover:bg-green-50 text-sm font-medium text-gray-700 flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2.5 hover:bg-green-50 text-sm font-medium text-gray-700 flex items-center gap-2"
                                                                 >
                                                                     <span className="text-green-600">✓</span> Finalizar
                                                                 </button>
@@ -358,13 +344,13 @@ export default function EventList({ events }: EventListProps) {
                                                                 <>
                                                                     <button
                                                                         onClick={() => handleAction(event, 'swap')}
-                                                                        className="w-full text-left px-4 py-3 hover:bg-orange-50 text-sm font-medium text-gray-700 flex items-center gap-2"
+                                                                        className="w-full text-left px-4 py-2.5 hover:bg-orange-50 text-sm font-medium text-gray-700 flex items-center gap-2"
                                                                     >
                                                                         <span className="text-orange-600">⇄</span> Fazer Troca
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleAction(event, 'addColaborador')}
-                                                                        className="w-full text-left px-4 py-3 hover:bg-purple-50 text-sm font-medium text-gray-700 flex items-center gap-2"
+                                                                        className="w-full text-left px-4 py-2.5 hover:bg-purple-50 text-sm font-medium text-gray-700 flex items-center gap-2"
                                                                     >
                                                                         <span className="text-purple-600">+</span> Adicionar Colaboradores
                                                                     </button>
