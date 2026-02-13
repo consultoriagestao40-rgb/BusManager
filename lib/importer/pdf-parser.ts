@@ -60,7 +60,7 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 scheduleDate = addHours(scheduleDate, 3);
 
                 // CRITICAL DEBUG: Leak this info to the API response so we can see it in GH Logs
-                errors.push(`DEBUG: Veiculo ${evt.vehicleId} | Texto: ${evt.timeStr} | Base: ${debugInit} | Final: ${scheduleDate.toISOString()}`);
+                errors.push(`DEBUG: Veiculo ${evt.vehicleId} | Texto: ${evt.timeStr} | Base: ${debugInit} | Final: ${scheduleDate.toISOString()} | RawLine: "${evt.rawBuffer[0] || 'N/A'}"`);
 
                 // Extract Metadata from Buffer
                 let driverName: string | undefined;
@@ -136,11 +136,14 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
         };
 
         // Relaxed Regex: Allow spaces between parts, and 1-2 digit days/months (e.g. 1/2/2026)
-        const eventStartRegex = /^(\d{1,10})\s*(\d{1,2}\/\d{1,2}\/\d{4})\s*(\d{1,2}:\d{2})(.*)$/;
+        // FIX: Use non-greedy capture for ID (\d+?) to prevent it from eating the first digit of the date
+        // if the columns are merged (e.g. "6410512/02/2026").
+        // Also enforcing \d{2} for day/month to encourage backtracking if needed.
+        const eventStartRegex = /^(\d+?)\s*(\d{2}\/\d{2}\/\d{4})\s*(\d{1,2}:\d{2})(.*)$/;
 
         // Broader regex to detect lines that MIGHT be events but failed the strict check
         // Matches anything looking like a date d/m/yyyy or dd/mm/yyyy
-        const datePattern = /\d{1,2}\/\d{1,2}\/\d{4}/;
+        const datePattern = /\d{2}\/\d{2}\/\d{4}/;
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
