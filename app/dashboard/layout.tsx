@@ -9,7 +9,7 @@ export default function DashboardLayout({
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Show sidebar on all screens except mobile */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex h-full">
                 <Sidebar />
             </div>
             <div className="flex-1 flex flex-col overflow-hidden">
