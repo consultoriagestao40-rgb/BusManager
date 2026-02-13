@@ -16,7 +16,7 @@ export default function DashboardPage() {
         if (events.length === 0) setLoading(true);
 
         try {
-            const res = await fetch(`/api/events?date=${currentDate.toISOString()}`);
+            const res = await fetch(`/api/events?date=${format(currentDate, 'yyyy-MM-dd')}`);
             if (res.ok) {
                 const data = await res.json();
                 setEvents(data.events);
