@@ -267,6 +267,49 @@ export default function DashboardPage() {
                 </div>
             </div>
 
+            {/* Search, Filter, and Export Controls */}
+            <div className="bg-white rounded shadow p-4">
+                <div className="flex flex-col md:flex-row gap-3 items-center">
+                    <input
+                        type="text"
+                        placeholder="Pesquisar por carro, empresa, motorista..."
+                        value={mainSearch}
+                        onChange={(e) => setMainSearch(e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    >
+                        <option value="TODOS">Todos Status</option>
+                        <option value="PREVISTO">Previsto</option>
+                        <option value="EM_ANDAMENTO">Em Andamento</option>
+                        <option value="CONCLUIDO">Concluído</option>
+                        <option value="CANCELADO">Cancelado</option>
+                        <option value="ESTURADO">Esturado</option>
+                    </select>
+                    <button
+                        onClick={exportMainToPDF}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2 whitespace-nowrap"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                        </svg>
+                        PDF
+                    </button>
+                    <button
+                        onClick={exportMainToExcel}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2 whitespace-nowrap"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                        </svg>
+                        Excel
+                    </button>
+                </div>
+            </div>
+
             <div className="bg-white rounded shadow overflow-hidden">
                 <div className="p-4 border-b">
                     <h2 className="font-semibold text-gray-700">Escala de Limpeza</h2>
