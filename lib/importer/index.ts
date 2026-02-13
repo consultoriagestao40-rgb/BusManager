@@ -19,7 +19,8 @@ export async function processImport(
     });
 
     if (existingImport) {
-        return { duplicate: true, importId: existingImport.id };
+        console.log('Duplicate import detected, but proceeding to force update.');
+        // return { duplicate: true, importId: existingImport.id };
     }
 
     // 2. Determine Source Type
