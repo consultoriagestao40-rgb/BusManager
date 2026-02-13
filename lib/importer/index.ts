@@ -18,10 +18,12 @@ export async function processImport(
         where: { content_hash: hash, status: 'SUCCESS' }
     });
 
+    /*
     if (existingImport) {
         console.log('Duplicate import detected, but proceeding to force update.');
         // return { duplicate: true, importId: existingImport.id };
     }
+    */
 
     // 2. Determine Source Type
     let sourceType: ImportSourceType = 'API';
