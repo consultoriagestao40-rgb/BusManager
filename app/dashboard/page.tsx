@@ -227,7 +227,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Basic Stats Stub (Dynamic data to be added later if needed) */}
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
                 <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-gray-500 text-sm">Total</h3>
                     <p className="text-2xl font-bold">{events.length}</p>
@@ -274,45 +274,49 @@ export default function DashboardPage() {
             </div>
 
             {/* Search, Filter, and Export Controls */}
-            <div className="bg-white rounded shadow p-4">
-                <div className="flex flex-col md:flex-row gap-3 items-center">
+            <div className="bg-white rounded shadow p-3 md:p-4">
+                <div className="flex flex-col gap-3">
                     <input
                         type="text"
                         placeholder="Pesquisar por carro, empresa, motorista..."
                         value={mainSearch}
                         onChange={(e) => setMainSearch(e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
                     />
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                        <option value="TODOS">Todos Status</option>
-                        <option value="PREVISTO">Previsto</option>
-                        <option value="EM_ANDAMENTO">Em Andamento</option>
-                        <option value="CONCLUIDO">Concluído</option>
-                        <option value="CANCELADO">Cancelado</option>
-                        <option value="ESTURADO">Esturado</option>
-                    </select>
-                    <button
-                        onClick={exportMainToPDF}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2 whitespace-nowrap"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                        </svg>
-                        PDF
-                    </button>
-                    <button
-                        onClick={exportMainToExcel}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2 whitespace-nowrap"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                        </svg>
-                        Excel
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm md:text-base"
+                        >
+                            <option value="TODOS">Todos Status</option>
+                            <option value="PREVISTO">Previsto</option>
+                            <option value="EM_ANDAMENTO">Em Andamento</option>
+                            <option value="CONCLUIDO">Concluído</option>
+                            <option value="CANCELADO">Cancelado</option>
+                            <option value="ESTURADO">Esturado</option>
+                        </select>
+                        <div className="flex gap-2 sm:gap-3">
+                            <button
+                                onClick={exportMainToPDF}
+                                className="flex-1 sm:flex-initial px-3 md:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center justify-center gap-2 text-sm md:text-base"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                                </svg>
+                                PDF
+                            </button>
+                            <button
+                                onClick={exportMainToExcel}
+                                className="flex-1 sm:flex-initial px-3 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 text-sm md:text-base"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                                </svg>
+                                Excel
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
