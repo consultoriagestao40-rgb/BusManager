@@ -229,46 +229,46 @@ export default function DashboardPage() {
 
             {/* Hide metric cards on mobile */}
             <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
-                <div className="bg-white p-4 rounded shadow">
-                    <h3 className="text-gray-500 text-sm">Total</h3>
-                    <p className="text-2xl font-bold">{events.length}</p>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200/50">
+                    <h3 className="text-blue-700 text-xs font-bold uppercase tracking-wide mb-1">Total</h3>
+                    <p className="text-4xl font-extrabold text-blue-900">{events.length}</p>
                 </div>
-                <div className="bg-white p-4 rounded shadow">
-                    <h3 className="text-gray-500 text-sm">Previstos</h3>
-                    <p className="text-2xl font-bold text-gray-800">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                    <h3 className="text-gray-700 text-xs font-bold uppercase tracking-wide mb-1">Previstos</h3>
+                    <p className="text-4xl font-extrabold text-gray-900">
                         {events.length - events.filter((e: any) => e.status === 'CANCELADO').length}
                     </p>
                 </div>
                 <div
-                    className="bg-white p-4 rounded shadow cursor-pointer hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-200"
+                    className="bg-gradient-to-br from-blue-100 to-blue-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-blue-300 hover:border-blue-400 hover:scale-105"
                     onClick={() => setShowInProgressModal(true)}
                 >
-                    <h3 className="text-gray-500 text-sm">Em Andamento</h3>
-                    <p className="text-2xl font-bold text-blue-600">
+                    <h3 className="text-blue-800 text-xs font-bold uppercase tracking-wide mb-1">Em Andamento</h3>
+                    <p className="text-4xl font-extrabold text-blue-900">
                         {events.filter((e: any) => e.status === 'EM_ANDAMENTO').length}
                     </p>
                 </div>
-                <div className="bg-white p-4 rounded shadow">
-                    <h3 className="text-gray-500 text-sm">Concluídos</h3>
-                    <p className="text-2xl font-bold text-green-600">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200/50">
+                    <h3 className="text-green-700 text-xs font-bold uppercase tracking-wide mb-1">Concluídos</h3>
+                    <p className="text-4xl font-extrabold text-green-900">
                         {events.filter((e: any) => e.status === 'CONCLUIDO').length}
                     </p>
                 </div>
                 <div
-                    className="bg-white p-4 rounded shadow cursor-pointer hover:bg-red-50 transition-colors border border-transparent hover:border-red-200"
+                    className="bg-gradient-to-br from-red-100 to-rose-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-red-300 hover:border-red-400 hover:scale-105"
                     onClick={() => setShowCancelledModal(true)}
                 >
-                    <h3 className="text-gray-500 text-sm">Cancelados</h3>
-                    <p className="text-2xl font-bold text-red-600">
+                    <h3 className="text-red-800 text-xs font-bold uppercase tracking-wide mb-1">Cancelados</h3>
+                    <p className="text-4xl font-extrabold text-red-900">
                         {events.filter((e: any) => e.status === 'CANCELADO').length}
                     </p>
                 </div>
                 <div
-                    className="bg-white p-4 rounded shadow cursor-pointer hover:bg-orange-50 transition-colors border border-transparent hover:border-orange-200"
+                    className="bg-gradient-to-br from-orange-100 to-amber-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-orange-300 hover:border-orange-400 hover:scale-105"
                     onClick={() => setShowSwapsModal(true)}
                 >
-                    <h3 className="text-gray-500 text-sm">Trocas</h3>
-                    <p className="text-2xl font-bold text-orange-600">
+                    <h3 className="text-orange-800 text-xs font-bold uppercase tracking-wide mb-1">Trocas</h3>
+                    <p className="text-4xl font-extrabold text-orange-900">
                         {events.filter((e: any) => e.swaps && e.swaps.length > 0).length}
                     </p>
                 </div>
