@@ -82,7 +82,8 @@ export async function processImport(
             importId: importRecord.id,
             count: parseResult.events.length,
             duplicates,
-            parseErrors: parseResult.errors
+            parseErrors: parseResult.errors,
+            duplicate: false
         };
 
     } catch (error: any) {
