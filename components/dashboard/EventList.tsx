@@ -217,16 +217,16 @@ export default function EventList({ events }: { events: Event[] }) {
     return (
         <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
+                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-30 shadow-sm backdrop-blur-sm">
                     <tr>
-                        <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Hora</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Carro</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Saída</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">H-1 (Meta)</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Colaborador</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">SLA</th>
-                        <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th className="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right text-sm font-semibold text-gray-900">
+                        <th className="py-4 pl-4 pr-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Hora</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Carro</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Saída</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">H-1 (Meta)</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Colaborador</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">SLA</th>
+                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th className="relative py-4 pl-3 pr-4 sm:pr-6 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                             Ações
                         </th>
                     </tr>
