@@ -1,0 +1,336 @@
+sync	Set up job	﻿2026-02-13T10:31:55.0344507Z Current runner version: '2.331.0'
+sync	Set up job	2026-02-13T10:31:55.0381063Z ##[group]Runner Image Provisioner
+sync	Set up job	2026-02-13T10:31:55.0382697Z Hosted Compute Agent
+sync	Set up job	2026-02-13T10:31:55.0383728Z Version: 20260123.484
+sync	Set up job	2026-02-13T10:31:55.0384993Z Commit: 6bd6555ca37d84114959e1c76d2c01448ff61c5d
+sync	Set up job	2026-02-13T10:31:55.0386393Z Build Date: 2026-01-23T19:41:17Z
+sync	Set up job	2026-02-13T10:31:55.0387970Z Worker ID: {84f9ec6b-e572-425f-ad56-e8282fed55c1}
+sync	Set up job	2026-02-13T10:31:55.0389463Z Azure Region: centralus
+sync	Set up job	2026-02-13T10:31:55.0390613Z ##[endgroup]
+sync	Set up job	2026-02-13T10:31:55.0393124Z ##[group]Operating System
+sync	Set up job	2026-02-13T10:31:55.0394294Z Ubuntu
+sync	Set up job	2026-02-13T10:31:55.0395288Z 24.04.3
+sync	Set up job	2026-02-13T10:31:55.0396309Z LTS
+sync	Set up job	2026-02-13T10:31:55.0397469Z ##[endgroup]
+sync	Set up job	2026-02-13T10:31:55.0398472Z ##[group]Runner Image
+sync	Set up job	2026-02-13T10:31:55.0399769Z Image: ubuntu-24.04
+sync	Set up job	2026-02-13T10:31:55.0400891Z Version: 20260209.23.1
+sync	Set up job	2026-02-13T10:31:55.0402911Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260209.23/images/ubuntu/Ubuntu2404-Readme.md
+sync	Set up job	2026-02-13T10:31:55.0406014Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260209.23
+sync	Set up job	2026-02-13T10:31:55.0408178Z ##[endgroup]
+sync	Set up job	2026-02-13T10:31:55.0410396Z ##[group]GITHUB_TOKEN Permissions
+sync	Set up job	2026-02-13T10:31:55.0413497Z Contents: read
+sync	Set up job	2026-02-13T10:31:55.0414575Z Metadata: read
+sync	Set up job	2026-02-13T10:31:55.0415733Z Packages: read
+sync	Set up job	2026-02-13T10:31:55.0416691Z ##[endgroup]
+sync	Set up job	2026-02-13T10:31:55.0419857Z Secret source: Actions
+sync	Set up job	2026-02-13T10:31:55.0421602Z Prepare workflow directory
+sync	Set up job	2026-02-13T10:31:55.0755186Z Prepare all required actions
+sync	Set up job	2026-02-13T10:31:55.0798758Z Getting action download info
+sync	Set up job	2026-02-13T10:31:55.4632115Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+sync	Set up job	2026-02-13T10:31:55.5904487Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+sync	Set up job	2026-02-13T10:31:55.6859806Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+sync	Set up job	2026-02-13T10:31:55.9055730Z Complete job name: sync
+sync	Checkout Repo	﻿2026-02-13T10:31:55.9797343Z ##[group]Run actions/checkout@v4
+sync	Checkout Repo	2026-02-13T10:31:55.9798401Z with:
+sync	Checkout Repo	2026-02-13T10:31:55.9798987Z   repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T10:31:55.9799859Z   token: ***
+sync	Checkout Repo	2026-02-13T10:31:55.9800342Z   ssh-strict: true
+sync	Checkout Repo	2026-02-13T10:31:55.9800835Z   ssh-user: git
+sync	Checkout Repo	2026-02-13T10:31:55.9801331Z   persist-credentials: true
+sync	Checkout Repo	2026-02-13T10:31:55.9801872Z   clean: true
+sync	Checkout Repo	2026-02-13T10:31:55.9802374Z   sparse-checkout-cone-mode: true
+sync	Checkout Repo	2026-02-13T10:31:55.9802982Z   fetch-depth: 1
+sync	Checkout Repo	2026-02-13T10:31:55.9803481Z   fetch-tags: false
+sync	Checkout Repo	2026-02-13T10:31:55.9804022Z   show-progress: true
+sync	Checkout Repo	2026-02-13T10:31:55.9804521Z   lfs: false
+sync	Checkout Repo	2026-02-13T10:31:55.9805029Z   submodules: false
+sync	Checkout Repo	2026-02-13T10:31:55.9805526Z   set-safe-directory: true
+sync	Checkout Repo	2026-02-13T10:31:55.9806310Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.0961798Z Syncing repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T10:31:56.0965284Z ##[group]Getting Git version info
+sync	Checkout Repo	2026-02-13T10:31:56.0966795Z Working directory is '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T10:31:56.0969296Z [command]/usr/bin/git version
+sync	Checkout Repo	2026-02-13T10:31:56.0970365Z git version 2.52.0
+sync	Checkout Repo	2026-02-13T10:31:56.0973771Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.0983583Z Temporarily overriding HOME='/home/runner/work/_temp/84fde514-a4e7-45aa-8895-2af410aa97d5' before making global git config changes
+sync	Checkout Repo	2026-02-13T10:31:56.0986484Z Adding repository directory to the temporary git global config as a safe directory
+sync	Checkout Repo	2026-02-13T10:31:56.0989337Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T10:31:56.1044550Z Deleting the contents of '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T10:31:56.1049094Z ##[group]Initializing the repository
+sync	Checkout Repo	2026-02-13T10:31:56.1054622Z [command]/usr/bin/git init /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T10:31:56.1182515Z hint: Using 'master' as the name for the initial branch. This default branch name
+sync	Checkout Repo	2026-02-13T10:31:56.1184073Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+sync	Checkout Repo	2026-02-13T10:31:56.1185515Z hint: to use in all of your new repositories, which will suppress this warning,
+sync	Checkout Repo	2026-02-13T10:31:56.1186982Z hint: call:
+sync	Checkout Repo	2026-02-13T10:31:56.1187938Z hint:
+sync	Checkout Repo	2026-02-13T10:31:56.1188635Z hint: 	git config --global init.defaultBranch <name>
+sync	Checkout Repo	2026-02-13T10:31:56.1189913Z hint:
+sync	Checkout Repo	2026-02-13T10:31:56.1191175Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+sync	Checkout Repo	2026-02-13T10:31:56.1193145Z hint: 'development'. The just-created branch can be renamed via this command:
+sync	Checkout Repo	2026-02-13T10:31:56.1194765Z hint:
+sync	Checkout Repo	2026-02-13T10:31:56.1195647Z hint: 	git branch -m <name>
+sync	Checkout Repo	2026-02-13T10:31:56.1196572Z hint:
+sync	Checkout Repo	2026-02-13T10:31:56.1198111Z hint: Disable this message with "git config set advice.defaultBranchName false"
+sync	Checkout Repo	2026-02-13T10:31:56.1200355Z Initialized empty Git repository in /home/runner/work/BusManager/BusManager/.git/
+sync	Checkout Repo	2026-02-13T10:31:56.1204034Z [command]/usr/bin/git remote add origin https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T10:31:56.1242186Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.1243820Z ##[group]Disabling automatic garbage collection
+sync	Checkout Repo	2026-02-13T10:31:56.1245852Z [command]/usr/bin/git config --local gc.auto 0
+sync	Checkout Repo	2026-02-13T10:31:56.1275944Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.1276803Z ##[group]Setting up auth
+sync	Checkout Repo	2026-02-13T10:31:56.1282188Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Checkout Repo	2026-02-13T10:31:56.1312394Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Checkout Repo	2026-02-13T10:31:56.1672470Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Checkout Repo	2026-02-13T10:31:56.1704906Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Checkout Repo	2026-02-13T10:31:56.1936215Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Checkout Repo	2026-02-13T10:31:56.1968613Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Checkout Repo	2026-02-13T10:31:56.2222761Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+sync	Checkout Repo	2026-02-13T10:31:56.2258270Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.2259907Z ##[group]Fetching the repository
+sync	Checkout Repo	2026-02-13T10:31:56.2270125Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9296d293517af75a282dd51175a7797200022079:refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T10:31:56.5888394Z From https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T10:31:56.5890882Z  * [new ref]         9296d293517af75a282dd51175a7797200022079 -> origin/main
+sync	Checkout Repo	2026-02-13T10:31:56.5923894Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.5925922Z ##[group]Determining the checkout info
+sync	Checkout Repo	2026-02-13T10:31:56.5928376Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.5931996Z [command]/usr/bin/git sparse-checkout disable
+sync	Checkout Repo	2026-02-13T10:31:56.5975433Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+sync	Checkout Repo	2026-02-13T10:31:56.6003631Z ##[group]Checking out the ref
+sync	Checkout Repo	2026-02-13T10:31:56.6007739Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T10:31:56.6104181Z Switched to a new branch 'main'
+sync	Checkout Repo	2026-02-13T10:31:56.6106496Z branch 'main' set up to track 'origin/main'.
+sync	Checkout Repo	2026-02-13T10:31:56.6116394Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T10:31:56.6150613Z [command]/usr/bin/git log -1 --format=%H
+sync	Checkout Repo	2026-02-13T10:31:56.6174133Z 9296d293517af75a282dd51175a7797200022079
+sync	Setup Node.js	﻿2026-02-13T10:31:56.6495883Z ##[group]Run actions/setup-node@v4
+sync	Setup Node.js	2026-02-13T10:31:56.6497290Z with:
+sync	Setup Node.js	2026-02-13T10:31:56.6498204Z   node-version: 20
+sync	Setup Node.js	2026-02-13T10:31:56.6499181Z   cache: npm
+sync	Setup Node.js	2026-02-13T10:31:56.6500111Z   always-auth: false
+sync	Setup Node.js	2026-02-13T10:31:56.6501143Z   check-latest: false
+sync	Setup Node.js	2026-02-13T10:31:56.6502403Z   token: ***
+sync	Setup Node.js	2026-02-13T10:31:56.6503469Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T10:31:56.8282681Z Found in cache @ /opt/hostedtoolcache/node/20.20.0/x64
+sync	Setup Node.js	2026-02-13T10:31:56.8289349Z ##[group]Environment details
+sync	Setup Node.js	2026-02-13T10:31:57.2174993Z node: v20.20.0
+sync	Setup Node.js	2026-02-13T10:31:57.2177648Z npm: 10.8.2
+sync	Setup Node.js	2026-02-13T10:31:57.2179158Z yarn: 1.22.22
+sync	Setup Node.js	2026-02-13T10:31:57.2182004Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T10:31:57.2199204Z [command]/opt/hostedtoolcache/node/20.20.0/x64/bin/npm config get cache
+sync	Setup Node.js	2026-02-13T10:31:57.3458737Z /home/runner/.npm
+sync	Setup Node.js	2026-02-13T10:31:57.5157326Z Cache hit for: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Setup Node.js	2026-02-13T10:31:58.6736075Z Received 79691776 of 256967561 (31.0%), 76.0 MBs/sec
+sync	Setup Node.js	2026-02-13T10:31:59.6770223Z Received 244384649 of 256967561 (95.1%), 116.4 MBs/sec
+sync	Setup Node.js	2026-02-13T10:31:59.7876355Z Received 256967561 of 256967561 (100.0%), 115.9 MBs/sec
+sync	Setup Node.js	2026-02-13T10:31:59.7878207Z Cache Size: ~245 MB (256967561 B)
+sync	Setup Node.js	2026-02-13T10:31:59.7949683Z [command]/usr/bin/tar -xf /home/runner/work/_temp/862faf01-de92-4641-97c9-466309033a5e/cache.tzst -P -C /home/runner/work/BusManager/BusManager --use-compress-program unzstd
+sync	Setup Node.js	2026-02-13T10:32:00.2377199Z Cache restored successfully
+sync	Setup Node.js	2026-02-13T10:32:00.2887459Z Cache restored from key: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Install Dependencies	﻿2026-02-13T10:32:00.3108970Z ##[group]Run npm ci
+sync	Install Dependencies	2026-02-13T10:32:00.3109293Z [36;1mnpm ci[0m
+sync	Install Dependencies	2026-02-13T10:32:00.3171157Z shell: /usr/bin/bash -e {0}
+sync	Install Dependencies	2026-02-13T10:32:00.3171471Z ##[endgroup]
+sync	Install Dependencies	2026-02-13T10:32:20.1345842Z 
+sync	Install Dependencies	2026-02-13T10:32:20.1354436Z > final-mare@0.1.0 postinstall
+sync	Install Dependencies	2026-02-13T10:32:20.1354941Z > prisma generate
+sync	Install Dependencies	2026-02-13T10:32:20.1355105Z 
+sync	Install Dependencies	2026-02-13T10:32:20.9939889Z Prisma schema loaded from prisma/schema.prisma
+sync	Install Dependencies	2026-02-13T10:32:21.3176777Z ┌─────────────────────────────────────────────────────────┐
+sync	Install Dependencies	2026-02-13T10:32:21.3177598Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3178550Z │  Update available 6.19.2 -> 7.4.0                       │
+sync	Install Dependencies	2026-02-13T10:32:21.3179685Z ✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 155ms
+sync	Install Dependencies	2026-02-13T10:32:21.3180777Z │                                                         │
+sync	Install Dependencies	2026-02-13T10:32:21.3181656Z │  This is a major update - please follow the guide at    │
+sync	Install Dependencies	2026-02-13T10:32:21.3182627Z │  https://pris.ly/d/major-version-upgrade                │
+sync	Install Dependencies	2026-02-13T10:32:21.3183485Z │                                                         │
+sync	Install Dependencies	2026-02-13T10:32:21.3184400Z │  Run the following to update                            │
+sync	Install Dependencies	2026-02-13T10:32:21.3185342Z │    npm i --save-dev prisma@latest                       │
+sync	Install Dependencies	2026-02-13T10:32:21.3186226Z │    npm i @prisma/client@latest                          │
+sync	Install Dependencies	2026-02-13T10:32:21.3187324Z └─────────────────────────────────────────────────────────┘
+sync	Install Dependencies	2026-02-13T10:32:21.3187727Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3188402Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+sync	Install Dependencies	2026-02-13T10:32:21.3189033Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3190054Z Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+sync	Install Dependencies	2026-02-13T10:32:21.3190926Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3561984Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3562864Z added 556 packages, and audited 557 packages in 21s
+sync	Install Dependencies	2026-02-13T10:32:21.3563550Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3564030Z 162 packages are looking for funding
+sync	Install Dependencies	2026-02-13T10:32:21.3564600Z   run `npm fund` for details
+sync	Install Dependencies	2026-02-13T10:32:21.3586573Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3587303Z 1 high severity vulnerability
+sync	Install Dependencies	2026-02-13T10:32:21.3587558Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3587816Z Some issues need review, and may require choosing
+sync	Install Dependencies	2026-02-13T10:32:21.3588186Z a different dependency.
+sync	Install Dependencies	2026-02-13T10:32:21.3588353Z 
+sync	Install Dependencies	2026-02-13T10:32:21.3588486Z Run `npm audit` for details.
+sync	Run Sync Script	﻿2026-02-13T10:32:21.4496415Z ##[group]Run npx tsx scripts/sync-schedule.ts
+sync	Run Sync Script	2026-02-13T10:32:21.4496826Z [36;1mnpx tsx scripts/sync-schedule.ts[0m
+sync	Run Sync Script	2026-02-13T10:32:21.4552456Z shell: /usr/bin/bash -e {0}
+sync	Run Sync Script	2026-02-13T10:32:21.4552730Z env:
+sync	Run Sync Script	2026-02-13T10:32:21.4553094Z   CLIENT_AGENCY: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4553351Z   CLIENT_USER: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4553841Z   CLIENT_PASS: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4554181Z   APP_URL: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4554424Z   APP_EMAIL: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4554652Z   APP_PASSWORD: ***
+sync	Run Sync Script	2026-02-13T10:32:21.4554881Z ##[endgroup]
+sync	Run Sync Script	2026-02-13T10:32:22.8520115Z 🚀 Starting Schedule Sync Bot (Enhanced Debugging)...
+sync	Run Sync Script	2026-02-13T10:32:23.2663096Z P1. Navigation to https://rip.nspenha.com.br/retaguarda/index.phtml...
+sync	Run Sync Script	2026-02-13T10:32:29.7519292Z P2. Filling Credentials...
+sync	Run Sync Script	2026-02-13T10:32:29.7520011Z Analyzing 1 frames...
+sync	Run Sync Script	2026-02-13T10:32:29.7687567Z Found 3 inputs in frame: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T10:32:29.8113079Z P2.1 Pressing Enter...
+sync	Run Sync Script	2026-02-13T10:32:30.8065559Z Login successful via Enter key.
+sync	Run Sync Script	2026-02-13T10:32:30.8066299Z P3.1 Waiting for navigation...
+sync	Run Sync Script	2026-02-13T10:32:30.8124512Z Login action completed. Checking for report link...
+sync	Run Sync Script	2026-02-13T10:32:30.8125705Z P3. Navigating to Report...
+sync	Run Sync Script	2026-02-13T10:32:30.8590694Z P3.1 analyzing page structure...
+sync	Run Sync Script	2026-02-13T10:32:30.8591288Z Found 1 frames.
+sync	Run Sync Script	2026-02-13T10:32:30.8591934Z Frame URL: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T10:32:30.8606657Z Frame has 17 links.
+sync	Run Sync Script	2026-02-13T10:32:30.8609878Z First 3 links: [{"text":"10.128.2.164 - 10.128.2.164","href":"","visible":true},{"text":"13/02/2026 06:36:15","href":"","visible":true},{"text":"ÁREA DE DOWNLOADS DA EMPRESA","href":"https://rip.nspenha.com.br/retaguarda/index.phtml#","visible":true}]
+sync	Run Sync Script	2026-02-13T10:32:30.8612427Z 🎯 TARGET FOUND in frame https://rip.nspenha.com.br/retaguarda/index.phtml: "Escala Programada"
+sync	Run Sync Script	2026-02-13T10:32:30.8617582Z Clicking target element...
+sync	Run Sync Script	2026-02-13T10:32:30.8626793Z Target Element HTML: <a href="javascript:void(0)" onclick="javascript: montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600 ) ">Escala Programada</a>
+sync	Run Sync Script	2026-02-13T10:32:30.8730836Z Standard click failed (Error: Node is either not clickable or not an Element). Trying fallback methods...
+sync	Run Sync Script	2026-02-13T10:32:30.8731822Z Attempting JS Click...
+sync	Run Sync Script	2026-02-13T10:32:30.8828023Z Waiting for potential popup...
+sync	Run Sync Script	2026-02-13T10:32:35.8828119Z No popup detected within 5s. Assuming same-page or parent frame update.
+sync	Run Sync Script	2026-02-13T10:32:35.8831787Z P4. Waiting for Report Page (Scanning all frames)...
+sync	Run Sync Script	2026-02-13T10:33:06.0831406Z Report verify failed. Attempting JS EXECUTION fallback...
+sync	Run Sync Script	2026-02-13T10:33:06.0832378Z Executing montaJanelaNova via JS in target frame...
+sync	Run Sync Script	2026-02-13T10:33:11.0984892Z Report found in frame after JS execution: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T10:33:11.0985916Z JS Execution successful! Content verified.
+sync	Run Sync Script	2026-02-13T10:33:11.0986511Z P4. Executing Search...
+sync	Run Sync Script	2026-02-13T10:33:16.1080457Z P5. Exporting PDF...
+sync	Run Sync Script	2026-02-13T10:33:19.8588212Z PDF Generated at /home/runner/work/BusManager/BusManager/schedule.pdf
+sync	Run Sync Script	2026-02-13T10:33:19.8589051Z P6. Uploading to BusManager...
+sync	Run Sync Script	2026-02-13T10:33:25.2125939Z Upload Success: {
+sync	Run Sync Script	2026-02-13T10:33:25.2126492Z   success: true,
+sync	Run Sync Script	2026-02-13T10:33:25.2127246Z   importId: '07bea353-6dc1-4b25-97df-f7bf0bd190e5',
+sync	Run Sync Script	2026-02-13T10:33:25.2128317Z   count: 92,
+sync	Run Sync Script	2026-02-13T10:33:25.2128714Z   duplicates: [],
+sync	Run Sync Script	2026-02-13T10:33:25.2131358Z   parseErrors: [
+sync	Run Sync Script	2026-02-13T10:33:25.2132556Z     'DEBUG: Veiculo 62005 | Texto: 00:20 | Base: 2026-02-13T00:20:00.000Z | Final: 2026-02-13T03:20:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2134593Z     'DEBUG: Veiculo 63040 | Texto: 01:00 | Base: 2026-02-13T01:00:00.000Z | Final: 2026-02-13T04:00:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2136419Z     'DEBUG: Veiculo 462304 | Texto: 03:10 | Base: 2026-02-13T03:10:00.000Z | Final: 2026-02-13T06:10:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2139055Z     'DEBUG: Veiculo 5585 | Texto: 03:30 | Base: 2026-02-13T03:30:00.000Z | Final: 2026-02-13T06:30:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2140807Z     'DEBUG: Veiculo 6702 | Texto: 03:30 | Base: 2026-02-13T03:30:00.000Z | Final: 2026-02-13T06:30:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2143100Z     'DEBUG: Veiculo 7164 | Texto: 05:00 | Base: 2026-02-13T05:00:00.000Z | Final: 2026-02-13T08:00:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2145138Z     'DEBUG: Veiculo 462405 | Texto: 05:05 | Base: 2026-02-13T05:05:00.000Z | Final: 2026-02-13T08:05:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2146978Z     'DEBUG: Veiculo 462302 | Texto: 05:20 | Base: 2026-02-13T05:20:00.000Z | Final: 2026-02-13T08:20:00.000Z | RawLine: "PIRACICABANA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2149210Z     'DEBUG: Veiculo 59002 | Texto: 06:00 | Base: 2026-02-13T06:00:00.000Z | Final: 2026-02-13T09:00:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2150887Z     'DEBUG: Veiculo 58009 | Texto: 06:00 | Base: 2026-02-13T06:00:00.000Z | Final: 2026-02-13T09:00:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2152741Z     'DEBUG: Veiculo 65504 | Texto: 07:00 | Base: 2026-02-13T07:00:00.000Z | Final: 2026-02-13T10:00:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2154490Z     'DEBUG: Veiculo 65509 | Texto: 07:00 | Base: 2026-02-13T07:00:00.000Z | Final: 2026-02-13T10:00:00.000Z | RawLine: "CURITIBA - PR X SAO MATEUS DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2156372Z     'DEBUG: Veiculo 2025 | Texto: 07:00 | Base: 2026-02-13T07:00:00.000Z | Final: 2026-02-13T10:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2158358Z     'DEBUG: Veiculo 65532 | Texto: 07:20 | Base: 2026-02-13T07:20:00.000Z | Final: 2026-02-13T10:20:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2160146Z     'DEBUG: Veiculo 65518 | Texto: 07:40 | Base: 2026-02-13T07:40:00.000Z | Final: 2026-02-13T10:40:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2161829Z     'DEBUG: Veiculo 65508 | Texto: 07:50 | Base: 2026-02-13T07:50:00.000Z | Final: 2026-02-13T10:50:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2163361Z     'DEBUG: Veiculo 65225 | Texto: 08:00 | Base: 2026-02-13T08:00:00.000Z | Final: 2026-02-13T11:00:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2165001Z     'DEBUG: Veiculo 920 | Texto: 08:00 | Base: 2026-02-13T08:00:00.000Z | Final: 2026-02-13T11:00:00.000Z | RawLine: "CARRO COM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2167577Z     'DEBUG: Veiculo 65516 | Texto: 08:20 | Base: 2026-02-13T08:20:00.000Z | Final: 2026-02-13T11:20:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2169254Z     'DEBUG: Veiculo 65520 | Texto: 08:20 | Base: 2026-02-13T08:20:00.000Z | Final: 2026-02-13T11:20:00.000Z | RawLine: "10060657 - JOSE RICARDO ALVES DE"',
+sync	Run Sync Script	2026-02-13T10:33:25.2170789Z     'Linha ignorada (falha no Regex): "13/02/202609:00SEMI-LEITOCANCELADOEXPRESSO PENHA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2172381Z     'DEBUG: Veiculo 61210 | Texto: 09:00 | Base: 2026-02-13T09:00:00.000Z | Final: 2026-02-13T12:00:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2174122Z     'DEBUG: Veiculo 65530 | Texto: 09:10 | Base: 2026-02-13T09:10:00.000Z | Final: 2026-02-13T12:10:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2175711Z     'DEBUG: Veiculo 65522 | Texto: 09:30 | Base: 2026-02-13T09:30:00.000Z | Final: 2026-02-13T12:30:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2179120Z     'DEBUG: Veiculo 2054 | Texto: 09:30 | Base: 2026-02-13T09:30:00.000Z | Final: 2026-02-13T12:30:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2180759Z     'Linha ignorada (falha no Regex): "Filtro: Data Viagem: 13/02/2026 até 13/02/2026"',
+sync	Run Sync Script	2026-02-13T10:33:25.2182013Z     'Linha ignorada (falha no Regex): "Data Impressão: 13/02/2026 - 07:33:16"',
+sync	Run Sync Script	2026-02-13T10:33:25.2183513Z     'DEBUG: Veiculo 65320 | Texto: 09:30 | Base: 2026-02-13T09:30:00.000Z | Final: 2026-02-13T12:30:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2185169Z     'DEBUG: Veiculo 65165 | Texto: 10:20 | Base: 2026-02-13T10:20:00.000Z | Final: 2026-02-13T13:20:00.000Z | RawLine: "10058008 - ANA PAOLA BUENO DOS"',
+sync	Run Sync Script	2026-02-13T10:33:25.2187552Z     'DEBUG: Veiculo 63025 | Texto: 11:00 | Base: 2026-02-13T11:00:00.000Z | Final: 2026-02-13T14:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2189718Z     'DEBUG: Veiculo 65511 | Texto: 11:00 | Base: 2026-02-13T11:00:00.000Z | Final: 2026-02-13T14:00:00.000Z | RawLine: "CURITIBA - PR X SAO MATEUS DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2191027Z     'Linha ignorada (falha no Regex): "13/02/202612:20"',
+sync	Run Sync Script	2026-02-13T10:33:25.2191792Z     'Linha ignorada (falha no Regex): "13/02/202612:20"',
+sync	Run Sync Script	2026-02-13T10:33:25.2193082Z     'DEBUG: Veiculo 65525 | Texto: 11:10 | Base: 2026-02-13T11:10:00.000Z | Final: 2026-02-13T14:10:00.000Z | RawLine: "10033619 - LUCIMAR ANTONIO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2194370Z     'Linha ignorada (falha no Regex): "13/02/202612:40"',
+sync	Run Sync Script	2026-02-13T10:33:25.2195097Z     'Linha ignorada (falha no Regex): "13/02/202612:40"',
+sync	Run Sync Script	2026-02-13T10:33:25.2196601Z     'DEBUG: Veiculo 65521 | Texto: 12:30 | Base: 2026-02-13T12:30:00.000Z | Final: 2026-02-13T15:30:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2199737Z     'DEBUG: Veiculo 61230 | Texto: 12:45 | Base: 2026-02-13T12:45:00.000Z | Final: 2026-02-13T15:45:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2201797Z     'DEBUG: Veiculo 65519 | Texto: 12:50 | Base: 2026-02-13T12:50:00.000Z | Final: 2026-02-13T15:50:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2203817Z     'DEBUG: Veiculo 61235 | Texto: 13:00 | Base: 2026-02-13T13:00:00.000Z | Final: 2026-02-13T16:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2206769Z     'DEBUG: Veiculo 65506 | Texto: 13:30 | Base: 2026-02-13T13:30:00.000Z | Final: 2026-02-13T16:30:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2208621Z     'DEBUG: Veiculo 65025 | Texto: 14:00 | Base: 2026-02-13T14:00:00.000Z | Final: 2026-02-13T17:00:00.000Z | RawLine: "10033622 - MARCIANO RODRIGUES"',
+sync	Run Sync Script	2026-02-13T10:33:25.2210379Z     'DEBUG: Veiculo 590 | Texto: 14:10 | Base: 2026-02-13T14:10:00.000Z | Final: 2026-02-13T17:10:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2211841Z     'DEBUG: Veiculo 65503 | Texto: 14:30 | Base: 2026-02-13T14:30:00.000Z | Final: 2026-02-13T17:30:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2213483Z     'DEBUG: Veiculo 58010 | Texto: 14:30 | Base: 2026-02-13T14:30:00.000Z | Final: 2026-02-13T17:30:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2215243Z     'DEBUG: Veiculo 65507 | Texto: 14:30 | Base: 2026-02-13T14:30:00.000Z | Final: 2026-02-13T17:30:00.000Z | RawLine: "CURITIBA - PR X SAO MATEUS DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2216969Z     'DEBUG: Veiculo 62000 | Texto: 14:30 | Base: 2026-02-13T14:30:00.000Z | Final: 2026-02-13T17:30:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2218854Z     'DEBUG: Veiculo 65512 | Texto: 14:40 | Base: 2026-02-13T14:40:00.000Z | Final: 2026-02-13T17:40:00.000Z | RawLine: "10049805 - CLEISTER FERNANDO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2220578Z     'DEBUG: Veiculo 65517 | Texto: 15:00 | Base: 2026-02-13T15:00:00.000Z | Final: 2026-02-13T18:00:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2222116Z     'DEBUG: Veiculo 65215 | Texto: 15:30 | Base: 2026-02-13T15:30:00.000Z | Final: 2026-02-13T18:30:00.000Z | RawLine: "CURITIBA - PR X SANTANA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2223690Z     'DEBUG: Veiculo 65527 | Texto: 15:40 | Base: 2026-02-13T15:40:00.000Z | Final: 2026-02-13T18:40:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2225295Z     'DEBUG: Veiculo 65504 | Texto: 15:50 | Base: 2026-02-13T15:50:00.000Z | Final: 2026-02-13T18:50:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2226851Z     'DEBUG: Veiculo 65505 | Texto: 16:00 | Base: 2026-02-13T16:00:00.000Z | Final: 2026-02-13T19:00:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2229059Z     'Linha ignorada (falha no Regex): "13/02/202616:05"',
+sync	Run Sync Script	2026-02-13T10:33:25.2230332Z     'DEBUG: Veiculo 63030 | Texto: 16:00 | Base: 2026-02-13T16:00:00.000Z | Final: 2026-02-13T19:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2232326Z     'DEBUG: Veiculo 65508 | Texto: 16:20 | Base: 2026-02-13T16:20:00.000Z | Final: 2026-02-13T19:20:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2233851Z     'DEBUG: Veiculo 65513 | Texto: 17:00 | Base: 2026-02-13T17:00:00.000Z | Final: 2026-02-13T20:00:00.000Z | RawLine: "10036843 - MAICON RODRIGO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2235710Z     'DEBUG: Veiculo 1600 | Texto: 17:00 | Base: 2026-02-13T17:00:00.000Z | Final: 2026-02-13T20:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2237556Z     'DEBUG: Veiculo 65510 | Texto: 17:30 | Base: 2026-02-13T17:30:00.000Z | Final: 2026-02-13T20:30:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2239069Z     'DEBUG: Veiculo 65528 | Texto: 17:30 | Base: 2026-02-13T17:30:00.000Z | Final: 2026-02-13T20:30:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2240898Z     'Linha ignorada (falha no Regex): "13/02/202618:10CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252911010058587 - ELIZEU ROBERTO DA SILVACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2242775Z     'DEBUG: Veiculo 65424 | Texto: 18:00 | Base: 2026-02-13T18:00:00.000Z | Final: 2026-02-13T21:00:00.000Z | RawLine: "10052097 - MARCOS ALBERTO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2244720Z     'Linha ignorada (falha no Regex): "13/02/202618:30EXECUTIVOATIVOEXPRESSO PENHACURITIBA - PR X ITAPOA - SC252660310045205 - SERGIO MARIANO DA SILVACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2246614Z     'Linha ignorada (falha no Regex): "13/02/202618:45CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR2529111"',
+sync	Run Sync Script	2026-02-13T10:33:25.2248562Z     'DEBUG: Veiculo 1134 | Texto: 18:20 | Base: 2026-02-13T18:20:00.000Z | Final: 2026-02-13T21:20:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2250333Z     'DEBUG: Veiculo 65519 | Texto: 18:50 | Base: 2026-02-13T18:50:00.000Z | Final: 2026-02-13T21:50:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2251942Z     'DEBUG: Veiculo 65509 | Texto: 19:00 | Base: 2026-02-13T19:00:00.000Z | Final: 2026-02-13T22:00:00.000Z | RawLine: "CURITIBA - PR X SAO MATEUS DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2253875Z     'Linha ignorada (falha no Regex): "13/02/202619:01CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X LAPA - PR252810610034050 - PEDRO LUIZ FAGUNDESCARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2256075Z     'Linha ignorada (falha no Regex): "13/02/202619:10CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252920210052904 - SILVIO JOSE MIRACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2294225Z     'DEBUG: Veiculo 1315 | Texto: 19:00 | Base: 2026-02-13T19:00:00.000Z | Final: 2026-02-13T22:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2295961Z     'DEBUG: Veiculo 65140 | Texto: 19:15 | Base: 2026-02-13T19:15:00.000Z | Final: 2026-02-13T22:15:00.000Z | RawLine: "SEMILEITO DIRETO /"',
+sync	Run Sync Script	2026-02-13T10:33:25.2298034Z     'Linha ignorada (falha no Regex): "13/02/202619:20CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252911210061179 - MAYCON VILELACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2300185Z     'Linha ignorada (falha no Regex): "13/02/202619:30CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252911310062760 - DOUGLAS DAL COLCARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2302098Z     'DEBUG: Veiculo 58007 | Texto: 19:20 | Base: 2026-02-13T19:20:00.000Z | Final: 2026-02-13T22:20:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2303435Z     'Linha ignorada (falha no Regex): "13/02/202619:40"',
+sync	Run Sync Script	2026-02-13T10:33:25.2304889Z     'Linha ignorada (falha no Regex): "13/02/202619:45EXECUTIVOATIVOEXPRESSO PENHACURITIBA - PR X ITAPOA - SC252660410058927 - ASLEI DE OLIVEIRA COSTACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2306974Z     'Linha ignorada (falha no Regex): "13/02/202619:50CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252911410051786 - ISAIAS DA SILVACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2309242Z     'DEBUG: Veiculo 65270 | Texto: 19:30 | Base: 2026-02-13T19:30:00.000Z | Final: 2026-02-13T22:30:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2310979Z     'DEBUG: Veiculo 65285 | Texto: 19:50 | Base: 2026-02-13T19:50:00.000Z | Final: 2026-02-13T22:50:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2312766Z     'Linha ignorada (falha no Regex): "13/02/202620:10EXECUTIVOATIVOEXPRESSO PENHACURITIBA - PR X ITAPOA - SC252660510058677 - DANIEL PINTO DA SILVACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2314736Z     'Linha ignorada (falha no Regex): "13/02/202620:10CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR2529115"',
+sync	Run Sync Script	2026-02-13T10:33:25.2316331Z     'DEBUG: Veiculo 1122 | Texto: 20:00 | Base: 2026-02-13T20:00:00.000Z | Final: 2026-02-13T23:00:00.000Z | RawLine: "CURITIBA - PR X FLORIANOPOLIS -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2331761Z     'Linha ignorada (falha no Regex): "13/02/202620:30CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR252911610062768 - ILZA DE SOUZA PARDINHOCARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2334705Z     'Linha ignorada (falha no Regex): "13/02/202620:40EXECUTIVOATIVOEXPRESSO PENHACURITIBA - PR X ITAPOA - SC252660610033932 - JACYR INACIO DE SOUZACARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2336396Z     'Linha ignorada (falha no Regex): "13/02/202620:45SEMILEITO DIRETOATIVOEXPRESSO PENHA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2337998Z     'DEBUG: Veiculo 660 | Texto: 20:15 | Base: 2026-02-13T20:15:00.000Z | Final: 2026-02-13T23:15:00.000Z | RawLine: "CURITIBA - PR X RIO DE JANEIRO -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2339512Z     'DEBUG: Veiculo 52602 | Texto: 21:00 | Base: 2026-02-13T21:00:00.000Z | Final: 2026-02-14T00:00:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2340935Z     'Linha ignorada (falha no Regex): "13/02/202621:00CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR2519117"',
+sync	Run Sync Script	2026-02-13T10:33:25.2342666Z     'DEBUG: Veiculo 2030 | Texto: 21:00 | Base: 2026-02-13T21:00:00.000Z | Final: 2026-02-14T00:00:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2344364Z     'DEBUG: Veiculo 65210 | Texto: 21:00 | Base: 2026-02-13T21:00:00.000Z | Final: 2026-02-14T00:00:00.000Z | RawLine: "CURITIBA - PR X PORTO ALEGRE -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2346154Z     'DEBUG: Veiculo 64050 | Texto: 21:01 | Base: 2026-02-13T21:01:00.000Z | Final: 2026-02-14T00:01:00.000Z | RawLine: "CURITIBA - PR X CAXIAS DO SUL -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2348441Z     'Linha ignorada (falha no Regex): "13/02/202621:30CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR251911810051874 - JEFFERSON NICOLIOCARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2350386Z     'DEBUG: Veiculo 65165 | Texto: 21:15 | Base: 2026-02-13T21:15:00.000Z | Final: 2026-02-14T00:15:00.000Z | RawLine: "CARRO COM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2352149Z     'DEBUG: Veiculo 64095 | Texto: 21:30 | Base: 2026-02-13T21:30:00.000Z | Final: 2026-02-14T00:30:00.000Z | RawLine: "CURITIBA - PR X VOLTA REDONDA -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2353465Z     'Linha ignorada (falha no Regex): "13/02/202621:40CONVENCIONALCANCELADO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2354978Z     'DEBUG: Veiculo 65534 | Texto: 21:40 | Base: 2026-02-13T21:40:00.000Z | Final: 2026-02-14T00:40:00.000Z | RawLine: "PRINCESA DO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2356825Z     'DEBUG: Veiculo 7001 | Texto: 21:45 | Base: 2026-02-13T21:45:00.000Z | Final: 2026-02-14T00:45:00.000Z | RawLine: "NÃO"',
+sync	Run Sync Script	2026-02-13T10:33:25.2358811Z     'Linha ignorada (falha no Regex): "13/02/202622:00CONVENCIONALATIVOEXPRESSO PENHACURITIBA - PR X GUARATUBA - PR251911910034056 - CIRO DE OLIVEIRA SANTOSCARRO SEM MANTA"',
+sync	Run Sync Script	2026-02-13T10:33:25.2360683Z     'DEBUG: Veiculo 2022 | Texto: 22:00 | Base: 2026-02-13T22:00:00.000Z | Final: 2026-02-14T01:00:00.000Z | RawLine: "CURITIBA - PR X RIO DE JANEIRO -"',
+sync	Run Sync Script	2026-02-13T10:33:25.2362326Z     'DEBUG: Veiculo 2042 | Texto: 22:10 | Base: 2026-02-13T22:10:00.000Z | Final: 2026-02-14T01:10:00.000Z | RawLine: "CURITIBA - PR X SAO PAULO (TIETE)"',
+sync	Run Sync Script	2026-02-13T10:33:25.2363289Z     ... 28 more items
+sync	Run Sync Script	2026-02-13T10:33:25.2363625Z   ],
+sync	Run Sync Script	2026-02-13T10:33:25.2377406Z   message: 'Importação concluída com sucesso.'
+sync	Run Sync Script	2026-02-13T10:33:25.2377967Z }
+sync	Post Setup Node.js	﻿2026-02-13T10:33:25.3628964Z Post job cleanup.
+sync	Post Setup Node.js	2026-02-13T10:33:25.5174405Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c, not saving cache.
+sync	Post Checkout Repo	﻿2026-02-13T10:33:25.5310539Z Post job cleanup.
+sync	Post Checkout Repo	2026-02-13T10:33:25.6261093Z [command]/usr/bin/git version
+sync	Post Checkout Repo	2026-02-13T10:33:25.6301034Z git version 2.52.0
+sync	Post Checkout Repo	2026-02-13T10:33:25.6345644Z Temporarily overriding HOME='/home/runner/work/_temp/338da4b1-acfd-4b2a-98a2-14c61b591629' before making global git config changes
+sync	Post Checkout Repo	2026-02-13T10:33:25.6347504Z Adding repository directory to the temporary git global config as a safe directory
+sync	Post Checkout Repo	2026-02-13T10:33:25.6352612Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Post Checkout Repo	2026-02-13T10:33:25.6389970Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Post Checkout Repo	2026-02-13T10:33:25.6424469Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Post Checkout Repo	2026-02-13T10:33:25.6663582Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Post Checkout Repo	2026-02-13T10:33:25.6686823Z http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T10:33:25.6699474Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T10:33:25.6732698Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Post Checkout Repo	2026-02-13T10:33:25.6962177Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Post Checkout Repo	2026-02-13T10:33:25.6994766Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Complete job	﻿2026-02-13T10:33:25.7340189Z Cleaning up orphan processes

@@ -1,0 +1,301 @@
+sync	Set up job	﻿2026-02-13T01:23:42.3862706Z Current runner version: '2.331.0'
+sync	Set up job	2026-02-13T01:23:42.3889137Z ##[group]Runner Image Provisioner
+sync	Set up job	2026-02-13T01:23:42.3890067Z Hosted Compute Agent
+sync	Set up job	2026-02-13T01:23:42.3890657Z Version: 20260123.484
+sync	Set up job	2026-02-13T01:23:42.3891397Z Commit: 6bd6555ca37d84114959e1c76d2c01448ff61c5d
+sync	Set up job	2026-02-13T01:23:42.3892180Z Build Date: 2026-01-23T19:41:17Z
+sync	Set up job	2026-02-13T01:23:42.3892924Z Worker ID: {9b66ba48-325c-4b5e-85de-eeaa39639fe4}
+sync	Set up job	2026-02-13T01:23:42.3893684Z Azure Region: westus3
+sync	Set up job	2026-02-13T01:23:42.3894297Z ##[endgroup]
+sync	Set up job	2026-02-13T01:23:42.3895852Z ##[group]Operating System
+sync	Set up job	2026-02-13T01:23:42.3896546Z Ubuntu
+sync	Set up job	2026-02-13T01:23:42.3897061Z 24.04.3
+sync	Set up job	2026-02-13T01:23:42.3897701Z LTS
+sync	Set up job	2026-02-13T01:23:42.3898392Z ##[endgroup]
+sync	Set up job	2026-02-13T01:23:42.3899012Z ##[group]Runner Image
+sync	Set up job	2026-02-13T01:23:42.3899713Z Image: ubuntu-24.04
+sync	Set up job	2026-02-13T01:23:42.3900345Z Version: 20260209.23.1
+sync	Set up job	2026-02-13T01:23:42.3901465Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260209.23/images/ubuntu/Ubuntu2404-Readme.md
+sync	Set up job	2026-02-13T01:23:42.3903136Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260209.23
+sync	Set up job	2026-02-13T01:23:42.3904207Z ##[endgroup]
+sync	Set up job	2026-02-13T01:23:42.3905420Z ##[group]GITHUB_TOKEN Permissions
+sync	Set up job	2026-02-13T01:23:42.3907400Z Contents: read
+sync	Set up job	2026-02-13T01:23:42.3908489Z Metadata: read
+sync	Set up job	2026-02-13T01:23:42.3909160Z Packages: read
+sync	Set up job	2026-02-13T01:23:42.3909783Z ##[endgroup]
+sync	Set up job	2026-02-13T01:23:42.3911931Z Secret source: Actions
+sync	Set up job	2026-02-13T01:23:42.3912920Z Prepare workflow directory
+sync	Set up job	2026-02-13T01:23:42.4244341Z Prepare all required actions
+sync	Set up job	2026-02-13T01:23:42.4282821Z Getting action download info
+sync	Set up job	2026-02-13T01:23:42.8997932Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+sync	Set up job	2026-02-13T01:23:43.0928149Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+sync	Set up job	2026-02-13T01:23:43.2222878Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+sync	Set up job	2026-02-13T01:23:43.4442134Z Complete job name: sync
+sync	Checkout Repo	﻿2026-02-13T01:23:43.5160222Z ##[group]Run actions/checkout@v4
+sync	Checkout Repo	2026-02-13T01:23:43.5161114Z with:
+sync	Checkout Repo	2026-02-13T01:23:43.5161627Z   repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T01:23:43.5162418Z   token: ***
+sync	Checkout Repo	2026-02-13T01:23:43.5162841Z   ssh-strict: true
+sync	Checkout Repo	2026-02-13T01:23:43.5163278Z   ssh-user: git
+sync	Checkout Repo	2026-02-13T01:23:43.5163723Z   persist-credentials: true
+sync	Checkout Repo	2026-02-13T01:23:43.5164219Z   clean: true
+sync	Checkout Repo	2026-02-13T01:23:43.5164664Z   sparse-checkout-cone-mode: true
+sync	Checkout Repo	2026-02-13T01:23:43.5165208Z   fetch-depth: 1
+sync	Checkout Repo	2026-02-13T01:23:43.5165637Z   fetch-tags: false
+sync	Checkout Repo	2026-02-13T01:23:43.5166079Z   show-progress: true
+sync	Checkout Repo	2026-02-13T01:23:43.5166539Z   lfs: false
+sync	Checkout Repo	2026-02-13T01:23:43.5167003Z   submodules: false
+sync	Checkout Repo	2026-02-13T01:23:43.5167451Z   set-safe-directory: true
+sync	Checkout Repo	2026-02-13T01:23:43.5168353Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:43.6332916Z Syncing repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T01:23:43.6336293Z ##[group]Getting Git version info
+sync	Checkout Repo	2026-02-13T01:23:43.6337698Z Working directory is '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T01:23:43.6339965Z [command]/usr/bin/git version
+sync	Checkout Repo	2026-02-13T01:23:43.6345048Z git version 2.52.0
+sync	Checkout Repo	2026-02-13T01:23:43.6373466Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:43.6388387Z Temporarily overriding HOME='/home/runner/work/_temp/47559d7c-804b-4d48-bfc0-8eaa7401539f' before making global git config changes
+sync	Checkout Repo	2026-02-13T01:23:43.6389804Z Adding repository directory to the temporary git global config as a safe directory
+sync	Checkout Repo	2026-02-13T01:23:43.6402636Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T01:23:43.6446735Z Deleting the contents of '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T01:23:43.6450736Z ##[group]Initializing the repository
+sync	Checkout Repo	2026-02-13T01:23:43.6455163Z [command]/usr/bin/git init /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T01:23:43.6570206Z hint: Using 'master' as the name for the initial branch. This default branch name
+sync	Checkout Repo	2026-02-13T01:23:43.6571542Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+sync	Checkout Repo	2026-02-13T01:23:43.6572915Z hint: to use in all of your new repositories, which will suppress this warning,
+sync	Checkout Repo	2026-02-13T01:23:43.6573717Z hint: call:
+sync	Checkout Repo	2026-02-13T01:23:43.6574295Z hint:
+sync	Checkout Repo	2026-02-13T01:23:43.6575385Z hint: 	git config --global init.defaultBranch <name>
+sync	Checkout Repo	2026-02-13T01:23:43.6576059Z hint:
+sync	Checkout Repo	2026-02-13T01:23:43.6576676Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+sync	Checkout Repo	2026-02-13T01:23:43.6577668Z hint: 'development'. The just-created branch can be renamed via this command:
+sync	Checkout Repo	2026-02-13T01:23:43.6578732Z hint:
+sync	Checkout Repo	2026-02-13T01:23:43.6579169Z hint: 	git branch -m <name>
+sync	Checkout Repo	2026-02-13T01:23:43.6579652Z hint:
+sync	Checkout Repo	2026-02-13T01:23:43.6580413Z hint: Disable this message with "git config set advice.defaultBranchName false"
+sync	Checkout Repo	2026-02-13T01:23:43.6581916Z Initialized empty Git repository in /home/runner/work/BusManager/BusManager/.git/
+sync	Checkout Repo	2026-02-13T01:23:43.6586864Z [command]/usr/bin/git remote add origin https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T01:23:43.6625713Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:43.6626565Z ##[group]Disabling automatic garbage collection
+sync	Checkout Repo	2026-02-13T01:23:43.6629858Z [command]/usr/bin/git config --local gc.auto 0
+sync	Checkout Repo	2026-02-13T01:23:43.6661155Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:43.6661901Z ##[group]Setting up auth
+sync	Checkout Repo	2026-02-13T01:23:43.6668972Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Checkout Repo	2026-02-13T01:23:43.6702159Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Checkout Repo	2026-02-13T01:23:43.7079650Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Checkout Repo	2026-02-13T01:23:43.7112574Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Checkout Repo	2026-02-13T01:23:43.7351454Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Checkout Repo	2026-02-13T01:23:43.7385599Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Checkout Repo	2026-02-13T01:23:43.7641805Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+sync	Checkout Repo	2026-02-13T01:23:43.7682908Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:43.7684360Z ##[group]Fetching the repository
+sync	Checkout Repo	2026-02-13T01:23:43.7693064Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c0b9dce9e7eb6f946fa21722a0c95661f46c8fb5:refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T01:23:44.2720745Z From https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T01:23:44.2723183Z  * [new ref]         c0b9dce9e7eb6f946fa21722a0c95661f46c8fb5 -> origin/main
+sync	Checkout Repo	2026-02-13T01:23:44.2758858Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:44.2760880Z ##[group]Determining the checkout info
+sync	Checkout Repo	2026-02-13T01:23:44.2763027Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:44.2766968Z [command]/usr/bin/git sparse-checkout disable
+sync	Checkout Repo	2026-02-13T01:23:44.2811050Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+sync	Checkout Repo	2026-02-13T01:23:44.2840433Z ##[group]Checking out the ref
+sync	Checkout Repo	2026-02-13T01:23:44.2844727Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T01:23:44.2950076Z Switched to a new branch 'main'
+sync	Checkout Repo	2026-02-13T01:23:44.2951909Z branch 'main' set up to track 'origin/main'.
+sync	Checkout Repo	2026-02-13T01:23:44.2960324Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T01:23:44.3000467Z [command]/usr/bin/git log -1 --format=%H
+sync	Checkout Repo	2026-02-13T01:23:44.3025371Z c0b9dce9e7eb6f946fa21722a0c95661f46c8fb5
+sync	Setup Node.js	﻿2026-02-13T01:23:44.3350463Z ##[group]Run actions/setup-node@v4
+sync	Setup Node.js	2026-02-13T01:23:44.3351694Z with:
+sync	Setup Node.js	2026-02-13T01:23:44.3352494Z   node-version: 20
+sync	Setup Node.js	2026-02-13T01:23:44.3353374Z   cache: npm
+sync	Setup Node.js	2026-02-13T01:23:44.3354225Z   always-auth: false
+sync	Setup Node.js	2026-02-13T01:23:44.3355152Z   check-latest: false
+sync	Setup Node.js	2026-02-13T01:23:44.3356344Z   token: ***
+sync	Setup Node.js	2026-02-13T01:23:44.3357390Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T01:23:44.5553353Z Found in cache @ /opt/hostedtoolcache/node/20.20.0/x64
+sync	Setup Node.js	2026-02-13T01:23:44.5560628Z ##[group]Environment details
+sync	Setup Node.js	2026-02-13T01:23:47.0670626Z node: v20.20.0
+sync	Setup Node.js	2026-02-13T01:23:47.0672263Z npm: 10.8.2
+sync	Setup Node.js	2026-02-13T01:23:47.0672833Z yarn: 1.22.22
+sync	Setup Node.js	2026-02-13T01:23:47.0675143Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T01:23:47.0698646Z [command]/opt/hostedtoolcache/node/20.20.0/x64/bin/npm config get cache
+sync	Setup Node.js	2026-02-13T01:23:47.4378893Z /home/runner/.npm
+sync	Setup Node.js	2026-02-13T01:23:47.6946966Z Cache hit for: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Setup Node.js	2026-02-13T01:23:48.9318088Z Received 37748736 of 256967561 (14.7%), 36.0 MBs/sec
+sync	Setup Node.js	2026-02-13T01:23:49.9322583Z Received 163577856 of 256967561 (63.7%), 78.0 MBs/sec
+sync	Setup Node.js	2026-02-13T01:23:50.5061880Z Received 256967561 of 256967561 (100.0%), 95.2 MBs/sec
+sync	Setup Node.js	2026-02-13T01:23:50.5063217Z Cache Size: ~245 MB (256967561 B)
+sync	Setup Node.js	2026-02-13T01:23:50.5191444Z [command]/usr/bin/tar -xf /home/runner/work/_temp/6a091569-4887-4a78-94bb-5573440b13c2/cache.tzst -P -C /home/runner/work/BusManager/BusManager --use-compress-program unzstd
+sync	Setup Node.js	2026-02-13T01:23:50.9906959Z Cache restored successfully
+sync	Setup Node.js	2026-02-13T01:23:51.0423868Z Cache restored from key: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Install Dependencies	﻿2026-02-13T01:23:51.0660754Z ##[group]Run npm ci
+sync	Install Dependencies	2026-02-13T01:23:51.0661125Z [36;1mnpm ci[0m
+sync	Install Dependencies	2026-02-13T01:23:51.0722361Z shell: /usr/bin/bash -e {0}
+sync	Install Dependencies	2026-02-13T01:23:51.0722677Z ##[endgroup]
+sync	Install Dependencies	2026-02-13T01:24:12.3312853Z 
+sync	Install Dependencies	2026-02-13T01:24:12.3320900Z > final-mare@0.1.0 postinstall
+sync	Install Dependencies	2026-02-13T01:24:12.3321433Z > prisma generate
+sync	Install Dependencies	2026-02-13T01:24:12.3321668Z 
+sync	Install Dependencies	2026-02-13T01:24:13.1934257Z Prisma schema loaded from prisma/schema.prisma
+sync	Install Dependencies	2026-02-13T01:24:13.5288321Z ┌─────────────────────────────────────────────────────────┐
+sync	Install Dependencies	2026-02-13T01:24:13.5289554Z │  Update available 6.19.2 -> 7.4.0                       │
+sync	Install Dependencies	2026-02-13T01:24:13.5290396Z │                                                         │
+sync	Install Dependencies	2026-02-13T01:24:13.5291340Z │  This is a major update - please follow the guide at    │
+sync	Install Dependencies	2026-02-13T01:24:13.5292336Z │  https://pris.ly/d/major-version-upgrade                │
+sync	Install Dependencies	2026-02-13T01:24:13.5293198Z │                                                         │
+sync	Install Dependencies	2026-02-13T01:24:13.5294029Z │  Run the following to update                            │
+sync	Install Dependencies	2026-02-13T01:24:13.5294991Z │    npm i --save-dev prisma@latest                       │
+sync	Install Dependencies	2026-02-13T01:24:13.5295874Z │    npm i @prisma/client@latest                          │
+sync	Install Dependencies	2026-02-13T01:24:13.5296814Z └─────────────────────────────────────────────────────────┘
+sync	Install Dependencies	2026-02-13T01:24:13.5297259Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5298178Z ✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 158ms
+sync	Install Dependencies	2026-02-13T01:24:13.5298883Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5299562Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+sync	Install Dependencies	2026-02-13T01:24:13.5300167Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5300706Z Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+sync	Install Dependencies	2026-02-13T01:24:13.5301284Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5639224Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5640249Z added 556 packages, and audited 557 packages in 22s
+sync	Install Dependencies	2026-02-13T01:24:13.5640766Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5641062Z 162 packages are looking for funding
+sync	Install Dependencies	2026-02-13T01:24:13.5641615Z   run `npm fund` for details
+sync	Install Dependencies	2026-02-13T01:24:13.5666737Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5667036Z 1 high severity vulnerability
+sync	Install Dependencies	2026-02-13T01:24:13.5667252Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5667697Z Some issues need review, and may require choosing
+sync	Install Dependencies	2026-02-13T01:24:13.5668574Z a different dependency.
+sync	Install Dependencies	2026-02-13T01:24:13.5668879Z 
+sync	Install Dependencies	2026-02-13T01:24:13.5669134Z Run `npm audit` for details.
+sync	Run Sync Script	﻿2026-02-13T01:24:13.6568541Z ##[group]Run npx tsx scripts/sync-schedule.ts
+sync	Run Sync Script	2026-02-13T01:24:13.6568955Z [36;1mnpx tsx scripts/sync-schedule.ts[0m
+sync	Run Sync Script	2026-02-13T01:24:13.6621153Z shell: /usr/bin/bash -e {0}
+sync	Run Sync Script	2026-02-13T01:24:13.6621420Z env:
+sync	Run Sync Script	2026-02-13T01:24:13.6621746Z   CLIENT_AGENCY: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6621993Z   CLIENT_USER: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6622220Z   CLIENT_PASS: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6622719Z   APP_URL: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6622971Z   APP_EMAIL: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6623194Z   APP_PASSWORD: ***
+sync	Run Sync Script	2026-02-13T01:24:13.6623407Z ##[endgroup]
+sync	Run Sync Script	2026-02-13T01:24:15.1642477Z 🚀 Starting Schedule Sync Bot (Enhanced Debugging)...
+sync	Run Sync Script	2026-02-13T01:24:16.6280077Z P1. Navigation to https://rip.nspenha.com.br/retaguarda/index.phtml...
+sync	Run Sync Script	2026-02-13T01:24:22.8595275Z P2. Filling Credentials...
+sync	Run Sync Script	2026-02-13T01:24:22.8596001Z Analyzing 1 frames...
+sync	Run Sync Script	2026-02-13T01:24:22.8796623Z Found 3 inputs in frame: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T01:24:22.9336879Z P2.1 Pressing Enter...
+sync	Run Sync Script	2026-02-13T01:24:23.9537624Z Login successful via Enter key.
+sync	Run Sync Script	2026-02-13T01:24:23.9538508Z P3.1 Waiting for navigation...
+sync	Run Sync Script	2026-02-13T01:24:23.9601003Z Login action completed. Checking for report link...
+sync	Run Sync Script	2026-02-13T01:24:23.9601729Z P3. Navigating to Report...
+sync	Run Sync Script	2026-02-13T01:24:24.0012405Z P3.1 analyzing page structure...
+sync	Run Sync Script	2026-02-13T01:24:24.0012988Z Found 1 frames.
+sync	Run Sync Script	2026-02-13T01:24:24.0013657Z Frame URL: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T01:24:24.0028294Z Frame has 17 links.
+sync	Run Sync Script	2026-02-13T01:24:24.0030873Z First 3 links: [{"text":"10.128.2.164 - 10.128.2.164","href":"","visible":true},{"text":"12/02/2026 22:23:28","href":"","visible":true},{"text":"ÁREA DE DOWNLOADS DA EMPRESA","href":"https://rip.nspenha.com.br/retaguarda/index.phtml#","visible":true}]
+sync	Run Sync Script	2026-02-13T01:24:24.0032651Z 🎯 TARGET FOUND in frame https://rip.nspenha.com.br/retaguarda/index.phtml: "Escala Programada"
+sync	Run Sync Script	2026-02-13T01:24:24.0038284Z Clicking target element...
+sync	Run Sync Script	2026-02-13T01:24:24.0046281Z Target Element HTML: <a href="javascript:void(0)" onclick="javascript: montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600 ) ">Escala Programada</a>
+sync	Run Sync Script	2026-02-13T01:24:24.0153222Z Standard click failed (Error: Node is either not clickable or not an Element). Trying fallback methods...
+sync	Run Sync Script	2026-02-13T01:24:24.0154146Z Attempting JS Click...
+sync	Run Sync Script	2026-02-13T01:24:24.0250843Z Waiting for potential popup...
+sync	Run Sync Script	2026-02-13T01:24:29.0255603Z No popup detected within 5s. Assuming same-page or parent frame update.
+sync	Run Sync Script	2026-02-13T01:24:29.0256396Z P4. Waiting for Report Page (Scanning all frames)...
+sync	Run Sync Script	2026-02-13T01:24:59.2505789Z Report verify failed. Attempting JS EXECUTION fallback...
+sync	Run Sync Script	2026-02-13T01:24:59.2508034Z Executing montaJanelaNova via JS in target frame...
+sync	Run Sync Script	2026-02-13T01:25:04.2646411Z Report found in frame after JS execution: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T01:25:04.2647403Z JS Execution successful! Content verified.
+sync	Run Sync Script	2026-02-13T01:25:04.2648184Z P4. Executing Search...
+sync	Run Sync Script	2026-02-13T01:25:09.2742305Z P5. Exporting PDF...
+sync	Run Sync Script	2026-02-13T01:25:12.8368518Z PDF Generated at /home/runner/work/BusManager/BusManager/schedule.pdf
+sync	Run Sync Script	2026-02-13T01:25:12.8369378Z P6. Uploading to BusManager...
+sync	Run Sync Script	2026-02-13T01:25:14.8148698Z Upload Success: {
+sync	Run Sync Script	2026-02-13T01:25:14.8149257Z   success: true,
+sync	Run Sync Script	2026-02-13T01:25:14.8153488Z   importId: 'bd28b6ab-f4ce-475e-a4c8-84c63c3589d7',
+sync	Run Sync Script	2026-02-13T01:25:14.8154224Z   count: 64,
+sync	Run Sync Script	2026-02-13T01:25:14.8154958Z   duplicates: [ '67021 (12:40) - Importado como duplicata' ],
+sync	Run Sync Script	2026-02-13T01:25:14.8155733Z   parseErrors: [
+sync	Run Sync Script	2026-02-13T01:25:14.8156745Z     'DEBUG: Veiculo 641051 | Texto: 00:20 | Base: 2026-02-02T00:20:00.000Z | Final: 2026-02-02T03:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8158601Z     'DEBUG: Veiculo 4622071 | Texto: 03:10 | Base: 2026-02-02T03:10:00.000Z | Final: 2026-02-02T06:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8160092Z     'DEBUG: Veiculo 55801 | Texto: 03:30 | Base: 2026-02-02T03:30:00.000Z | Final: 2026-02-02T06:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8161469Z     'DEBUG: Veiculo 55871 | Texto: 03:30 | Base: 2026-02-02T03:30:00.000Z | Final: 2026-02-02T06:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8163405Z     'DEBUG: Veiculo 56211 | Texto: 05:00 | Base: 2026-02-02T05:00:00.000Z | Final: 2026-02-02T08:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8164719Z     'DEBUG: Veiculo 4623061 | Texto: 05:05 | Base: 2026-02-02T05:05:00.000Z | Final: 2026-02-02T08:05:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8166304Z     'DEBUG: Veiculo 655161 | Texto: 05:20 | Base: 2026-02-02T05:20:00.000Z | Final: 2026-02-02T08:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8167700Z     'DEBUG: Veiculo 655071 | Texto: 07:00 | Base: 2026-02-02T07:00:00.000Z | Final: 2026-02-02T10:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8169185Z     'DEBUG: Veiculo 652351 | Texto: 07:00 | Base: 2026-02-02T07:00:00.000Z | Final: 2026-02-02T10:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8170433Z     'DEBUG: Veiculo 181701 | Texto: 07:00 | Base: 2026-02-02T07:00:00.000Z | Final: 2026-02-02T10:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8171690Z     'DEBUG: Veiculo 655281 | Texto: 07:20 | Base: 2026-02-02T07:20:00.000Z | Final: 2026-02-02T10:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8172975Z     'DEBUG: Veiculo 612351 | Texto: 07:40 | Base: 2026-02-02T07:40:00.000Z | Final: 2026-02-02T10:40:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8174374Z     'DEBUG: Veiculo 641101 | Texto: 08:00 | Base: 2026-02-02T08:00:00.000Z | Final: 2026-02-02T11:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8175850Z     'DEBUG: Veiculo 652301 | Texto: 08:00 | Base: 2026-02-02T08:00:00.000Z | Final: 2026-02-02T11:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8177026Z     'DEBUG: Veiculo 640101 | Texto: 09:00 | Base: 2026-02-02T09:00:00.000Z | Final: 2026-02-02T12:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8178499Z     'DEBUG: Veiculo 655021 | Texto: 09:10 | Base: 2026-02-02T09:10:00.000Z | Final: 2026-02-02T12:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8179677Z     'DEBUG: Veiculo 630551 | Texto: 09:30 | Base: 2026-02-02T09:30:00.000Z | Final: 2026-02-02T12:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8180746Z     'DEBUG: Veiculo 1 | Texto: 10:10 | Base: 2026-02-02T10:10:00.000Z | Final: 2026-02-02T13:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8181899Z     'DEBUG: Veiculo 651051 | Texto: 10:20 | Base: 2026-02-02T10:20:00.000Z | Final: 2026-02-02T13:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8183025Z     'DEBUG: Veiculo 655091 | Texto: 11:00 | Base: 2026-02-02T11:00:00.000Z | Final: 2026-02-02T14:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8184266Z     'DEBUG: Veiculo 630051 | Texto: 11:00 | Base: 2026-02-02T11:00:00.000Z | Final: 2026-02-02T14:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8185483Z     'DEBUG: Veiculo 4623041 | Texto: 12:20 | Base: 2026-02-02T12:20:00.000Z | Final: 2026-02-02T15:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8186712Z     'DEBUG: Veiculo 55821 | Texto: 12:20 | Base: 2026-02-02T12:20:00.000Z | Final: 2026-02-02T15:20:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8188341Z     'DEBUG: Veiculo 655341 | Texto: 12:30 | Base: 2026-02-02T12:30:00.000Z | Final: 2026-02-02T15:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8189491Z     'DEBUG: Veiculo 67021 | Texto: 12:40 | Base: 2026-02-02T12:40:00.000Z | Final: 2026-02-02T15:40:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8190884Z     'Linha ignorada (falha no Regex): "Filtro: Data Viagem: 12/02/2026 até 12/02/2026"',
+sync	Run Sync Script	2026-02-13T01:25:14.8191994Z     'Linha ignorada (falha no Regex): "Data Impressão: 12/02/2026 - 22:25:09"',
+sync	Run Sync Script	2026-02-13T01:25:14.8193128Z     'DEBUG: Veiculo 67021 | Texto: 12:40 | Base: 2026-02-02T12:40:00.000Z | Final: 2026-02-02T15:40:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8194345Z     'DEBUG: Veiculo 612201 | Texto: 12:45 | Base: 2026-02-02T12:45:00.000Z | Final: 2026-02-02T15:45:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8195631Z     'DEBUG: Veiculo 655201 | Texto: 12:50 | Base: 2026-02-02T12:50:00.000Z | Final: 2026-02-02T15:50:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8196779Z     'DEBUG: Veiculo 655181 | Texto: 13:00 | Base: 2026-02-02T13:00:00.000Z | Final: 2026-02-02T16:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8198122Z     'DEBUG: Veiculo 653051 | Texto: 13:00 | Base: 2026-02-02T13:00:00.000Z | Final: 2026-02-02T16:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8199238Z     'DEBUG: Veiculo 655171 | Texto: 13:30 | Base: 2026-02-02T13:30:00.000Z | Final: 2026-02-02T16:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8200638Z     'DEBUG: Veiculo 650701 | Texto: 14:00 | Base: 2026-02-02T14:00:00.000Z | Final: 2026-02-02T17:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8201770Z     'DEBUG: Veiculo 655111 | Texto: 14:30 | Base: 2026-02-02T14:30:00.000Z | Final: 2026-02-02T17:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8202947Z     'DEBUG: Veiculo 655161 | Texto: 15:00 | Base: 2026-02-02T15:00:00.000Z | Final: 2026-02-02T18:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8204257Z     'DEBUG: Veiculo 655241 | Texto: 15:30 | Base: 2026-02-02T15:30:00.000Z | Final: 2026-02-02T18:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8205382Z     'DEBUG: Veiculo 640651 | Texto: 16:00 | Base: 2026-02-02T16:00:00.000Z | Final: 2026-02-02T19:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8206505Z     'DEBUG: Veiculo 55851 | Texto: 16:05 | Base: 2026-02-02T16:05:00.000Z | Final: 2026-02-02T19:05:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8207631Z     'DEBUG: Veiculo 655051 | Texto: 17:00 | Base: 2026-02-02T17:00:00.000Z | Final: 2026-02-02T20:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8208936Z     'DEBUG: Veiculo 655011 | Texto: 17:30 | Base: 2026-02-02T17:30:00.000Z | Final: 2026-02-02T20:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8210168Z     'DEBUG: Veiculo 655191 | Texto: 18:50 | Base: 2026-02-02T18:50:00.000Z | Final: 2026-02-02T21:50:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8211419Z     'DEBUG: Veiculo 655071 | Texto: 19:00 | Base: 2026-02-02T19:00:00.000Z | Final: 2026-02-02T22:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8212644Z     'DEBUG: Veiculo 655131 | Texto: 19:10 | Base: 2026-02-02T19:10:00.000Z | Final: 2026-02-02T22:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8214577Z     'DEBUG: Veiculo 640051 | Texto: 19:15 | Base: 2026-02-02T19:15:00.000Z | Final: 2026-02-02T22:15:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8216088Z     'DEBUG: Veiculo 652751 | Texto: 19:30 | Base: 2026-02-02T19:30:00.000Z | Final: 2026-02-02T22:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8217501Z     'DEBUG: Veiculo 55821 | Texto: 19:40 | Base: 2026-02-02T19:40:00.000Z | Final: 2026-02-02T22:40:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8218915Z     'DEBUG: Veiculo 655101 | Texto: 20:10 | Base: 2026-02-02T20:10:00.000Z | Final: 2026-02-02T23:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8220198Z     'DEBUG: Veiculo 20201 | Texto: 20:15 | Base: 2026-02-02T20:15:00.000Z | Final: 2026-02-02T23:15:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8221429Z     'DEBUG: Veiculo 642151 | Texto: 21:00 | Base: 2026-02-02T21:00:00.000Z | Final: 2026-02-03T00:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8222967Z     'DEBUG: Veiculo 650651 | Texto: 21:00 | Base: 2026-02-02T21:00:00.000Z | Final: 2026-02-03T00:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8224203Z     'DEBUG: Veiculo 651051 | Texto: 21:15 | Base: 2026-02-02T21:15:00.000Z | Final: 2026-02-03T00:15:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8225383Z     'DEBUG: Veiculo 651001 | Texto: 21:30 | Base: 2026-02-02T21:30:00.000Z | Final: 2026-02-03T00:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8227360Z     'DEBUG: Veiculo 642051 | Texto: 22:00 | Base: 2026-02-02T22:00:00.000Z | Final: 2026-02-03T01:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8228838Z     'DEBUG: Veiculo 511471 | Texto: 22:10 | Base: 2026-02-02T22:10:00.000Z | Final: 2026-02-03T01:10:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8230140Z     'DEBUG: Veiculo 653151 | Texto: 22:30 | Base: 2026-02-02T22:30:00.000Z | Final: 2026-02-03T01:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8231366Z     'DEBUG: Veiculo 655291 | Texto: 22:50 | Base: 2026-02-02T22:50:00.000Z | Final: 2026-02-03T01:50:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8232606Z     'DEBUG: Veiculo 55771 | Texto: 22:59 | Base: 2026-02-02T22:59:00.000Z | Final: 2026-02-03T01:59:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8233832Z     'DEBUG: Veiculo 4624101 | Texto: 22:59 | Base: 2026-02-02T22:59:00.000Z | Final: 2026-02-03T01:59:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8235027Z     'DEBUG: Veiculo 55851 | Texto: 22:59 | Base: 2026-02-02T22:59:00.000Z | Final: 2026-02-03T01:59:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8236239Z     'DEBUG: Veiculo 656151 | Texto: 23:00 | Base: 2026-02-02T23:00:00.000Z | Final: 2026-02-03T02:00:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8237340Z     'DEBUG: Veiculo 640851 | Texto: 23:30 | Base: 2026-02-02T23:30:00.000Z | Final: 2026-02-03T02:30:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8238609Z     'DEBUG: Veiculo 655251 | Texto: 23:35 | Base: 2026-02-02T23:35:00.000Z | Final: 2026-02-03T02:35:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8239946Z     'DEBUG: Veiculo 1132 | Texto: 23:45 | Base: 2026-02-12T23:45:00.000Z | Final: 2026-02-13T02:45:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8241038Z     'DEBUG: Veiculo 640251 | Texto: 23:58 | Base: 2026-02-02T23:58:00.000Z | Final: 2026-02-03T02:58:00.000Z',
+sync	Run Sync Script	2026-02-13T01:25:14.8242360Z     'DEBUG: Veiculo 611501 | Texto: 23:59 | Base: 2026-02-02T23:59:00.000Z | Final: 2026-02-03T02:59:00.000Z'
+sync	Run Sync Script	2026-02-13T01:25:14.8243109Z   ],
+sync	Run Sync Script	2026-02-13T01:25:14.8258275Z   message: 'Importação concluída com sucesso.'
+sync	Run Sync Script	2026-02-13T01:25:14.8258878Z }
+sync	Post Setup Node.js	﻿2026-02-13T01:25:14.9675853Z Post job cleanup.
+sync	Post Setup Node.js	2026-02-13T01:25:15.1230514Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c, not saving cache.
+sync	Post Checkout Repo	﻿2026-02-13T01:25:15.1363104Z Post job cleanup.
+sync	Post Checkout Repo	2026-02-13T01:25:15.2320599Z [command]/usr/bin/git version
+sync	Post Checkout Repo	2026-02-13T01:25:15.2357608Z git version 2.52.0
+sync	Post Checkout Repo	2026-02-13T01:25:15.2401542Z Temporarily overriding HOME='/home/runner/work/_temp/75da9b58-7c87-4262-9f1a-cf3c51920d03' before making global git config changes
+sync	Post Checkout Repo	2026-02-13T01:25:15.2402575Z Adding repository directory to the temporary git global config as a safe directory
+sync	Post Checkout Repo	2026-02-13T01:25:15.2407046Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Post Checkout Repo	2026-02-13T01:25:15.2449147Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Post Checkout Repo	2026-02-13T01:25:15.2482562Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Post Checkout Repo	2026-02-13T01:25:15.2736175Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Post Checkout Repo	2026-02-13T01:25:15.2762090Z http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T01:25:15.2775329Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T01:25:15.2811827Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Post Checkout Repo	2026-02-13T01:25:15.3071283Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Post Checkout Repo	2026-02-13T01:25:15.3108588Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Complete job	﻿2026-02-13T01:25:15.3488847Z Cleaning up orphan processes

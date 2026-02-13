@@ -1,0 +1,237 @@
+sync	Set up job	﻿2026-02-13T00:50:43.5557987Z Current runner version: '2.331.0'
+sync	Set up job	2026-02-13T00:50:43.5583450Z ##[group]Runner Image Provisioner
+sync	Set up job	2026-02-13T00:50:43.5584286Z Hosted Compute Agent
+sync	Set up job	2026-02-13T00:50:43.5584829Z Version: 20260123.484
+sync	Set up job	2026-02-13T00:50:43.5585636Z Commit: 6bd6555ca37d84114959e1c76d2c01448ff61c5d
+sync	Set up job	2026-02-13T00:50:43.5586347Z Build Date: 2026-01-23T19:41:17Z
+sync	Set up job	2026-02-13T00:50:43.5587012Z Worker ID: {0e9d9295-83b9-4142-89d7-1d7c855685f0}
+sync	Set up job	2026-02-13T00:50:43.5587702Z Azure Region: westus3
+sync	Set up job	2026-02-13T00:50:43.5588235Z ##[endgroup]
+sync	Set up job	2026-02-13T00:50:43.5589643Z ##[group]Operating System
+sync	Set up job	2026-02-13T00:50:43.5590445Z Ubuntu
+sync	Set up job	2026-02-13T00:50:43.5591009Z 24.04.3
+sync	Set up job	2026-02-13T00:50:43.5591551Z LTS
+sync	Set up job	2026-02-13T00:50:43.5592040Z ##[endgroup]
+sync	Set up job	2026-02-13T00:50:43.5592555Z ##[group]Runner Image
+sync	Set up job	2026-02-13T00:50:43.5593147Z Image: ubuntu-24.04
+sync	Set up job	2026-02-13T00:50:43.5593667Z Version: 20260209.23.1
+sync	Set up job	2026-02-13T00:50:43.5594698Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260209.23/images/ubuntu/Ubuntu2404-Readme.md
+sync	Set up job	2026-02-13T00:50:43.5596446Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260209.23
+sync	Set up job	2026-02-13T00:50:43.5597383Z ##[endgroup]
+sync	Set up job	2026-02-13T00:50:43.5598466Z ##[group]GITHUB_TOKEN Permissions
+sync	Set up job	2026-02-13T00:50:43.5600477Z Contents: read
+sync	Set up job	2026-02-13T00:50:43.5601034Z Metadata: read
+sync	Set up job	2026-02-13T00:50:43.5601595Z Packages: read
+sync	Set up job	2026-02-13T00:50:43.5602154Z ##[endgroup]
+sync	Set up job	2026-02-13T00:50:43.5604362Z Secret source: Actions
+sync	Set up job	2026-02-13T00:50:43.5605464Z Prepare workflow directory
+sync	Set up job	2026-02-13T00:50:43.5915563Z Prepare all required actions
+sync	Set up job	2026-02-13T00:50:43.5953553Z Getting action download info
+sync	Set up job	2026-02-13T00:50:44.0521255Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+sync	Set up job	2026-02-13T00:50:44.1611376Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+sync	Set up job	2026-02-13T00:50:44.2370556Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+sync	Set up job	2026-02-13T00:50:44.4192189Z Complete job name: sync
+sync	Checkout Repo	﻿2026-02-13T00:50:44.4845687Z ##[group]Run actions/checkout@v4
+sync	Checkout Repo	2026-02-13T00:50:44.4846672Z with:
+sync	Checkout Repo	2026-02-13T00:50:44.4847217Z   repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T00:50:44.4848176Z   token: ***
+sync	Checkout Repo	2026-02-13T00:50:44.4848682Z   ssh-strict: true
+sync	Checkout Repo	2026-02-13T00:50:44.4849179Z   ssh-user: git
+sync	Checkout Repo	2026-02-13T00:50:44.4849678Z   persist-credentials: true
+sync	Checkout Repo	2026-02-13T00:50:44.4850201Z   clean: true
+sync	Checkout Repo	2026-02-13T00:50:44.4850711Z   sparse-checkout-cone-mode: true
+sync	Checkout Repo	2026-02-13T00:50:44.4851475Z   fetch-depth: 1
+sync	Checkout Repo	2026-02-13T00:50:44.4851931Z   fetch-tags: false
+sync	Checkout Repo	2026-02-13T00:50:44.4852448Z   show-progress: true
+sync	Checkout Repo	2026-02-13T00:50:44.4852939Z   lfs: false
+sync	Checkout Repo	2026-02-13T00:50:44.4853401Z   submodules: false
+sync	Checkout Repo	2026-02-13T00:50:44.4853923Z   set-safe-directory: true
+sync	Checkout Repo	2026-02-13T00:50:44.4854691Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:44.6048454Z Syncing repository: consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T00:50:44.6051066Z ##[group]Getting Git version info
+sync	Checkout Repo	2026-02-13T00:50:44.6052352Z Working directory is '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T00:50:44.6054104Z [command]/usr/bin/git version
+sync	Checkout Repo	2026-02-13T00:50:44.6054942Z git version 2.52.0
+sync	Checkout Repo	2026-02-13T00:50:44.6057865Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:44.6064371Z Temporarily overriding HOME='/home/runner/work/_temp/41f9ad7a-66f7-409f-b75a-cea93c9d7c48' before making global git config changes
+sync	Checkout Repo	2026-02-13T00:50:44.6066654Z Adding repository directory to the temporary git global config as a safe directory
+sync	Checkout Repo	2026-02-13T00:50:44.6078318Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T00:50:44.6116089Z Deleting the contents of '/home/runner/work/BusManager/BusManager'
+sync	Checkout Repo	2026-02-13T00:50:44.6120150Z ##[group]Initializing the repository
+sync	Checkout Repo	2026-02-13T00:50:44.6124500Z [command]/usr/bin/git init /home/runner/work/BusManager/BusManager
+sync	Checkout Repo	2026-02-13T00:50:44.6207583Z hint: Using 'master' as the name for the initial branch. This default branch name
+sync	Checkout Repo	2026-02-13T00:50:44.6209284Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+sync	Checkout Repo	2026-02-13T00:50:44.6211100Z hint: to use in all of your new repositories, which will suppress this warning,
+sync	Checkout Repo	2026-02-13T00:50:44.6212233Z hint: call:
+sync	Checkout Repo	2026-02-13T00:50:44.6213063Z hint:
+sync	Checkout Repo	2026-02-13T00:50:44.6213832Z hint: 	git config --global init.defaultBranch <name>
+sync	Checkout Repo	2026-02-13T00:50:44.6214711Z hint:
+sync	Checkout Repo	2026-02-13T00:50:44.6215781Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+sync	Checkout Repo	2026-02-13T00:50:44.6217093Z hint: 'development'. The just-created branch can be renamed via this command:
+sync	Checkout Repo	2026-02-13T00:50:44.6218159Z hint:
+sync	Checkout Repo	2026-02-13T00:50:44.6218860Z hint: 	git branch -m <name>
+sync	Checkout Repo	2026-02-13T00:50:44.6219551Z hint:
+sync	Checkout Repo	2026-02-13T00:50:44.6220517Z hint: Disable this message with "git config set advice.defaultBranchName false"
+sync	Checkout Repo	2026-02-13T00:50:44.6222011Z Initialized empty Git repository in /home/runner/work/BusManager/BusManager/.git/
+sync	Checkout Repo	2026-02-13T00:50:44.6224948Z [command]/usr/bin/git remote add origin https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T00:50:44.6259036Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:44.6260292Z ##[group]Disabling automatic garbage collection
+sync	Checkout Repo	2026-02-13T00:50:44.6264477Z [command]/usr/bin/git config --local gc.auto 0
+sync	Checkout Repo	2026-02-13T00:50:44.6294587Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:44.6295680Z ##[group]Setting up auth
+sync	Checkout Repo	2026-02-13T00:50:44.6304928Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Checkout Repo	2026-02-13T00:50:44.6338202Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Checkout Repo	2026-02-13T00:50:44.6644696Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Checkout Repo	2026-02-13T00:50:44.6675876Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Checkout Repo	2026-02-13T00:50:44.6866846Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Checkout Repo	2026-02-13T00:50:44.6905277Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Checkout Repo	2026-02-13T00:50:44.7104439Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+sync	Checkout Repo	2026-02-13T00:50:44.7137069Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:44.7137885Z ##[group]Fetching the repository
+sync	Checkout Repo	2026-02-13T00:50:44.7145927Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +a0455154e22d0286031b48cf646d321b44c770f6:refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T00:50:45.2163077Z From https://github.com/consultoriagestao40-rgb/BusManager
+sync	Checkout Repo	2026-02-13T00:50:45.2164238Z  * [new ref]         a0455154e22d0286031b48cf646d321b44c770f6 -> origin/main
+sync	Checkout Repo	2026-02-13T00:50:45.2193346Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:45.2194550Z ##[group]Determining the checkout info
+sync	Checkout Repo	2026-02-13T00:50:45.2195881Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:45.2200096Z [command]/usr/bin/git sparse-checkout disable
+sync	Checkout Repo	2026-02-13T00:50:45.2238517Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+sync	Checkout Repo	2026-02-13T00:50:45.2267066Z ##[group]Checking out the ref
+sync	Checkout Repo	2026-02-13T00:50:45.2272124Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+sync	Checkout Repo	2026-02-13T00:50:45.2347257Z Switched to a new branch 'main'
+sync	Checkout Repo	2026-02-13T00:50:45.2348488Z branch 'main' set up to track 'origin/main'.
+sync	Checkout Repo	2026-02-13T00:50:45.2354505Z ##[endgroup]
+sync	Checkout Repo	2026-02-13T00:50:45.2389830Z [command]/usr/bin/git log -1 --format=%H
+sync	Checkout Repo	2026-02-13T00:50:45.2411257Z a0455154e22d0286031b48cf646d321b44c770f6
+sync	Setup Node.js	﻿2026-02-13T00:50:45.2647034Z ##[group]Run actions/setup-node@v4
+sync	Setup Node.js	2026-02-13T00:50:45.2647669Z with:
+sync	Setup Node.js	2026-02-13T00:50:45.2648080Z   node-version: 20
+sync	Setup Node.js	2026-02-13T00:50:45.2648492Z   cache: npm
+sync	Setup Node.js	2026-02-13T00:50:45.2649687Z   always-auth: false
+sync	Setup Node.js	2026-02-13T00:50:45.2650153Z   check-latest: false
+sync	Setup Node.js	2026-02-13T00:50:45.2650818Z   token: ***
+sync	Setup Node.js	2026-02-13T00:50:45.2651432Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T00:50:45.4440244Z Found in cache @ /opt/hostedtoolcache/node/20.20.0/x64
+sync	Setup Node.js	2026-02-13T00:50:45.4447256Z ##[group]Environment details
+sync	Setup Node.js	2026-02-13T00:50:45.7503553Z node: v20.20.0
+sync	Setup Node.js	2026-02-13T00:50:45.7505856Z npm: 10.8.2
+sync	Setup Node.js	2026-02-13T00:50:45.7507101Z yarn: 1.22.22
+sync	Setup Node.js	2026-02-13T00:50:45.7509662Z ##[endgroup]
+sync	Setup Node.js	2026-02-13T00:50:45.7527341Z [command]/opt/hostedtoolcache/node/20.20.0/x64/bin/npm config get cache
+sync	Setup Node.js	2026-02-13T00:50:45.8598058Z /home/runner/.npm
+sync	Setup Node.js	2026-02-13T00:50:46.1146059Z Cache hit for: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Setup Node.js	2026-02-13T00:50:47.3547359Z Received 46137344 of 256967561 (18.0%), 44.0 MBs/sec
+sync	Setup Node.js	2026-02-13T00:50:48.3536914Z Received 171966464 of 256967561 (66.9%), 82.0 MBs/sec
+sync	Setup Node.js	2026-02-13T00:50:48.7964298Z Received 256967561 of 256967561 (100.0%), 100.3 MBs/sec
+sync	Setup Node.js	2026-02-13T00:50:48.7996410Z Cache Size: ~245 MB (256967561 B)
+sync	Setup Node.js	2026-02-13T00:50:48.8092320Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ab64897f-2ee6-4e85-9976-c6cc1c83a049/cache.tzst -P -C /home/runner/work/BusManager/BusManager --use-compress-program unzstd
+sync	Setup Node.js	2026-02-13T00:50:49.1043386Z Cache restored successfully
+sync	Setup Node.js	2026-02-13T00:50:49.1347518Z Cache restored from key: node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c
+sync	Install Dependencies	﻿2026-02-13T00:50:49.1479974Z ##[group]Run npm ci
+sync	Install Dependencies	2026-02-13T00:50:49.1480370Z [36;1mnpm ci[0m
+sync	Install Dependencies	2026-02-13T00:50:49.1520047Z shell: /usr/bin/bash -e {0}
+sync	Install Dependencies	2026-02-13T00:50:49.1520391Z ##[endgroup]
+sync	Install Dependencies	2026-02-13T00:51:06.6609503Z 
+sync	Install Dependencies	2026-02-13T00:51:06.6618807Z > final-mare@0.1.0 postinstall
+sync	Install Dependencies	2026-02-13T00:51:06.6619597Z > prisma generate
+sync	Install Dependencies	2026-02-13T00:51:06.6619852Z 
+sync	Install Dependencies	2026-02-13T00:51:07.4689137Z Prisma schema loaded from prisma/schema.prisma
+sync	Install Dependencies	2026-02-13T00:51:07.7841295Z ┌─────────────────────────────────────────────────────────┐
+sync	Install Dependencies	2026-02-13T00:51:07.7842508Z │  Update available 6.19.2 -> 7.4.0                       │
+sync	Install Dependencies	2026-02-13T00:51:07.7843200Z │                                                         │
+sync	Install Dependencies	2026-02-13T00:51:07.7843972Z │  This is a major update - please follow the guide at    │
+sync	Install Dependencies	2026-02-13T00:51:07.7844787Z │  https://pris.ly/d/major-version-upgrade                │
+sync	Install Dependencies	2026-02-13T00:51:07.7845740Z │                                                         │
+sync	Install Dependencies	2026-02-13T00:51:07.7846427Z │  Run the following to update                            │
+sync	Install Dependencies	2026-02-13T00:51:07.7847341Z │    npm i --save-dev prisma@latest                       │
+sync	Install Dependencies	2026-02-13T00:51:07.7848132Z │    npm i @prisma/client@latest                          │
+sync	Install Dependencies	2026-02-13T00:51:07.7848967Z └─────────────────────────────────────────────────────────┘
+sync	Install Dependencies	2026-02-13T00:51:07.7849381Z 
+sync	Install Dependencies	2026-02-13T00:51:07.7850016Z ✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 145ms
+sync	Install Dependencies	2026-02-13T00:51:07.7850502Z 
+sync	Install Dependencies	2026-02-13T00:51:07.7851919Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+sync	Install Dependencies	2026-02-13T00:51:07.7852558Z 
+sync	Install Dependencies	2026-02-13T00:51:07.7853322Z Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+sync	Install Dependencies	2026-02-13T00:51:07.7854060Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8075970Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8076946Z added 556 packages, and audited 557 packages in 19s
+sync	Install Dependencies	2026-02-13T00:51:07.8077565Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8078034Z 162 packages are looking for funding
+sync	Install Dependencies	2026-02-13T00:51:07.8078581Z   run `npm fund` for details
+sync	Install Dependencies	2026-02-13T00:51:07.8100317Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8100865Z 1 high severity vulnerability
+sync	Install Dependencies	2026-02-13T00:51:07.8101214Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8546649Z Some issues need review, and may require choosing
+sync	Install Dependencies	2026-02-13T00:51:07.8547049Z a different dependency.
+sync	Install Dependencies	2026-02-13T00:51:07.8547208Z 
+sync	Install Dependencies	2026-02-13T00:51:07.8547329Z Run `npm audit` for details.
+sync	Run Sync Script	﻿2026-02-13T00:51:07.8588734Z ##[group]Run npx tsx scripts/sync-schedule.ts
+sync	Run Sync Script	2026-02-13T00:51:07.8589098Z [36;1mnpx tsx scripts/sync-schedule.ts[0m
+sync	Run Sync Script	2026-02-13T00:51:07.8618564Z shell: /usr/bin/bash -e {0}
+sync	Run Sync Script	2026-02-13T00:51:07.8618831Z env:
+sync	Run Sync Script	2026-02-13T00:51:07.8619318Z   CLIENT_AGENCY: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8619562Z   CLIENT_USER: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8620003Z   CLIENT_PASS: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8620287Z   APP_URL: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8620503Z   APP_EMAIL: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8620707Z   APP_PASSWORD: ***
+sync	Run Sync Script	2026-02-13T00:51:07.8620915Z ##[endgroup]
+sync	Run Sync Script	2026-02-13T00:51:09.1180404Z 🚀 Starting Schedule Sync Bot (Enhanced Debugging)...
+sync	Run Sync Script	2026-02-13T00:51:10.3111304Z P1. Navigation to https://rip.nspenha.com.br/retaguarda/index.phtml...
+sync	Run Sync Script	2026-02-13T00:51:17.0949470Z P2. Filling Credentials...
+sync	Run Sync Script	2026-02-13T00:51:17.0950096Z Analyzing 1 frames...
+sync	Run Sync Script	2026-02-13T00:51:17.1228979Z Found 3 inputs in frame: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T00:51:17.1728777Z P2.1 Pressing Enter...
+sync	Run Sync Script	2026-02-13T00:51:18.0667777Z Login successful via Enter key.
+sync	Run Sync Script	2026-02-13T00:51:18.0668541Z P3.1 Waiting for navigation...
+sync	Run Sync Script	2026-02-13T00:51:18.0731716Z Login action completed. Checking for report link...
+sync	Run Sync Script	2026-02-13T00:51:18.0732417Z P3. Navigating to Report...
+sync	Run Sync Script	2026-02-13T00:51:18.1247083Z P3.1 analyzing page structure...
+sync	Run Sync Script	2026-02-13T00:51:18.1247529Z Found 1 frames.
+sync	Run Sync Script	2026-02-13T00:51:18.1247932Z Frame URL: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T00:51:18.1258889Z Frame has 17 links.
+sync	Run Sync Script	2026-02-13T00:51:18.1260990Z First 3 links: [{"text":"10.128.2.164 - 10.128.2.164","href":"","visible":true},{"text":"12/02/2026 21:48:14","href":"","visible":true},{"text":"ÁREA DE DOWNLOADS DA EMPRESA","href":"https://rip.nspenha.com.br/retaguarda/index.phtml#","visible":true}]
+sync	Run Sync Script	2026-02-13T00:51:18.1262474Z 🎯 TARGET FOUND in frame https://rip.nspenha.com.br/retaguarda/index.phtml: "Escala Programada"
+sync	Run Sync Script	2026-02-13T00:51:18.1270867Z Clicking target element...
+sync	Run Sync Script	2026-02-13T00:51:18.1278744Z Target Element HTML: <a href="javascript:void(0)" onclick="javascript: montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600 ) ">Escala Programada</a>
+sync	Run Sync Script	2026-02-13T00:51:18.1426705Z Standard click failed (Error: Node is either not clickable or not an Element). Trying fallback methods...
+sync	Run Sync Script	2026-02-13T00:51:18.1427374Z Attempting JS Click...
+sync	Run Sync Script	2026-02-13T00:51:18.1527867Z Waiting for potential popup...
+sync	Run Sync Script	2026-02-13T00:51:23.1528326Z No popup detected within 5s. Assuming same-page or parent frame update.
+sync	Run Sync Script	2026-02-13T00:51:23.1529265Z P4. Waiting for Report Page (Scanning all frames)...
+sync	Run Sync Script	2026-02-13T00:51:53.3446540Z Report verify failed. Attempting JS EXECUTION fallback...
+sync	Run Sync Script	2026-02-13T00:51:53.3447325Z Executing montaJanelaNova via JS in target frame...
+sync	Run Sync Script	2026-02-13T00:51:58.3615509Z Report found in frame after JS execution: https://rip.nspenha.com.br/retaguarda/index.phtml
+sync	Run Sync Script	2026-02-13T00:51:58.3616121Z JS Execution successful! Content verified.
+sync	Run Sync Script	2026-02-13T00:51:58.3616428Z P4. Executing Search...
+sync	Run Sync Script	2026-02-13T00:52:03.3707077Z P5. Exporting PDF...
+sync	Run Sync Script	2026-02-13T00:52:06.8937125Z PDF Generated at /home/runner/work/BusManager/BusManager/schedule.pdf
+sync	Run Sync Script	2026-02-13T00:52:06.8938012Z P6. Uploading to BusManager...
+sync	Run Sync Script	2026-02-13T00:52:09.7037202Z Upload Success: {
+sync	Run Sync Script	2026-02-13T00:52:09.7037661Z   success: true,
+sync	Run Sync Script	2026-02-13T00:52:09.7038251Z   importId: 'ec90644a-b92e-4424-a720-7567f25244ea',
+sync	Run Sync Script	2026-02-13T00:52:09.7038745Z   count: 64,
+sync	Run Sync Script	2026-02-13T00:52:09.7039029Z   duplicates: [],
+sync	Run Sync Script	2026-02-13T00:52:09.7039354Z   parseErrors: [
+sync	Run Sync Script	2026-02-13T00:52:09.7040047Z     'Linha ignorada (falha no Regex): "Filtro: Data Viagem: 12/02/2026 até 12/02/2026"',
+sync	Run Sync Script	2026-02-13T00:52:09.7040969Z     'Linha ignorada (falha no Regex): "Data Impressão: 12/02/2026 - 21:52:03"'
+sync	Run Sync Script	2026-02-13T00:52:09.7041555Z   ],
+sync	Run Sync Script	2026-02-13T00:52:09.7042060Z   message: 'Importação concluída com sucesso.'
+sync	Run Sync Script	2026-02-13T00:52:09.7042473Z }
+sync	Post Setup Node.js	﻿2026-02-13T00:52:09.8458052Z Post job cleanup.
+sync	Post Setup Node.js	2026-02-13T00:52:09.9916369Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-cda2bb4ee23f2c13cbb458c7af3e5686de54cf23cffc029c6a9f57dc6bda962c, not saving cache.
+sync	Post Checkout Repo	﻿2026-02-13T00:52:10.0032182Z Post job cleanup.
+sync	Post Checkout Repo	2026-02-13T00:52:10.0928862Z [command]/usr/bin/git version
+sync	Post Checkout Repo	2026-02-13T00:52:10.0962810Z git version 2.52.0
+sync	Post Checkout Repo	2026-02-13T00:52:10.1002840Z Temporarily overriding HOME='/home/runner/work/_temp/7688bf44-e0ad-44b0-bbf9-653f94c5cc3f' before making global git config changes
+sync	Post Checkout Repo	2026-02-13T00:52:10.1004604Z Adding repository directory to the temporary git global config as a safe directory
+sync	Post Checkout Repo	2026-02-13T00:52:10.1009675Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/BusManager/BusManager
+sync	Post Checkout Repo	2026-02-13T00:52:10.1044369Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+sync	Post Checkout Repo	2026-02-13T00:52:10.1078057Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+sync	Post Checkout Repo	2026-02-13T00:52:10.1269708Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+sync	Post Checkout Repo	2026-02-13T00:52:10.1289655Z http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T00:52:10.1301242Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+sync	Post Checkout Repo	2026-02-13T00:52:10.1330248Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+sync	Post Checkout Repo	2026-02-13T00:52:10.1522366Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+sync	Post Checkout Repo	2026-02-13T00:52:10.1555336Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+sync	Complete job	﻿2026-02-13T00:52:10.1848174Z Cleaning up orphan processes
