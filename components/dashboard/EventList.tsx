@@ -360,8 +360,8 @@ export default function EventList({ events }: { events: Event[] }) {
                             </div>
                         </div>
                     </div>
-                )
-            }
+                )}
+
 
             {
                 swapModalOpen && selectedEvent && (
@@ -421,8 +421,8 @@ export default function EventList({ events }: { events: Event[] }) {
                             </div>
                         </div>
                     </div>
-                )
-            }
+                )}
+
             {
                 finishModalOpen && selectedEvent && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -483,9 +483,8 @@ export default function EventList({ events }: { events: Event[] }) {
                             </div>
                         </div>
                     </div>
-                </div >
-            )
-}
+            )}
+
 
         </>
     );
