@@ -28,7 +28,7 @@ export default function Sidebar() {
 
     return (
         <div
-            className={`relative flex flex-col bg-gray-900 text-white transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-56'}`}
+            className={`relative h-screen flex flex-col bg-gray-900 text-white transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-56'}`}
         >
             {/* Collapse Toggle Button */}
             <button
