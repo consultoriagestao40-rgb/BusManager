@@ -89,7 +89,7 @@ export default function KPIDashboard() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
                 <div className="bg-white p-6 rounded shadow border-l-4 border-blue-500">
                     <div className="flex items-center justify-between">
                         <div>
