@@ -227,10 +227,16 @@ export default function DashboardPage() {
             </div>
 
             {/* Basic Stats Stub (Dynamic data to be added later if needed) */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div className="bg-white p-4 rounded shadow">
+                    <h3 className="text-gray-500 text-sm">Total</h3>
+                    <p className="text-2xl font-bold">{events.length}</p>
+                </div>
                 <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-gray-500 text-sm">Previstos</h3>
-                    <p className="text-2xl font-bold">{events.length}</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                        {events.length - events.filter((e: any) => e.status === 'CANCELADO').length}
+                    </p>
                 </div>
                 <div
                     className="bg-white p-4 rounded shadow cursor-pointer hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-200"
