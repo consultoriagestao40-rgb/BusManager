@@ -216,22 +216,28 @@ export default function EventList({ events }: { events: Event[] }) {
 
     return (
         <>
-            <div className="relative w-full">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                        <thead className="bg-blue-600 sticky top-0 z-50 shadow-md">
+            {/* Fixed height container with sticky header */}
+            <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-150px)] overflow-y-auto">
+                    <table className="w-full min-w-full border-collapse">
+                        <thead className="bg-gradient-to-r from-blue-600 to-blue-700 sticky top-0 z-50 shadow-lg">
                             <tr>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Hora</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Carro</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden md:table-cell">Saída</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden lg:table-cell">Meta</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden md:table-cell">Colaborador</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">SLA</th>
-                                <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Status</th>
-                                <th className="py-3 px-3 text-right text-xs font-extrabold text-white uppercase">Ações</th>
+                                <th className="py-4 px-2 md:px-4 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">
+                                    <div className="flex flex-col">
+                                        <span>Hora</span>
+                                        <span className="text-[10px] font-normal opacity-75">Local</span>
+                                    </div>
+                                </th>
+                                <th className="py-4 px-2 md:px-4 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Carro</th>
+                                <th className="hidden md:table-cell py-4 px-4 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Saída</th>
+                                <th className="hidden lg:table-cell py-4 px-4 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Meta</th>
+                                <th className="hidden md:table-cell py-4 px-4 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Colaborador</th>
+                                <th className="py-4 px-2 md:px-4 text-center text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">SLA</th>
+                                <th className="py-4 px-2 md:px-4 text-center text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Status</th>
+                                <th className="py-4 px-2 md:px-4 text-right text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Ações</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white">
+                        <tbody className="divide-y divide-gray-100 bg-white">
                             {events.map((event) => {
                                 const sla = getSlaStatus(event);
                                 const slaColor = {
@@ -249,14 +255,18 @@ export default function EventList({ events }: { events: Event[] }) {
                                 const cleanerName = event.cleaner?.name || '-';
 
                                 return (
-                                    <tr key={event.id} className={getRowClass(sla)}>
-                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                                            {format(new Date(event.hora_viagem), 'HH:mm')}
-                                            <div className="text-[10px] text-gray-400 font-normal">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</div>
+                                    <tr key={event.id} className={`${getRowClass(sla)} hover:bg-blue-50/50 transition-colors`}>
+                                        <td className="py-3 md:py-4 pl-2 md:pl-4 pr-1 md:pr-3">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm md:text-base font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
+                                                <span className="text-[10px] md:text-xs text-gray-400 mt-0.5">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</span>
+                                            </div>
                                         </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            <span className="font-bold text-gray-900">{event.vehicle.client_vehicle_number}</span>
-                                            {event.vehicle.prefix && <span className="ml-2 text-xs bg-gray-200 px-1 rounded">{event.vehicle.prefix}</span>}
+                                        <td className="py-3 md:py-4 px-1 md:px-3">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm md:text-base font-extrabold text-gray-900">{event.vehicle.client_vehicle_number}</span>
+                                                {event.vehicle.prefix && <span className="text-[10px] md:text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded mt-1 inline-block w-fit font-medium">{event.vehicle.prefix}</span>}
+                                            </div>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                             {format(new Date(event.saida_programada_at), 'HH:mm')}
@@ -483,7 +493,7 @@ export default function EventList({ events }: { events: Event[] }) {
                             </div>
                         </div>
                     </div>
-            )}
+                )}
 
 
         </>
