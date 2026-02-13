@@ -41,7 +41,22 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 }
 
                 const [hours, minutes] = evt.timeStr.split(':').map(Number);
-                const scheduleDate = addMinutes(addHours(baseDate, hours), minutes);
+                // Base date is parsed as local/UTC depending on env. 
+                // We assume input is BRT (UTC-3). If server is UTC, "20:45" becomes "20:45 UTC".
+                // When displayed in BRT, it becomes "17:45" (-3h). 
+                // We want it to be "23:45 UTC" so it displays as "20:45 BRT".
+                // ERROR IN USER REPORT: 1132 is 20:45 in PDF. 
+                // If it shows 17:45, we need +3h.
+                // If user says "shown as 20:45" but PDF says "23:45" -> then it's correct?
+                // Wait, user said: "carro 1132, esta com saida para 20:45. Veja esse mesmo carro no sistem do cliente 23:45"
+                // So System = 20:45, Client (Real) = 23:45.
+                // System is BEHIND by 3 hours.
+                // This means we need to ADD 3 hours.
+
+                let scheduleDate = addMinutes(addHours(baseDate, hours), minutes);
+
+                // FIX: Add 3 hours to compensate for UTC-3 input being treated as UTC
+                scheduleDate = addHours(scheduleDate, 3);
 
                 // Extract Metadata from Buffer
                 let driverName: string | undefined;
