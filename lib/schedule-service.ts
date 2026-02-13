@@ -81,10 +81,8 @@ export async function createScheduleVersion(
             // Exclude client_vehicle_number as it's not in the CleaningEvent model
             const { client_vehicle_number, ...eventData } = event;
 
-            // Convert hh:mm string to Date
-            const [hours, minutes] = event.hora_viagem.split(':').map(Number);
-            const horaViagemDate = new Date(dataViagem);
-            horaViagemDate.setHours(hours, minutes, 0, 0);
+            // Use the already corrected date from the parser (which has +3h applied)
+            const horaViagemDate = new Date(event.saida_programada_at);
 
             processedEvents.push({
                 ...eventData,
