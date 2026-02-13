@@ -8,16 +8,16 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="flex h-screen bg-gray-100">
-            {/* Hide sidebar on mobile/tablet, show on desktop (lg+) */}
-            <div className="hidden lg:block">
+            {/* Show sidebar on all screens except mobile */}
+            <div className="hidden md:block">
                 <Sidebar />
             </div>
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Hide header on mobile/tablet, show on desktop (lg+) */}
-                <div className="hidden lg:block">
+                {/* Show header on all screens except mobile */}
+                <div className="hidden md:block">
                     <Header />
                 </div>
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-2 sm:p-4 lg:p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-2 sm:p-4 md:p-6">
                     {children}
                 </main>
             </div>

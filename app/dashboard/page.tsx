@@ -227,7 +227,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Basic Stats Stub (Dynamic data to be added later if needed) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
                 <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-gray-500 text-sm">Total</h3>
                     <p className="text-2xl font-bold">{events.length}</p>
