@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "BusManager",
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'screen-orientation': 'landscape',
+    'x5-orientation': 'landscape',
+  },
 };
 
 export default function RootLayout({
@@ -36,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
