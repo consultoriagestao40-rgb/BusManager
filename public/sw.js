@@ -1,4 +1,4 @@
-const CACHE_NAME = 'busmanager-v11';
+const CACHE_NAME = 'busmanager-v12';
 const urlsToCache = [
     '/dashboard',
     '/api/events',
@@ -30,6 +30,25 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
+        })
+    );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            // Focus existing window or open new one
+            for (const client of clientList) {
+                if (client.url.includes('/dashboard') && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow('/dashboard');
+            }
         })
     );
 });
