@@ -215,268 +215,267 @@ export default function EventList({ events }: { events: Event[] }) {
     };
 
     return (
-        <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-30 shadow-sm backdrop-blur-sm">
-                    <tr>
-                        <th className="py-4 pl-4 pr-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Hora</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Carro</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Saída</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">H-1 (Meta)</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Colaborador</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">SLA</th>
-                        <th className="px-3 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                        <th className="relative py-4 pl-3 pr-4 sm:pr-6 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                            Ações
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                    {events.map((event) => {
-                        const sla = getSlaStatus(event);
-                        const slaColor = {
-                            completed: 'text-green-600',
-                            expired: 'text-red-600',
-                            critical: 'text-orange-600',
-                            warning: 'text-yellow-600',
-                            normal: 'text-green-600'
-                        }[sla];
+        <div className="relative w-full">
+            <div className="overflow-x-auto">
+                <table className="min-w-full">
+                    <thead className="bg-blue-600 sticky top-0 z-50 shadow-md">
+                        <tr>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Hora</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Carro</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden md:table-cell">Saída</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden lg:table-cell">Meta</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase hidden md:table-cell">Colaborador</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">SLA</th>
+                            <th className="py-3 px-3 text-left text-xs font-extrabold text-white uppercase">Status</th>
+                            <th className="py-3 px-3 text-right text-xs font-extrabold text-white uppercase">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                        {events.map((event) => {
+                            const sla = getSlaStatus(event);
+                            const slaColor = {
+                                completed: 'text-green-600',
+                                expired: 'text-red-600',
+                                critical: 'text-orange-600',
+                                warning: 'text-yellow-600',
+                                normal: 'text-green-600'
+                            }[sla];
 
-                        const diff = differenceInMinutes(new Date(event.liberar_ate_at), now);
-                        const diffText = diff > 0 ? `${Math.floor(diff / 60)}h ${diff % 60}m` : 'Estourado';
+                            const diff = differenceInMinutes(new Date(event.liberar_ate_at), now);
+                            const diffText = diff > 0 ? `${Math.floor(diff / 60)}h ${diff % 60}m` : 'Estourado';
 
-                        // Find cleaner name if available
-                        const cleanerName = event.cleaner?.name || '-';
+                            // Find cleaner name if available
+                            const cleanerName = event.cleaner?.name || '-';
 
-                        return (
-                            <tr key={event.id} className={getRowClass(sla)}>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                                    {format(new Date(event.hora_viagem), 'HH:mm')}
-                                    <div className="text-[10px] text-gray-400 font-normal">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</div>
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <span className="font-bold text-gray-900">{event.vehicle.client_vehicle_number}</span>
-                                    {event.vehicle.prefix && <span className="ml-2 text-xs bg-gray-200 px-1 rounded">{event.vehicle.prefix}</span>}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {format(new Date(event.saida_programada_at), 'HH:mm')}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {format(new Date(event.liberar_ate_at), 'HH:mm')}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 font-medium">
-                                    {cleanerName}
-                                </td>
-                                <td className={`whitespace-nowrap px-3 py-4 text-sm font-bold ${slaColor}`}>
-                                    {sla === 'completed' ? <CheckCircle className="w-5 h-5" /> : diffText}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium 
+                            return (
+                                <tr key={event.id} className={getRowClass(sla)}>
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                                        {format(new Date(event.hora_viagem), 'HH:mm')}
+                                        <div className="text-[10px] text-gray-400 font-normal">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</div>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <span className="font-bold text-gray-900">{event.vehicle.client_vehicle_number}</span>
+                                        {event.vehicle.prefix && <span className="ml-2 text-xs bg-gray-200 px-1 rounded">{event.vehicle.prefix}</span>}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {format(new Date(event.saida_programada_at), 'HH:mm')}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {format(new Date(event.liberar_ate_at), 'HH:mm')}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 font-medium">
+                                        {cleanerName}
+                                    </td>
+                                    <td className={`whitespace-nowrap px-3 py-4 text-sm font-bold ${slaColor}`}>
+                                        {sla === 'completed' ? <CheckCircle className="w-5 h-5" /> : diffText}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium 
                         ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-800' :
-                                            event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                                        {event.status}
-                                    </span>
-                                </td>
-                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                    {event.status !== 'CONCLUIDO' && (
-                                        <div className="flex justify-end space-x-2">
-                                            {event.status === 'PREVISTO' && (
+                                                event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                                            {event.status}
+                                        </span>
+                                    </td>
+                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        {event.status !== 'CONCLUIDO' && (
+                                            <div className="flex justify-end space-x-2">
+                                                {event.status === 'PREVISTO' && (
+                                                    <button
+                                                        onClick={() => handleAction(event.id, 'start')}
+                                                        disabled={processing}
+                                                        title="Iniciar Limpeza"
+                                                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                                                    >
+                                                        <Play className="w-5 h-5" />
+                                                    </button>
+                                                )}
+
+                                                {event.status === 'EM_ANDAMENTO' && (
+                                                    <button
+                                                        onClick={() => handleAction(event.id, 'finish')}
+                                                        disabled={processing}
+                                                        title="Finalizar Limpeza"
+                                                        className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                                    >
+                                                        <CheckCircle className="w-5 h-5" />
+                                                    </button>
+                                                )}
+
                                                 <button
-                                                    onClick={() => handleAction(event.id, 'start')}
+                                                    onClick={() => openSwap(event)}
                                                     disabled={processing}
-                                                    title="Iniciar Limpeza"
-                                                    className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                                                    title="Trocar Veículo"
+                                                    className="p-1 text-orange-600 hover:bg-orange-50 rounded"
                                                 >
-                                                    <Play className="w-5 h-5" />
+                                                    <RefreshCw className="w-5 h-5" />
                                                 </button>
-                                            )}
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
 
-                                            {event.status === 'EM_ANDAMENTO' && (
-                                                <button
-                                                    onClick={() => handleAction(event.id, 'finish')}
-                                                    disabled={processing}
-                                                    title="Finalizar Limpeza"
-                                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
-                                                >
-                                                    <CheckCircle className="w-5 h-5" />
-                                                </button>
-                                            )}
+                {startModalOpen && selectedEvent && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                            <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
+                            <p className="mb-4">Selecione o Colaborador para o veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
 
-                                            <button
-                                                onClick={() => openSwap(event)}
-                                                disabled={processing}
-                                                title="Trocar Veículo"
-                                                className="p-1 text-orange-600 hover:bg-orange-50 rounded"
-                                            >
-                                                <RefreshCw className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-
-            {startModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
-                        <p className="mb-4">Selecione o Colaborador para o veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
-
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Colaborador</label>
-                            <select
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                value={selectedCleaner}
-                                onChange={(e) => setSelectedCleaner(e.target.value)}
-                            >
-                                <option value="">Selecione...</option>
-                                {cleaners.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={() => setStartModalOpen(false)}
-                                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={confirmStart}
-                                disabled={processing || !selectedCleaner}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                            >
-                                {processing ? 'Iniciando...' : 'Confirmar Início'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {swapModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
-                        <p className="mb-4">Veículo Atual: <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Novo Veículo</label>
-                                <input
-                                    type="text"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                    value={swapVehicle}
-                                    onChange={(e) => setSwapVehicle(e.target.value)}
-                                    placeholder="Número do carro"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Motivo</label>
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Colaborador</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                    value={swapReason}
-                                    onChange={(e) => setSwapReason(e.target.value)}
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                    value={selectedCleaner}
+                                    onChange={(e) => setSelectedCleaner(e.target.value)}
                                 >
-                                    <option value="QUEBRA">Quebra</option>
-                                    <option value="ONIBUS_NAO_CHEGOU_NO_HORARIO">Ônibus Atrasado</option>
-                                    <option value="MANUTENCAO">Manutenção</option>
-                                    <option value="OUTROS">Outros</option>
+                                    <option value="">Selecione...</option>
+                                    {cleaners.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Observação</label>
-                                <textarea
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                    value={swapObs}
-                                    onChange={(e) => setSwapObs(e.target.value)}
-                                />
-                            </div>
-                        </div>
 
-                        <div className="mt-6 flex justify-end space-x-3">
-                            <button
-                                onClick={() => setSwapModalOpen(false)}
-                                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSwapSubmit}
-                                disabled={processing}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                            >
-                                {processing ? 'Salvando...' : 'Confirmar Troca'}
-                            </button>
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    onClick={() => setStartModalOpen(false)}
+                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={confirmStart}
+                                    disabled={processing || !selectedCleaner}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {processing ? 'Iniciando...' : 'Confirmar Início'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {finishModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
-                        <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+                )}
 
-                        <div className="space-y-4 mb-6">
-                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckExterno(!checkExterno)}>
-                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkExterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                    {checkExterno && <CheckCircle className="w-4 h-4" />}
+                {swapModalOpen && selectedEvent && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                            <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
+                            <p className="mb-4">Veículo Atual: <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Novo Veículo</label>
+                                    <input
+                                        type="text"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                        value={swapVehicle}
+                                        onChange={(e) => setSwapVehicle(e.target.value)}
+                                        placeholder="Número do carro"
+                                    />
                                 </div>
-                                <span className="text-gray-700 font-medium select-none">Limpeza Externa</span>
-                            </div>
-
-                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckInterno(!checkInterno)}>
-                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkInterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                    {checkInterno && <CheckCircle className="w-4 h-4" />}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Motivo</label>
+                                    <select
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                        value={swapReason}
+                                        onChange={(e) => setSwapReason(e.target.value)}
+                                    >
+                                        <option value="QUEBRA">Quebra</option>
+                                        <option value="ONIBUS_NAO_CHEGOU_NO_HORARIO">Ônibus Atrasado</option>
+                                        <option value="MANUTENCAO">Manutenção</option>
+                                        <option value="OUTROS">Outros</option>
+                                    </select>
                                 </div>
-                                <span className="text-gray-700 font-medium select-none">Limpeza Interna</span>
-                            </div>
-
-                            <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckPneus(!checkPneus)}>
-                                <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkPneus ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                    {checkPneus && <CheckCircle className="w-4 h-4" />}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Observação</label>
+                                    <textarea
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                        value={swapObs}
+                                        onChange={(e) => setSwapObs(e.target.value)}
+                                    />
                                 </div>
-                                <span className="text-gray-700 font-medium select-none">Pretinho nos Pneus</span>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Observação {(checkInterno && checkExterno && checkPneus) ? '(Opcional)' : <span className="text-red-600 font-bold">(Obrigatório)</span>}
-                                </label>
-                                <textarea
-                                    className={`w-full rounded-md shadow-sm p-2 border ${(!checkInterno || !checkExterno || !checkPneus) && !finishObs.trim() ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'}`}
-                                    rows={3}
-                                    placeholder={(!checkInterno || !checkExterno || !checkPneus) ? "Justifique o item não realizado..." : "Alguma observação adicional?"}
-                                    value={finishObs}
-                                    onChange={(e) => setFinishObs(e.target.value)}
-                                />
+                            <div className="mt-6 flex justify-end space-x-3">
+                                <button
+                                    onClick={() => setSwapModalOpen(false)}
+                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleSwapSubmit}
+                                    disabled={processing}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {processing ? 'Salvando...' : 'Confirmar Troca'}
+                                </button>
                             </div>
-                        </div>
-
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={() => setFinishModalOpen(false)}
-                                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleFinishSubmit}
-                                disabled={processing}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                            >
-                                {processing ? 'Salvando...' : 'Concluir Serviço'}
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
-    );
+                )}
+                {finishModalOpen && selectedEvent && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                            <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+                            <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                            <div className="space-y-4 mb-6">
+                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckExterno(!checkExterno)}>
+                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkExterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                        {checkExterno && <CheckCircle className="w-4 h-4" />}
+                                    </div>
+                                    <span className="text-gray-700 font-medium select-none">Limpeza Externa</span>
+                                </div>
+
+                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckInterno(!checkInterno)}>
+                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkInterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                        {checkInterno && <CheckCircle className="w-4 h-4" />}
+                                    </div>
+                                    <span className="text-gray-700 font-medium select-none">Limpeza Interna</span>
+                                </div>
+
+                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckPneus(!checkPneus)}>
+                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkPneus ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                        {checkPneus && <CheckCircle className="w-4 h-4" />}
+                                    </div>
+                                    <span className="text-gray-700 font-medium select-none">Pretinho nos Pneus</span>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Observação {(checkInterno && checkExterno && checkPneus) ? '(Opcional)' : <span className="text-red-600 font-bold">(Obrigatório)</span>}
+                                    </label>
+                                    <textarea
+                                        className={`w-full rounded-md shadow-sm p-2 border ${(!checkInterno || !checkExterno || !checkPneus) && !finishObs.trim() ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'}`}
+                                        rows={3}
+                                        placeholder={(!checkInterno || !checkExterno || !checkPneus) ? "Justifique o item não realizado..." : "Alguma observação adicional?"}
+                                        value={finishObs}
+                                        onChange={(e) => setFinishObs(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    onClick={() => setFinishModalOpen(false)}
+                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleFinishSubmit}
+                                    disabled={processing}
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                                >
+                                    {processing ? 'Salvando...' : 'Concluir Serviço'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+            );
 }
 
