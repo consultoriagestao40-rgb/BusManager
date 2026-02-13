@@ -317,165 +317,174 @@ export default function EventList({ events }: { events: Event[] }) {
                         })}
                     </tbody>
                 </table>
-
-                {startModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                            <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
-                            <p className="mb-4">Selecione o Colaborador para o veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
-
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Colaborador</label>
-                                <select
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                    value={selectedCleaner}
-                                    onChange={(e) => setSelectedCleaner(e.target.value)}
-                                >
-                                    <option value="">Selecione...</option>
-                                    {cleaners.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="flex justify-end space-x-3">
-                                <button
-                                    onClick={() => setStartModalOpen(false)}
-                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={confirmStart}
-                                    disabled={processing || !selectedCleaner}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {processing ? 'Iniciando...' : 'Confirmar Início'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {swapModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                            <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
-                            <p className="mb-4">Veículo Atual: <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Novo Veículo</label>
-                                    <input
-                                        type="text"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                        value={swapVehicle}
-                                        onChange={(e) => setSwapVehicle(e.target.value)}
-                                        placeholder="Número do carro"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Motivo</label>
-                                    <select
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                        value={swapReason}
-                                        onChange={(e) => setSwapReason(e.target.value)}
-                                    >
-                                        <option value="QUEBRA">Quebra</option>
-                                        <option value="ONIBUS_NAO_CHEGOU_NO_HORARIO">Ônibus Atrasado</option>
-                                        <option value="MANUTENCAO">Manutenção</option>
-                                        <option value="OUTROS">Outros</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Observação</label>
-                                    <textarea
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
-                                        value={swapObs}
-                                        onChange={(e) => setSwapObs(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="mt-6 flex justify-end space-x-3">
-                                <button
-                                    onClick={() => setSwapModalOpen(false)}
-                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={handleSwapSubmit}
-                                    disabled={processing}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {processing ? 'Salvando...' : 'Confirmar Troca'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {finishModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                            <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
-                            <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
-
-                            <div className="space-y-4 mb-6">
-                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckExterno(!checkExterno)}>
-                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkExterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                        {checkExterno && <CheckCircle className="w-4 h-4" />}
-                                    </div>
-                                    <span className="text-gray-700 font-medium select-none">Limpeza Externa</span>
-                                </div>
-
-                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckInterno(!checkInterno)}>
-                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkInterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                        {checkInterno && <CheckCircle className="w-4 h-4" />}
-                                    </div>
-                                    <span className="text-gray-700 font-medium select-none">Limpeza Interna</span>
-                                </div>
-
-                                <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckPneus(!checkPneus)}>
-                                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkPneus ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
-                                        {checkPneus && <CheckCircle className="w-4 h-4" />}
-                                    </div>
-                                    <span className="text-gray-700 font-medium select-none">Pretinho nos Pneus</span>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Observação {(checkInterno && checkExterno && checkPneus) ? '(Opcional)' : <span className="text-red-600 font-bold">(Obrigatório)</span>}
-                                    </label>
-                                    <textarea
-                                        className={`w-full rounded-md shadow-sm p-2 border ${(!checkInterno || !checkExterno || !checkPneus) && !finishObs.trim() ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'}`}
-                                        rows={3}
-                                        placeholder={(!checkInterno || !checkExterno || !checkPneus) ? "Justifique o item não realizado..." : "Alguma observação adicional?"}
-                                        value={finishObs}
-                                        onChange={(e) => setFinishObs(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex justify-end space-x-3">
-                                <button
-                                    onClick={() => setFinishModalOpen(false)}
-                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={handleFinishSubmit}
-                                    disabled={processing}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                                >
-                                    {processing ? 'Salvando...' : 'Concluir Serviço'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
+        </div>
+
+
+                {
+        startModalOpen && selectedEvent && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
+                    <p className="mb-4">Selecione o Colaborador para o veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Colaborador</label>
+                        <select
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                            value={selectedCleaner}
+                            onChange={(e) => setSelectedCleaner(e.target.value)}
+                        >
+                            <option value="">Selecione...</option>
+                            {cleaners.map(c => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            onClick={() => setStartModalOpen(false)}
+                            className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={confirmStart}
+                            disabled={processing || !selectedCleaner}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {processing ? 'Iniciando...' : 'Confirmar Início'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    {
+        swapModalOpen && selectedEvent && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
+                    <p className="mb-4">Veículo Atual: <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Novo Veículo</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                value={swapVehicle}
+                                onChange={(e) => setSwapVehicle(e.target.value)}
+                                placeholder="Número do carro"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Motivo</label>
+                            <select
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                value={swapReason}
+                                onChange={(e) => setSwapReason(e.target.value)}
+                            >
+                                <option value="QUEBRA">Quebra</option>
+                                <option value="ONIBUS_NAO_CHEGOU_NO_HORARIO">Ônibus Atrasado</option>
+                                <option value="MANUTENCAO">Manutenção</option>
+                                <option value="OUTROS">Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Observação</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                value={swapObs}
+                                onChange={(e) => setSwapObs(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-3">
+                        <button
+                            onClick={() => setSwapModalOpen(false)}
+                            className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleSwapSubmit}
+                            disabled={processing}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {processing ? 'Salvando...' : 'Confirmar Troca'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    {
+        finishModalOpen && selectedEvent && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+                    <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
+
+                    <div className="space-y-4 mb-6">
+                        <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckExterno(!checkExterno)}>
+                            <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkExterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                {checkExterno && <CheckCircle className="w-4 h-4" />}
+                            </div>
+                            <span className="text-gray-700 font-medium select-none">Limpeza Externa</span>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckInterno(!checkInterno)}>
+                            <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkInterno ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                {checkInterno && <CheckCircle className="w-4 h-4" />}
+                            </div>
+                            <span className="text-gray-700 font-medium select-none">Limpeza Interna</span>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer" onClick={() => setCheckPneus(!checkPneus)}>
+                            <div className={`w-6 h-6 rounded border flex items-center justify-center ${checkPneus ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300'}`}>
+                                {checkPneus && <CheckCircle className="w-4 h-4" />}
+                            </div>
+                            <span className="text-gray-700 font-medium select-none">Pretinho nos Pneus</span>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Observação {(checkInterno && checkExterno && checkPneus) ? '(Opcional)' : <span className="text-red-600 font-bold">(Obrigatório)</span>}
+                            </label>
+                            <textarea
+                                className={`w-full rounded-md shadow-sm p-2 border ${(!checkInterno || !checkExterno || !checkPneus) && !finishObs.trim() ? 'border-red-300 ring-1 ring-red-300' : 'border-gray-300'}`}
+                                rows={3}
+                                placeholder={(!checkInterno || !checkExterno || !checkPneus) ? "Justifique o item não realizado..." : "Alguma observação adicional?"}
+                                value={finishObs}
+                                onChange={(e) => setFinishObs(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            onClick={() => setFinishModalOpen(false)}
+                            className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleFinishSubmit}
+                            disabled={processing}
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                        >
+                            {processing ? 'Salvando...' : 'Concluir Serviço'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+            </div >
             );
 }
 
