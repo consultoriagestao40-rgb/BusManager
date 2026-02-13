@@ -13,6 +13,8 @@ export default function RegisterServiceWorker() {
     }
 
     // Lock screen orientation to landscape on mobile devices
+    // DISABLED - users can use any orientation they want
+    /*
     const lockOrientation = async () => {
       try {
         const screenAny = window.screen as any;
@@ -29,6 +31,7 @@ export default function RegisterServiceWorker() {
     if (window.innerWidth <= 1024) {
       lockOrientation();
     }
+    */
   }, []);
 
   return null;

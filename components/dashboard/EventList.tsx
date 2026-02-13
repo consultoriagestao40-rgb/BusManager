@@ -218,7 +218,7 @@ export default function EventList({ events }: { events: Event[] }) {
         <>
             {/* Fixed height container with sticky header */}
             <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="max-h-[calc(100vh-100px)] md:max-h-[calc(100vh-80px)] overflow-y-auto">
+                <div className="max-h-[calc(100vh-100px)] md:max-h-[calc(100vh-80px)] overflow-y-auto overflow-x-auto">
                     <table className="w-full min-w-full border-collapse" style={{ tableLayout: 'auto' }}>
                         <thead className="bg-gradient-to-r from-blue-600 to-blue-700 sticky top-0 z-50 shadow-lg">
                             <tr>
@@ -229,9 +229,9 @@ export default function EventList({ events }: { events: Event[] }) {
                                     </div>
                                 </th>
                                 <th className="py-3 md:py-4 px-1 md:px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Carro</th>
-                                <th className="hidden md:table-cell py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Saída</th>
-                                <th className="hidden lg:table-cell py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Meta</th>
-                                <th className="hidden md:table-cell py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Colaborador</th>
+                                <th className="py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Saída</th>
+                                <th className="py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Meta</th>
+                                <th className="py-3 md:py-4 px-3 text-left text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Colaborador</th>
                                 <th className="py-3 md:py-4 px-3 text-center text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">SLA</th>
                                 <th className="py-3 md:py-4 px-3 text-center text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Status</th>
                                 <th className="py-3 md:py-4 px-3 text-right text-xs md:text-sm font-black text-white uppercase tracking-wide border-b-2 border-blue-800">Ações</th>
@@ -268,13 +268,13 @@ export default function EventList({ events }: { events: Event[] }) {
                                                 {event.vehicle.prefix && <span className="text-[10px] md:text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded mt-1 inline-block w-fit font-medium">{event.vehicle.prefix}</span>}
                                             </div>
                                         </td>
-                                        <td className="hidden md:table-cell py-3 md:py-4 px-3 text-sm text-gray-700">
+                                        <td className="py-3 md:py-4 px-3 text-sm text-gray-700">
                                             {format(new Date(event.saida_programada_at), 'HH:mm')}
                                         </td>
-                                        <td className="hidden lg:table-cell py-3 md:py-4 px-3 text-sm text-gray-700">
+                                        <td className="py-3 md:py-4 px-3 text-sm text-gray-700">
                                             {format(new Date(event.liberar_ate_at), 'HH:mm')}
                                         </td>
-                                        <td className="hidden md:table-cell py-3 md:py-4 px-3 text-sm text-gray-700 font-medium">
+                                        <td className="py-3 md:py-4 px-3 text-sm text-gray-700 font-medium">
                                             {cleanerName}
                                         </td>
                                         <td className={`py-3 md:py-4 px-3 text-center text-sm font-bold ${slaColor}`}>
@@ -336,8 +336,8 @@ export default function EventList({ events }: { events: Event[] }) {
 
             {
                 startModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+                        <div className="bg-white rounded-lg p-4 md:p-6 max-w-md w-full my-4 max-h-[90vh] overflow-y-auto">
                             <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
                             <p className="mb-4">Selecione o Colaborador para o veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
 
@@ -377,8 +377,8 @@ export default function EventList({ events }: { events: Event[] }) {
 
             {
                 swapModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+                        <div className="bg-white rounded-lg p-4 md:p-6 max-w-md w-full my-4 max-h-[90vh] overflow-y-auto">
                             <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
                             <p className="mb-4">Veículo Atual: <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
 
@@ -437,8 +437,8 @@ export default function EventList({ events }: { events: Event[] }) {
 
             {
                 finishModalOpen && selectedEvent && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+                        <div className="bg-white rounded-lg p-4 md:p-6 max-w-md w-full my-4 max-h-[90vh] overflow-y-auto">
                             <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
                             <p className="mb-4">Confirme os itens realizados no veículo <span className="font-bold">{selectedEvent.vehicle.client_vehicle_number}</span></p>
 
