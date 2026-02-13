@@ -483,8 +483,9 @@ export default function EventList({ events }: { events: Event[] }) {
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+}
 
         </>
     );
