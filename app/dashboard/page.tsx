@@ -59,6 +59,10 @@ export default function DashboardPage() {
     const [inProgressSearch, setInProgressSearch] = useState('');
     const [swapsSearch, setSwapsSearch] = useState('');
 
+    // Main table search and filter
+    const [mainSearch, setMainSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState('TODOS');
+
     // Helper to extract all swaps
     const getAllSwaps = () => {
         return events.flatMap((e: any) =>
@@ -118,6 +122,56 @@ export default function DashboardPage() {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Cancelados');
         XLSX.writeFile(wb, `cancelados_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
+    };
+
+    // Main table filtering
+    const filteredEvents = events.filter((e: any) => {
+        const searchLower = mainSearch.toLowerCase();
+        const matchesSearch = (
+            e.vehicle.client_vehicle_number?.toString().includes(searchLower) ||
+            e.empresa?.toLowerCase().includes(searchLower) ||
+            e.motorista?.toLowerCase().includes(searchLower)
+        );
+        const matchesStatus = statusFilter === 'TODOS' || e.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    // Main table export functions
+    const exportMainToPDF = () => {
+        const doc = new jsPDF();
+        doc.text('Escala de Limpeza', 14, 15);
+        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')}`, 14, 22);
+
+        const tableData = filteredEvents.map((e: any) => [
+            e.vehicle.client_vehicle_number,
+            format(new Date(e.hora_viagem), 'HH:mm'),
+            format(new Date(e.saida_programada_at), 'HH:mm'),
+            e.empresa || '-',
+            e.status
+        ]);
+
+        autoTable(doc, {
+            head: [['Carro', 'Hora', 'Saída', 'Empresa', 'Status']],
+            body: tableData,
+            startY: 28,
+        });
+
+        doc.save(`escala_limpeza_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
+    };
+
+    const exportMainToExcel = () => {
+        const tableData = filteredEvents.map((e: any) => ({
+            'Carro': e.vehicle.client_vehicle_number,
+            'Hora': format(new Date(e.hora_viagem), 'HH:mm'),
+            'Saída': format(new Date(e.saida_programada_at), 'HH:mm'),
+            'Empresa': e.empresa || '-',
+            'Status': e.status
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(tableData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Escala');
+        XLSX.writeFile(wb, `escala_limpeza_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
     };
 
     return (
@@ -223,7 +277,7 @@ export default function DashboardPage() {
                         Nenhum evento importado para hoje.
                     </div>
                 ) : (
-                    <EventList events={events} />
+                    <EventList events={filteredEvents} />
                 )}
             </div>
 
