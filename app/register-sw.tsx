@@ -15,8 +15,9 @@ export default function RegisterServiceWorker() {
     // Lock screen orientation to landscape on mobile devices
     const lockOrientation = async () => {
       try {
-        if (window.screen?.orientation?.lock) {
-          await window.screen.orientation.lock('landscape');
+        const screenAny = window.screen as any;
+        if (screenAny?.orientation?.lock) {
+          await screenAny.orientation.lock('landscape');
           console.log('Orientation locked to landscape');
         }
       } catch (error) {
