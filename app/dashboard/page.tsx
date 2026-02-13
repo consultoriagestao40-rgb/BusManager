@@ -5,6 +5,9 @@ import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import EventList from '@/components/dashboard/EventList';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 export default function DashboardPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -51,6 +54,11 @@ export default function DashboardPage() {
     const [showInProgressModal, setShowInProgressModal] = useState(false);
     const [showCancelledModal, setShowCancelledModal] = useState(false);
 
+    // Search states
+    const [cancelledSearch, setCancelledSearch] = useState('');
+    const [inProgressSearch, setInProgressSearch] = useState('');
+    const [swapsSearch, setSwapsSearch] = useState('');
+
     // Helper to extract all swaps
     const getAllSwaps = () => {
         return events.flatMap((e: any) =>
@@ -64,6 +72,53 @@ export default function DashboardPage() {
     const swapsList = getAllSwaps();
     const inProgressList = events.filter((e: any) => e.status === 'EM_ANDAMENTO');
     const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
+
+    // Filtered lists
+    const filteredCancelled = cancelledList.filter((e: any) => {
+        const searchLower = cancelledSearch.toLowerCase();
+        return (
+            e.vehicle.client_vehicle_number?.toString().includes(searchLower) ||
+            e.empresa?.toLowerCase().includes(searchLower)
+        );
+    });
+
+    // Export functions
+    const exportCancelledToPDF = () => {
+        const doc = new jsPDF();
+        doc.text('Veículos Cancelados', 14, 15);
+        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')}`, 14, 22);
+
+        const tableData = filteredCancelled.map((e: any) => [
+            e.vehicle.client_vehicle_number,
+            format(new Date(e.hora_viagem), 'HH:mm'),
+            format(new Date(e.saida_programada_at), 'HH:mm'),
+            e.empresa || '-',
+            'Cancelado'
+        ]);
+
+        autoTable(doc, {
+            head: [['Carro', 'Hora Prevista', 'Saída', 'Empresa', 'Status']],
+            body: tableData,
+            startY: 28,
+        });
+
+        doc.save(`cancelados_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
+    };
+
+    const exportCancelledToExcel = () => {
+        const tableData = filteredCancelled.map((e: any) => ({
+            'Carro': e.vehicle.client_vehicle_number,
+            'Hora Prevista': format(new Date(e.hora_viagem), 'HH:mm'),
+            'Saída': format(new Date(e.saida_programada_at), 'HH:mm'),
+            'Empresa': e.empresa || '-',
+            'Status': 'Cancelado'
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(tableData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Cancelados');
+        XLSX.writeFile(wb, `cancelados_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
+    };
 
     return (
         <div className="space-y-6">
@@ -305,14 +360,44 @@ export default function DashboardPage() {
             {showCancelledModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold text-gray-800">Veículos Cancelados</h3>
-                            <button
-                                onClick={() => setShowCancelledModal(false)}
-                                className="text-gray-500 hover:text-gray-700 font-bold text-xl"
-                            >
-                                &times;
-                            </button>
+                        <div className="mb-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-gray-800">Veículos Cancelados</h3>
+                                <button
+                                    onClick={() => setShowCancelledModal(false)}
+                                    className="text-gray-500 hover:text-gray-700 font-bold text-xl"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div className="flex gap-3 items-center">
+                                <input
+                                    type="text"
+                                    placeholder="Pesquisar por carro, empresa..."
+                                    value={cancelledSearch}
+                                    onChange={(e) => setCancelledSearch(e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <button
+                                    onClick={exportCancelledToPDF}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                                    </svg>
+                                    PDF
+                                </button>
+                                <button
+                                    onClick={exportCancelledToExcel}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                                    </svg>
+                                    Excel
+                                </button>
+                            </div>
                         </div>
 
                         {cancelledList.length === 0 ? (
@@ -329,7 +414,7 @@ export default function DashboardPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {cancelledList.map((event: any) => (
+                                    {filteredCancelled.map((event: any) => (
                                         <tr key={event.id}>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
                                                 {event.vehicle.client_vehicle_number}
