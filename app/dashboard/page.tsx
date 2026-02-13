@@ -274,8 +274,8 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Search, Filter, and Export Controls */}
-            <div className="bg-white rounded shadow p-3 md:p-4">
+            {/* Search and Filter - Mobile: inline with title; Desktop: separate block */}
+            <div className="hidden md:block bg-white rounded shadow p-3 md:p-4">
                 <div className="flex flex-col gap-3">
                     <input
                         type="text"
@@ -322,8 +322,33 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white rounded shadow overflow-hidden">
-                <div className="p-4 border-b">
-                    <h2 className="font-semibold text-gray-700">Escala de Limpeza</h2>
+                {/* Mobile: Title with inline search/filter */}
+                <div className="p-3 border-b md:p-4">
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <h2 className="font-semibold text-gray-700 text-lg">Escala de Limpeza</h2>
+                        {/* Mobile-only search and filter */}
+                        <div className="flex md:hidden flex-col gap-2">
+                            <input
+                                type="text"
+                                placeholder="Pesquisar..."
+                                value={mainSearch}
+                                onChange={(e) => setMainSearch(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            />
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                            >
+                                <option value="TODOS">Todos Status</option>
+                                <option value="PREVISTO">Previsto</option>
+                                <option value="EM_ANDAMENTO">Em Andamento</option>
+                                <option value="CONCLUIDO">Concluído</option>
+                                <option value="CANCELADO">Cancelado</option>
+                                <option value="ESTURADO">Esturado</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {events.length === 0 ? (
