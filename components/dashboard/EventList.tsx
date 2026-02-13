@@ -252,6 +252,7 @@ export default function EventList({ events }: { events: Event[] }) {
                             <tr key={event.id} className={getRowClass(sla)}>
                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
                                     {format(new Date(event.hora_viagem), 'HH:mm')}
+                                    <div className="text-[10px] text-gray-400 font-normal">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</div>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                     <span className="font-bold text-gray-900">{event.vehicle.client_vehicle_number}</span>
