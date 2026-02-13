@@ -321,44 +321,21 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded shadow overflow-hidden">
-                {/* Mobile: Title with inline search/filter */}
-                <div className="sticky top-0 z-20 bg-white p-2 border-b md:p-4">
-                    <div className="flex items-center gap-2 justify-between">
-                        <h2 className="font-semibold text-gray-700 text-base md:text-lg whitespace-nowrap">Escala de Limpeza</h2>
-                        {/* Mobile: horizontal search and filter */}
-                        <div className="flex md:hidden gap-2 flex-1">
-                            <input
-                                type="text"
-                                placeholder="Pesquisar..."
-                                value={mainSearch}
-                                onChange={(e) => setMainSearch(e.target.value)}
-                                className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                            />
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-xs"
-                            >
-                                <option value="TODOS">Todos</option>
-                                <option value="PREVISTO">Previsto</option>
-                                <option value="EM_ANDAMENTO">Andamento</option>
-                                <option value="CONCLUIDO">Concluído</option>
-                                <option value="CANCELADO">Cancelado</option>
-                                <option value="ESTURADO">Esturado</option>
-                            </select>
-                        </div>
-                    </div>
+            {/* EventList handles its own header, filters, and table */}
+            {loading ? (
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
-
-                {events.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">
-                        Nenhum evento importado para hoje.
-                    </div>
-                ) : (
-                    <EventList events={filteredEvents} />
-                )}
-            </div>
+            ) : events.length === 0 ? (
+                <div className="flex flex-col items-center justify-center min-h-screen text-gray-500">
+                    <p className="text-lg">Nenhum evento importado para hoje.</p>
+                    <a href="/dashboard/import" className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium">
+                        Nova Importação
+                    </a>
+                </div>
+            ) : (
+                <EventList events={filteredEvents} />
+            )}
 
             {showSwapsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
