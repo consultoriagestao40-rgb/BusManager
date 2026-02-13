@@ -1,4 +1,4 @@
-const CACHE_NAME = 'busmanager-v4';
+const CACHE_NAME = 'busmanager-v5';
 const urlsToCache = [
     '/dashboard',
     '/api/events',
