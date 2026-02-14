@@ -176,189 +176,32 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            {/* Hide date navigation and import button on mobile */}
-            <div className="hidden md:flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-white rounded-lg shadow p-1">
-                        <button
-                            onClick={handlePrevDay}
-                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"
-                            title="Dia Anterior"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-
-                        <div className="flex items-center px-4 border-l border-r border-gray-200">
-                            <Calendar size={18} className="text-gray-500 mr-2" />
-                            <span className="font-semibold text-gray-800 capitalize min-w-[140px] text-center">
+            {/* Main Content Area */}
+            {loading ? (
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                </div>
+            ) : (
+                <div className="max-w-7xl mx-auto">
+                    {/* Date Navigation (Desktop Only) */}
+                    <div className="hidden md:flex justify-between items-center mb-6 px-4">
+                        <div className="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+                            <button onClick={handlePrevDay} className="p-2 hover:bg-gray-50 rounded-lg transition-colors"><ChevronLeft size={20} /></button>
+                            <span className="font-bold text-gray-700 w-40 text-center uppercase tracking-wider">
                                 {format(currentDate, "dd 'de' MMMM", { locale: ptBR })}
                             </span>
-                            <input
-                                type="date"
-                                value={format(currentDate, 'yyyy-MM-dd')}
-                                onChange={handleDateChange}
-                                className="absolute opacity-0 w-[140px] cursor-pointer"
-                            />
+                            <button onClick={handleNextDay} className="p-2 hover:bg-gray-50 rounded-lg transition-colors"><ChevronRight size={20} /></button>
                         </div>
-
-                        <button
-                            onClick={handleNextDay}
-                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"
-                            title="Próximo Dia"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
-
-                    {!isToday && (
-                        <button
-                            onClick={() => setCurrentDate(new Date())}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                            Voltar para Hoje
-                        </button>
-                    )}
-                </div>
-
-                <div className="space-x-2">
-                    <a href="/dashboard/import" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium text-sm transition-colors shadow-sm">
-                        Nova Importação
-                    </a>
-                </div>
-            </div>
-
-            {/* Hide metric cards on mobile */}
-            <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-200/50">
-                    <h3 className="text-blue-700 text-xs font-bold uppercase tracking-wide mb-1">Total</h3>
-                    <p className="text-4xl font-extrabold text-blue-900">{events.length}</p>
-                </div>
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                    <h3 className="text-gray-700 text-xs font-bold uppercase tracking-wide mb-1">Previstos</h3>
-                    <p className="text-4xl font-extrabold text-gray-900">
-                        {events.length - events.filter((e: any) => e.status === 'CANCELADO').length}
-                    </p>
-                </div>
-                <div
-                    className="bg-gradient-to-br from-blue-100 to-blue-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-blue-300 hover:border-blue-400 hover:scale-105"
-                    onClick={() => setShowInProgressModal(true)}
-                >
-                    <h3 className="text-blue-800 text-xs font-bold uppercase tracking-wide mb-1">Em Andamento</h3>
-                    <p className="text-4xl font-extrabold text-blue-900">
-                        {events.filter((e: any) => e.status === 'EM_ANDAMENTO').length}
-                    </p>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200/50">
-                    <h3 className="text-green-700 text-xs font-bold uppercase tracking-wide mb-1">Concluídos</h3>
-                    <p className="text-4xl font-extrabold text-green-900">
-                        {events.filter((e: any) => e.status === 'CONCLUIDO').length}
-                    </p>
-                </div>
-                <div
-                    className="bg-gradient-to-br from-red-100 to-rose-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-red-300 hover:border-red-400 hover:scale-105"
-                    onClick={() => setShowCancelledModal(true)}
-                >
-                    <h3 className="text-red-800 text-xs font-bold uppercase tracking-wide mb-1">Cancelados</h3>
-                    <p className="text-4xl font-extrabold text-red-900">
-                        {events.filter((e: any) => e.status === 'CANCELADO').length}
-                    </p>
-                </div>
-                <div
-                    className="bg-gradient-to-br from-orange-100 to-amber-200 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-orange-300 hover:border-orange-400 hover:scale-105"
-                    onClick={() => setShowSwapsModal(true)}
-                >
-                    <h3 className="text-orange-800 text-xs font-bold uppercase tracking-wide mb-1">Trocas</h3>
-                    <p className="text-4xl font-extrabold text-orange-900">
-                        {events.filter((e: any) => e.swaps && e.swaps.length > 0).length}
-                    </p>
-                </div>
-            </div>
-
-            {/* Search and Filter - Mobile: inline with title; Desktop: separate block */}
-            <div className="hidden md:block bg-white rounded shadow p-3 md:p-4">
-                <div className="flex flex-col gap-3">
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por carro, empresa, motorista..."
-                        value={mainSearch}
-                        onChange={(e) => setMainSearch(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
-                    />
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm md:text-base"
-                        >
-                            <option value="TODOS">Todos Status</option>
-                            <option value="PREVISTO">Previsto</option>
-                            <option value="EM_ANDAMENTO">Em Andamento</option>
-                            <option value="CONCLUIDO">Concluído</option>
-                            <option value="CANCELADO">Cancelado</option>
-                            <option value="ESTURADO">Esturado</option>
-                        </select>
-                        <div className="flex gap-2 sm:gap-3">
-                            <button
-                                onClick={exportMainToPDF}
-                                className="flex-1 sm:flex-initial px-4 md:px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 font-bold flex items-center justify-center gap-2 text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                                </svg>
-                                PDF
-                            </button>
-                            <button
-                                onClick={exportMainToExcel}
-                                className="flex-1 sm:flex-initial px-4 md:px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-bold flex items-center justify-center gap-2 text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                                </svg>
-                                Excel
-                            </button>
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowSwapsModal(true)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 shadow-sm transition-all">Trocas</button>
+                            <a href="/dashboard/import" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">Importar</a>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div className="bg-white rounded shadow overflow-hidden">
-                {/* Mobile: Title with inline search/filter */}
-                <div className="sticky top-0 z-20 bg-white p-2 border-b md:p-4">
-                    <div className="flex items-center gap-2 justify-between">
-                        <h2 className="font-semibold text-gray-700 text-base md:text-lg whitespace-nowrap">Escala de Limpeza</h2>
-                        {/* Mobile: horizontal search and filter */}
-                        <div className="flex md:hidden gap-2 flex-1">
-                            <input
-                                type="text"
-                                placeholder="Pesquisar..."
-                                value={mainSearch}
-                                onChange={(e) => setMainSearch(e.target.value)}
-                                className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                            />
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-xs"
-                            >
-                                <option value="TODOS">Todos</option>
-                                <option value="PREVISTO">Previsto</option>
-                                <option value="EM_ANDAMENTO">Andamento</option>
-                                <option value="CONCLUIDO">Concluído</option>
-                                <option value="CANCELADO">Cancelado</option>
-                                <option value="ESTURADO">Esturado</option>
-                            </select>
-                        </div>
-                    </div>
+                    {/* The Clean Event List */}
+                    <EventList events={events} />
                 </div>
-
-                {events.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">
-                        Nenhum evento importado para hoje.
-                    </div>
-                ) : (
-                    <EventList events={filteredEvents} />
-                )}
-            </div>
+            )}
 
             {showSwapsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -516,18 +359,12 @@ export default function DashboardPage() {
                                     onClick={exportCancelledToPDF}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                                    </svg>
                                     PDF
                                 </button>
                                 <button
                                     onClick={exportCancelledToExcel}
                                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                                    </svg>
                                     Excel
                                 </button>
                             </div>
@@ -583,6 +420,6 @@ export default function DashboardPage() {
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 }
