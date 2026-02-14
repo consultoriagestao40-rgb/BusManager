@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search } from 'lucide-react';
 import EventList from '@/components/dashboard/EventList';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
