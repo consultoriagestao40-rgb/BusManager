@@ -176,29 +176,104 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
+            {/* Dashboard Header (Desktop only) */}
+            <div className="hidden md:flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">Painel de Escala</h1>
+                    <p className="text-gray-500">Gestão de limpeza e tráfego de veículos</p>
+                </div>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => setShowSwapsModal(true)}
+                        className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2"
+                    >
+                        Relatório de Trocas
+                    </button>
+                    <a href="/dashboard/import" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
+                        Importar Escala
+                    </a>
+                </div>
+            </div>
+
+            {/* Metric Cards (Desktop only) */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total de Viagens</p>
+                    <p className="text-3xl font-bold text-gray-800">{events.length}</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Em Andamento</p>
+                    <p className="text-3xl font-bold text-blue-600">{inProgressList.length}</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Trocas Realizadas</p>
+                    <p className="text-3xl font-bold text-orange-600">{swapsList.length}</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-50 transition-all" onClick={() => setShowCancelledModal(true)}>
+                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Cancelados</p>
+                    <p className="text-3xl font-bold text-red-600">{cancelledList.length}</p>
+                </div>
+            </div>
+
             {/* Main Content Area */}
             {loading ? (
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
                 </div>
             ) : (
-                <div className="max-w-7xl mx-auto">
-                    {/* Date Navigation (Desktop Only) */}
-                    <div className="hidden md:flex justify-between items-center mb-6 px-4">
-                        <div className="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
-                            <button onClick={handlePrevDay} className="p-2 hover:bg-gray-50 rounded-lg transition-colors"><ChevronLeft size={20} /></button>
-                            <span className="font-bold text-gray-700 w-40 text-center uppercase tracking-wider">
-                                {format(currentDate, "dd 'de' MMMM", { locale: ptBR })}
-                            </span>
-                            <button onClick={handleNextDay} className="p-2 hover:bg-gray-50 rounded-lg transition-colors"><ChevronRight size={20} /></button>
+                <div className="w-full">
+                    {/* Filters & Export Section (Desktop Only) */}
+                    <div className="hidden md:flex flex-col md:flex-row gap-4 mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                        <div className="flex-1 flex gap-3">
+                            <div className="bg-gray-50 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200">
+                                <Calendar size={18} className="text-gray-400" />
+                                <input
+                                    type="date"
+                                    value={format(currentDate, 'yyyy-MM-dd')}
+                                    onChange={handleDateChange}
+                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none"
+                                />
+                            </div>
+                            <div className="bg-gray-50 flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 group focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+                                <Search size={18} className="text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Pesquisar por carro, empresa, motorista..."
+                                    value={mainSearch}
+                                    onChange={(e) => setMainSearch(e.target.value)}
+                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none w-full"
+                                />
+                            </div>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowSwapsModal(true)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 shadow-sm transition-all">Trocas</button>
-                            <a href="/dashboard/import" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">Importar</a>
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="bg-white px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                            >
+                                <option value="TODOS">Todos os Status</option>
+                                <option value="PREVISTO">Previsto</option>
+                                <option value="EM_ANDAMENTO">Em Andamento</option>
+                                <option value="CONCLUIDO">Concluído</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                            <button onClick={exportMainToPDF} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all">PDF</button>
+                            <button onClick={exportMainToExcel} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all">Excel</button>
                         </div>
                     </div>
 
-                    {/* The Clean Event List */}
+                    {/* Desktop Date Navigation Bar (Alternative) */}
+                    <div className="hidden md:flex items-center justify-between mb-4 px-2">
+                        <div className="flex items-center gap-2">
+                            <button onClick={handlePrevDay} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><ChevronLeft size={20} /></button>
+                            <span className="font-bold text-gray-700 uppercase tracking-widest text-sm">
+                                {format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                            </span>
+                            <button onClick={handleNextDay} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><ChevronRight size={20} /></button>
+                        </div>
+                        {isToday && <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider">Hoje</span>}
+                    </div>
+
                     <EventList events={events} />
                 </div>
             )}
