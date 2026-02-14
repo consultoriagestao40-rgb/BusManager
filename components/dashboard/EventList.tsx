@@ -129,9 +129,13 @@ export default function EventList({ events }: EventListProps) {
         <div className="flex flex-col min-h-screen bg-gray-50">
             {/* Header Dark */}
             <header className="bg-[#1A1A1A] text-white py-4 px-6 md:py-6 shadow-md sticky top-0 z-40">
-                <h1 className="text-xl md:text-2xl font-bold text-center tracking-widest uppercase">
-                    Escala de Limpeza
-                </h1>
+                <div className="flex justify-between items-center max-w-7xl mx-auto w-full">
+                    <div className="w-10"></div> {/* Spacer */}
+                    <h1 className="text-xl md:text-2xl font-bold text-center tracking-widest uppercase flex-1">
+                        Escala de Limpeza
+                    </h1>
+                    <span className="text-[8px] text-gray-500 opacity-50">v1.2.2</span>
+                </div>
             </header>
 
             {/* Sticky Filters Section */}
