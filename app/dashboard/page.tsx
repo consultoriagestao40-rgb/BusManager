@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table } from 'lucide-react';
+import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -181,65 +182,56 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            {/* Dashboard Header (Desktop only) */}
-            <div className="hidden md:flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Painel de Escala</h1>
-                    <p className="text-gray-500">Gestão de limpeza e tráfego de veículos</p>
-                </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setShowSwapsModal(true)}
-                        className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2"
-                    >
-                        Relatório de Trocas
-                    </button>
-                    <a href="/dashboard/import" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
-                        Importar Escala
+            {/* --- DESKTOP VERSION (Original Designer) --- */}
+            <div className="hidden md:block space-y-6">
+                {/* Date Navigation & Import */}
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                        <button onClick={handlePrevDay} className="p-1 hover:bg-gray-100 rounded-lg"><ChevronLeft size={20} /></button>
+                        <div className="flex items-center gap-2">
+                            <Calendar size={18} className="text-gray-400" />
+                            <span className="font-bold text-gray-700">{format(currentDate, "dd 'De' MMMM", { locale: ptBR })}</span>
+                        </div>
+                        <button onClick={handleNextDay} className="p-1 hover:bg-gray-100 rounded-lg"><ChevronRight size={20} /></button>
+                    </div>
+                    <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
+                        Nova Importação
                     </a>
                 </div>
-            </div>
 
-            {/* Metric Cards (Desktop only) */}
-            <div className="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total de Viagens</p>
-                    <p className="text-3xl font-bold text-gray-800">{events.length}</p>
+                {/* Original Colored Metric Cards (Vibrant like Foto 02) */}
+                <div className="grid grid-cols-6 gap-4 mb-8">
+                    <div className="bg-white p-5 rounded-2xl border-l-[6px] border-blue-600 shadow-xl shadow-blue-50/50 transform hover:-translate-y-1 transition-all">
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total</p>
+                        <p className="text-4xl font-black text-blue-900">{events.length}</p>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border-l-[6px] border-gray-400 shadow-xl shadow-gray-50/50 transform hover:-translate-y-1 transition-all">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Previstos</p>
+                        <p className="text-4xl font-black text-gray-800">{events.filter((e: any) => e.status === 'PREVISTO').length}</p>
+                    </div>
+                    <div className="bg-[#EBF5FF] p-5 rounded-2xl border-l-[6px] border-blue-400 shadow-xl shadow-blue-100/50 transform hover:-translate-y-1 transition-all">
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Em Andamento</p>
+                        <p className="text-4xl font-black text-blue-800">{inProgressList.length}</p>
+                    </div>
+                    <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all">
+                        <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos</p>
+                        <p className="text-4xl font-black text-green-800">{events.filter((e: any) => e.status === 'CONCLUIDO').length}</p>
+                    </div>
+                    <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all">
+                        <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>
+                        <p className="text-4xl font-black text-red-800">{cancelledList.length}</p>
+                    </div>
+                    <div className="bg-[#FFFBEB] p-5 rounded-2xl border-l-[6px] border-amber-500 shadow-xl shadow-amber-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowSwapsModal(true)}>
+                        <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Trocas</p>
+                        <p className="text-4xl font-black text-amber-800">{swapsList.length}</p>
+                    </div>
                 </div>
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Em Andamento</p>
-                    <p className="text-3xl font-bold text-blue-600">{inProgressList.length}</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Trocas Realizadas</p>
-                    <p className="text-3xl font-bold text-orange-600">{swapsList.length}</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-50 transition-all" onClick={() => setShowCancelledModal(true)}>
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Cancelados</p>
-                    <p className="text-3xl font-bold text-red-600">{cancelledList.length}</p>
-                </div>
-            </div>
 
-            {/* Main Content Area */}
-            {loading ? (
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-                </div>
-            ) : (
-                <div className="w-full">
-                    {/* Filters & Export Section (Desktop Only) */}
-                    <div className="hidden md:flex flex-col md:flex-row gap-4 mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                {/* Main Content Area (Original Filters & Table) */}
+                <div className="space-y-6">
+                    <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                         <div className="flex-1 flex gap-3">
-                            <div className="bg-gray-50 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200">
-                                <Calendar size={18} className="text-gray-400" />
-                                <input
-                                    type="date"
-                                    value={format(currentDate, 'yyyy-MM-dd')}
-                                    onChange={handleDateChange}
-                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none"
-                                />
-                            </div>
-                            <div className="bg-gray-50 flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 group focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+                            <div className="bg-gray-50 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 group focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                                 <Search size={18} className="text-gray-400" />
                                 <input
                                     type="text"
@@ -256,32 +248,32 @@ export default function DashboardPage() {
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className="bg-white px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
                             >
-                                <option value="TODOS">Todos os Status</option>
+                                <option value="TODOS">Todos Status</option>
                                 <option value="PREVISTO">Previsto</option>
                                 <option value="EM_ANDAMENTO">Em Andamento</option>
                                 <option value="CONCLUIDO">Concluído</option>
                                 <option value="CANCELADO">Cancelado</option>
                             </select>
-                            <button onClick={exportMainToPDF} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all">PDF</button>
-                            <button onClick={exportMainToExcel} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all">Excel</button>
+                            <button onClick={exportMainToPDF} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-red-700 shadow-md shadow-red-100 transition-all"><FileText size={16} /> PDF</button>
+                            <button onClick={exportMainToExcel} className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-green-700 shadow-md shadow-green-100 transition-all"><Table size={16} /> Excel</button>
                         </div>
                     </div>
 
-                    {/* Desktop Date Navigation Bar (Alternative) */}
-                    <div className="hidden md:flex items-center justify-between mb-4 px-2">
-                        <div className="flex items-center gap-2">
-                            <button onClick={handlePrevDay} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><ChevronLeft size={20} /></button>
-                            <span className="font-bold text-gray-700 uppercase tracking-widest text-sm">
-                                {format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-                            </span>
-                            <button onClick={handleNextDay} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><ChevronRight size={20} /></button>
-                        </div>
-                        {isToday && <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider">Hoje</span>}
-                    </div>
-
-                    <EventDashboardList events={events} />
+                    <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
+                    <WebEventList events={filteredEvents} />
                 </div>
-            )}
+            </div>
+
+            {/* --- MOBILE/PWA VERSION (New Redesign) --- */}
+            <div className="md:hidden">
+                {loading ? (
+                    <div className="flex items-center justify-center min-h-[60vh]">
+                        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                    </div>
+                ) : (
+                    <EventDashboardList events={events} />
+                )}
+            </div>
 
             {showSwapsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
