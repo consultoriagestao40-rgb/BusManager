@@ -6,7 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 

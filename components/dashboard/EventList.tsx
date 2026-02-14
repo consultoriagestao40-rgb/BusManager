@@ -154,7 +154,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                     <h1 className="text-xl md:text-2xl font-bold text-center tracking-widest uppercase flex-1">
                         Escala de Limpeza
                     </h1>
-                    <span className="text-[8px] text-gray-500 opacity-50">v1.2.3</span>
+                    <span className="text-[8px] text-gray-500 opacity-50">v1.2.5</span>
                 </div>
             </header>
 
