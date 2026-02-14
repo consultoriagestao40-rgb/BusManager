@@ -1,0 +1,8 @@
+[2026-02-14T10:57:23.447Z] 🚀 Starting Schedule Sync Bot (Enhanced Debugging)...
+[2026-02-14T10:57:55.580Z] Fatal Error: AxiosError: Request failed with status code 401
+[2026-02-14T10:57:56.293Z] Screenshot saved to error-state.png
+[2026-02-14T10:57:56.320Z] HTML dump saved to error-page.html
+[2026-02-14T10:59:13.057Z] 🚀 Starting Schedule Sync Bot (Enhanced Debugging)...
+[2026-02-14T10:59:43.534Z] Fatal Error: AxiosError: Request failed with status code 401
+[2026-02-14T10:59:43.717Z] Screenshot saved to error-state.png
+[2026-02-14T10:59:43.771Z] HTML dump saved to error-page.html

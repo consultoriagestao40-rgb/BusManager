@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Loader2, ChevronLeft, ChevronRight, Calendar, Search } from 'lucide-react';
-import EventList from '@/components/dashboard/EventList';
+import EventDashboardList from '@/components/dashboard/EventList';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -42,9 +42,14 @@ export default function DashboardPage() {
     const handleNextDay = () => setCurrentDate(prev => addDays(prev, 1));
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value) {
-            // Create date at noon to avoid timezone rolling issues with simple string parsing
-            const [year, month, day] = e.target.value.split('-').map(Number);
-            setCurrentDate(new Date(year, month - 1, day, 12));
+            try {
+                const [year, month, day] = e.target.value.split('-').map(Number);
+                if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+                    setCurrentDate(new Date(year, month - 1, day, 12));
+                }
+            } catch (err) {
+                console.error("Invalid date selected", err);
+            }
         }
     };
 
@@ -274,7 +279,7 @@ export default function DashboardPage() {
                         {isToday && <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider">Hoje</span>}
                     </div>
 
-                    <EventList events={events} />
+                    <EventDashboardList events={events} />
                 </div>
             )}
 

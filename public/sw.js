@@ -1,4 +1,4 @@
-const CACHE_NAME = 'busmanager-v13';
+const CACHE_NAME = 'busmanager-v15';
 const urlsToCache = [
     '/dashboard',
     '/api/events',
@@ -10,6 +10,7 @@ self.addEventListener('install', (event) => {
             return cache.addAll(urlsToCache);
         })
     );
+    self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -32,6 +33,7 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    self.clients.claim();
 });
 
 // Handle notification clicks

@@ -1,0 +1,1132 @@
+<html><head><script type="text/javascript" charset="UTF-8">
+/* <![CDATA[ */
+try { if (undefined == xajax.config) xajax.config = {}; } catch (e) { xajax = {}; xajax.config = {}; };
+xajax.config.requestURI = "https://rip.nspenha.com.br/retaguarda/index.phtml";
+xajax.config.statusMessages = false;
+xajax.config.waitCursor = true;
+xajax.config.version = "xajax 0.5 rc1";
+xajax.config.legacy = false;
+xajax.config.defaultMode = "asynchronous";
+xajax.config.defaultMethod = "POST";
+/* ]]> */
+</script>
+<script type="text/javascript" src="../xajax/xajax_js/xajax_core.js" charset="UTF-8"></script>
+<script type="text/javascript" charset="UTF-8">
+/* <![CDATA[ */
+window.setTimeout(
+ function() {
+  var scriptExists = false;
+  try { if (xajax.isLoaded) scriptExists = true; }
+  catch (e) {}
+  if (!scriptExists) {
+   alert("Error: the xajax Javascript component could not be included. Perhaps the URL is incorrect?\nURL: ../xajax/xajax_js/xajax_core.js");
+  }
+ }, 2000);
+/* ]]> */
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+/* <![CDATA[ */
+xajax_AcessoRapidoOpcao = function() { return xajax.request( { xjxfun: 'AcessoRapidoOpcao' }, { parameters: arguments } ); };
+xajax_BuscaNomeAgencia = function() { return xajax.request( { xjxfun: 'BuscaNomeAgencia' }, { parameters: arguments } ); };
+xajax_BuscaNomeUsuario = function() { return xajax.request( { xjxfun: 'BuscaNomeUsuario' }, { parameters: arguments } ); };
+/* ]]> */
+</script>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" lang="pt-br">
+
+
+	<link rel="shortcut icon" href="imagens/SVPO.ico">
+	<title> :: Retaguarda Interna Penha ::  </title>
+
+        <meta name="Language" content="Portuguese">
+	<meta name="rating" content="General">
+	<meta name="revisit-after" content="7 days">
+	<meta name="ROBOTS" content="ALL">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <meta http-equiv="Cache-control" content="no-cache">
+
+
+	<link rel="stylesheet" type="text/css" media="all" href="calendario/calendar-win2k-cold-1.css" title="win2k-cold-1">
+	<script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/xajax/xajax_js/xajax_core.js"></script>
+
+
+	<script src="scripts/AC_RunActiveContent.js" type="text/javascript"></script>
+	<script type="text/javascript" src="scripts/funcoesDiversas.js"></script>
+	<script type="text/javascript" src="calendario/calendar.js"></script>
+	<script type="text/javascript" src="calendario/lang/calendar-pt.js"></script>
+	<script type="text/javascript" src="calendario/calendar-setup.js"></script>
+	<script type="text/javascript" src="scripts/ActivePrinter.js"></script>
+	<script type="text/javascript" src="scripts/funcoesCaixa.js"></script>
+	<script type="text/javascript" src="../js/menu-for-applications.js"></script>
+	<script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/scripts/funcoes.js"></script>
+	<script type="text/javascript" src="scripts/svpo.js"></script>
+
+	<script type="text/javascript" src="scripts/caixa.js"></script>
+	<script type="text/javascript" src="scripts/KitBeneficio.js"></script>
+	<script type="text/javascript" src="scripts/srvp.js"></script>
+	<script type="text/javascript" src="scripts/internet.js"></script>
+	<script type="text/javascript" src="scripts/crm.js"></script>
+	<script type="text/javascript" src="scripts/frota.js"></script>
+	<script type="text/javascript" src="scripts/softwares.js"></script>
+
+<!--
+        <link type="text/css" href="js/jquery/themes/ui-lightness/ui.all.css" rel="stylesheet" />
+
+
+        <script type="text/javascript" src="js/jquery/jquery-1.3.2.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.core.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.dialog.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.tabs.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.droppable.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.resizable.js"></script>
+        <script type="text/javascript" src="js/jquery/ui/ui.datepicker.js"></script>
+        -->
+
+
+        <!-- inicio jquery -->
+
+        <link type="text/css" href="https://rip.nspenha.com.br/retaguarda/js/jquery/jquery-ui.css" rel="stylesheet">
+
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/jquery-1.5.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/jquery-ui.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.core.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.dialog.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.tabs.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.droppable.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.resizable.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.ui.datepicker.js"></script>
+
+
+
+
+
+
+        <!-- fim jquery -->
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/ui/jquery.maskedinput-1.2.2.js"></script>
+
+
+        <link rel="stylesheet" href="https://rip.nspenha.com.br/retaguarda/scripts_ssw/ssw_260110.css" type="text/css">
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/scripts_ssw/ssw_010910.js"></script>
+	<script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/scripts_ssw/ssw0031_210710.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/scripts_ssw/lookup_260810.js"></script>
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/desk.js"></script>
+
+
+
+        <script language="javascript">
+            $J = jQuery.noConflict();
+
+
+
+
+            /// tradução datepicker().............
+        $J.datepicker.setDefaults({ dateFormat: 'dd/mm/yy',
+            dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+            dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            nextText: 'Próximo',
+            prevText: 'Anterior'
+        });
+
+
+
+        </script>
+
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/desk.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/funcoesGeral.js"></script>
+
+         <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/scripts/prototype.js"></script>
+
+
+         <!-- MENUS NOVOS -->
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/fg/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/fg/fg.menu.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jgrowl/jquery.jgrowl_minimized.js"></script>
+
+
+        <link type="text/css" href="https://rip.nspenha.com.br/retaguarda/js/jgrowl/uploadify.jGrowl.css" rel="stylesheet">
+        <link type="text/css" href="https://rip.nspenha.com.br/retaguarda/js/jgrowl/uploadify.styling.css" rel="stylesheet">
+
+
+        <script language="javascript">
+            $K = jQuery.noConflict();
+        </script>
+        <link type="text/css" href="https://rip.nspenha.com.br/retaguarda/js/fg/fg.menu.css" media="screen" rel="stylesheet">
+        <!-- <link type="text/css" href="js/fg/theme/ui.all.css" media="screen" rel="stylesheet" /> -->
+
+
+
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery/jquery.autocomplete.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://rip.nspenha.com.br/retaguarda/js/jquery/jquery.autocomplete.css">
+
+        <link rel="stylesheet" type="text/css" href="https://rip.nspenha.com.br/retaguarda/estilos/estilos1024.css">
+
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/tbJquery/jquery.min.js"></script>
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/tbJquery/jquery-ui.min.js"></script>
+        <script language="javascript">
+            $T = jQuery.noConflict();
+        </script>
+
+        <script type="text/javascript" src="https://rip.nspenha.com.br/retaguarda/js/jquery.fixheadertable-2.0/javascript/jquery.fixheadertable.min.js"></script>
+        <!-- <script type="text/javascript" src="js/Fixed-Header-Table-master/Fixed-Header-Table-master/jquery.fixedheadertable.js"></script> -->
+
+
+	<script language="JavaScript" type="text/JavaScript">
+
+		function verificaSessao()
+		{
+
+
+			new Ajax.Updater( 'divSessao' , 'index.phtml?acao=verificasessao' ,
+			{
+				method: 'post',
+				onComplete : function()
+				{
+
+					if (document.frmSessao.sessaousuario.value == 0)
+					{
+						alert('Sua sessão expirou. Efetue o login no sistema novamente.') ;
+
+						clearInterval(intervalo) ;
+
+						var altura, largura ;
+						largura= (screen.width) - 10 ;
+						altura = (screen.height) - 20 ;
+
+						window.open('login.phtml', '_self', 'top=0, left=5, width='+ largura  +',height='+ altura  +',toolbar=no,location=no, directories=no,status=no,menubar=no,scrollbars=yes,resizable=no' ) ;
+
+					}else if (document.frmSessao.sessaousuario.value == 1)
+						var intervalo = window.setTimeout('verificaSessao()', 20000) ;
+                                        else if (document.frmSessao.sessaousuario.value == 99)
+                                        {
+                                            var altura, largura ;
+                                            largura= (screen.width) - 10 ;
+                                            altura = (screen.height) - 20 ;
+
+                                            alert('Atenção!!!\nOcorreu uma falha na conexão com o banco de dados.\n\nVocê será desconectado e redirecionado para a tela de login.');
+
+                                            window.location.href = 'logoff.php' ;
+
+                                            //window.open('index.phtml', '_self', 'top=0, left=5, width='+ largura  +',height='+ altura  +',toolbar=no,location=no, directories=no,status=no,menubar=no,scrollbars=yes,resizable=no' ) ;
+
+                                        }
+
+				 } ,
+				onFailure : function(){ alert('Falha no Ajax.') }
+			})
+
+		}
+
+                function ValidaCampos()
+                {
+                        if (document.frm.txtAgencia.value=='')
+                        {
+                                alert('Preencha o campo Agência.') ;
+                                $('txtAgencia').focus();
+                                return false ;
+                        }
+                        if (document.frm.txtLogin.value=='')
+                        {
+                                alert('Preencha o campo Usuário.') ;
+                                $('txtLogin').focus();
+                                return false ;
+                        }
+                        if (document.frm.txtSenha.value=='')
+                        {
+                                alert('Preencha o campo Senha.') ;
+                                $('txtSenha').focus();
+                                return false ;
+                        }
+
+                        return true ;
+                }
+
+
+	</script>
+
+        <link rel="stylesheet" type="text/css" href="css/formNovo.css">
+
+        <!-- CSS TABLES HEADER FIXED -->
+        <!-- <link rel="stylesheet" type="text/css" href="js/jquery.fixheadertable-2.0/jquery-ui/css/redmond/jquery-ui-1.8.4.custom.css"/> --
+
+        <!-- <link rel="stylesheet" type="text/css" href="js/Fixed-Header-Table-master/Fixed-Header-Table-master/css/defaultTheme.css" />
+        <link rel="stylesheet" type="text/css" href="js/Fixed-Header-Table-master/Fixed-Header-Table-master/demo/css/960.css" />
+        <link rel="stylesheet" type="text/css" href="js/Fixed-Header-Table-master/Fixed-Header-Table-master/demo/css/myTheme.css" /> -->
+        <link rel="stylesheet" type="text/css" href="js/jquery.fixheadertable-2.0/css/base.css">
+
+
+<style type="text/css">
+
+    .ui-dialog-titlebar{
+        color: #002080 ;
+
+    }
+
+    body {
+
+        margin-left: 1px;
+        margin-top: 2px;
+        margin-right: 1px;
+        margin-bottom: 1px;
+
+    }
+
+</style>
+
+
+
+</head>
+<body>
+
+
+
+
+
+    <table width="99%" border="0" align="center" cellpadding="0" cellspacing="0" class="tabelaCadastro">
+    <tbody><tr>
+    <td>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#8BB3C7">
+            <tbody><tr>
+                    <td valign="middle" align="left" width="210">
+                    <script type="text/javascript">
+                    //AC_FL_RunContent( 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0','width','315','height','80','src','imagens/svpo','quality','high','pluginspage','http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash','movie','imagens/svpo' ); //end AC code
+                    </script>
+
+                    <!-- <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="315" height="80">
+                                  <param name="movie" value="imagens/svpo.swf">
+                                  <param name="quality" value="high">
+                                  <embed src="imagens/svpo.swf" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="315" height="80"></embed>
+                                        </object> -->
+
+                    <img src="imagens/01.jpg" width="290" height="80" alt="" border="0">
+
+                    </td>
+                    <td>  &nbsp; </td>
+                    <td>  &nbsp; </td>
+
+                    <td valign="middle" align="left">
+
+                            <table border="0" align="left" cellpadding="0" cellspacing="0" class="usuarioSessao" bgcolor="#8BB3C7" width="100%">
+                            <tbody><tr>
+                                    <td colspan="2"> &nbsp; </td>
+                            </tr>
+                            <tr>
+                                    <td colspan="5" valign="top">
+
+                                            <table border="0" align="left" cellpadding="1" cellspacing="1" class="usuarioSessao" width="80%">
+                                            <tbody><tr>
+                                                    <td align="left" width="88"> Usuário:&nbsp;&nbsp; </td>
+                                                    <td class="usuarioSessao2" colspan="3"> <font size="1" color="White"> JVS001 - JVS </font>	</td>
+                                            </tr>
+                                            <tr>
+                                                    <td align="left" width="88"> Agência:&nbsp;&nbsp; </td>
+                                                    <td align="left" class="usuarioSessao2" colspan="3"> <font size="1" color="White"> 000000 - PENHA MATRIZ	 </font> </td>
+                                            </tr>
+                                            <tr>
+                                                    <td align="left" colspan="1" valign="top"> Nº Terminal:&nbsp;&nbsp; </td>
+                                                    <td colspan="1">
+                                                    <a class="usuarioSessao2"> <font size="1" color="White"> 10.128.2.164 - 10.128.2.164 </font>  </a>                                                     </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                    <td width="100" align="left">
+                                                            Último Acesso:&nbsp;&nbsp;
+                                                    </td>
+                                                    <td width="180" align="left">
+                                                            <a class="usuarioSessao2">
+                                                              <font size="1" color="White"> 14/02/2026  07:57:35 </font>
+                                                            </a>
+                                                    </td>
+                                            </tr>
+                                            </tbody></table>
+
+                                    </td>
+
+                                    <td valign="top" colspan="5" align="right">
+                                            <table cellpadding="0" cellspacing="0" border="0">
+                                            <tbody><tr>
+                                                    <td class="textoPadrao">
+                                                    
+                                                    Clique no link abaixo para entrar em nossa área de FTP.
+                                                    </td>
+                                            </tr>
+                                            <tr>
+                                                    <td align="center">
+
+                                                            <font size="4" color="Blue">
+																<a href="#">  ÁREA DE DOWNLOADS DA EMPRESA </a>
+                                                            </font>
+                                                            
+													<!--				  <br><span style='color:red;'></span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=Quadro_de_tarifas_2020.pdf" >download Quadro Tarifas 2020 ANTT </a>
+															<br><span style='color:red;'>NOVO</span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=caxiense_antt_2019.pdf" >download Oficio ANTT - Caxiense 2019/2020 </a>
+															<br><span style='color:red;'>NOVO</span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=oficios_antt_18122019.pdf" >download Oficio ANTT - Carros Terceiros 2019/2020 </a>		
+<br><span style='color:red;'>NOVO</span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=oficio_maringa_penha_2019	.pdf" >download Oficio ANTT - Maringa 2019/2020 </a>	
+<br><span style='color:red;'>NOVO</span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=Kopereck_Turisa.pdf" >download Oficio ANTT - Kopereck e Turisa 2019/2020 </a>		-->													
+<br><span style="color:red;"></span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=COD_PAINEL_ONIBUS.pdf">download Códigos Itinerários Penha</a>														
+
+<br><span style="color:red;">Novo</span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=APOLICESSEGUROPENHA2026.pdf">download Seguros Penha 2026</a>
+<br><span style="color:red;">Novo</span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=APOLICESEXPRESSONSPENHA2026.pdf">download Seguros Exp Penha 2026</a>
+
+<!-- <br><span style='color:red;'></span>
+<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=Seguro_Cruz_2024.pdf" >download Seguros CRUZ 2024</a> -->
+<br><span style="color:red;">Novo</span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=APOLICESSEGUROPRINCESA2026.pdf">download Seguros PRINCESA 2026</a>
+<br><span style="color:red;">Novo</span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=DER_doc_pasta_TOTAL_140126.pdf">download Penha DER/DOC TOTAL</a>
+
+<br><span style="color:red;"></span>
+<a href="https://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=Resolucao_5965_Quadro_tarifa.pdf">download Resolução 5965</a>
+<br><br>
+
+
+													<label style="width: 120px; "><span style="color:red;"></span>
+														<input id="btnDownLoadOficio" type="button" value="Download Oficios Grupo " onclick="javascript:  montaJanelaNova('oficio/listaarquivos.php',  'container', 'Lista Arquivos Oficios', false, false, 900, 600 ) ; " style="width: 170px;" class="btn">
+													</label>
+													<label style="width: 130px; "><span style="color:red;">Novo</span>
+														<input id="btnDownLoadOficioTerceiros" type="button" value="Download Oficios Terceiros" onclick="javascript:  montaJanelaNova('oficioterceiros/listaarquivos.php',  'container', 'Lista Arquivos Oficios Terceiros', false, false, 900, 600 ) ; " style="width: 170px;background-color:#efe8da;" class="btn">
+													</label>
+
+
+															<!--
+															<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=quadro_tarifa_penha_05072018.pdf" >download Tarifa 05/07/2018 ANTT </a>
+<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=saopaulo_itapema_semileito.pdf" >download Tarifa Sao Paulo x Itapema (semileito)28/02/2019 ANTT </a>															
+<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=quadro_tarifa_antt_81.pdf" >download Tarifa Sao Paulo x Itapema Leito 07/02/2019 ANTT </a>															
+<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=curitiba_rio_janeiro_leito_21122018.pdf" >download Tarifa Curitiba x Rio de Janeiro Leito 21/12/2018 ANTT </a>															
+<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=bage_sao_paulo_semileito070219.pdf" >download Tarifa Bage x Sao Paulo (semileito)  07/02/2019 ANTT </a>															
+<br>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=saopaulo_riogrande_br101.pdf" >download Tarifa Sao Paulo x Rio Grande via BR101(semileito)  06/05/2019 ANTT </a>																														
+<br> 
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=curitiba_camaqua_br101.pdf" >download Tarifa Curitiba x Camaqua via BR101(semileito)  10/10/2019 ANTT </a>																				<br> 
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=porto_alegre_saopaulo_conv.pdf" >download Tarifa Porto Alegre x Sao Paulo (conv)  19/09/2019 ANTT </a>																				<br> 
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=quadro_tarifa_18102019.pdf" >download Tarifa Quadro Tarifa 18/10/2019 ANTT </a><br><span style='color:red;'>NOVO</span>
+															<a href="http://rip.nspenha.com.br/retaguarda/arquivos/download.php?arquivo_download=apolice_penha_2020.pdf" >Apolice de Seguro Frota Penha 2020 </a>																																																		
+-->
+
+                                                    </td>
+                                            </tr>
+                                            <tr>
+                                            <td align="right">
+                                            
+                                                            <a href="javascript:void(0);" onclick="javascript: if (confirm('Deseja encerrar a sessão?')) { window.location.href='logoff.php' ; }   " class="AcessoRapido"> <font size="2" color="Red"> Encerrar Sessão </font>  </a>
+                                                                                                 </td>
+                                             </tr>
+                                             </tbody></table>
+
+                                    </td>
+
+
+                            </tr>
+                            </tbody></table>
+
+                    </td>
+                    <td> &nbsp; </td>
+
+            </tr>
+            </tbody></table>
+
+    </td>
+    </tr>
+
+    <tr>
+        <td colspan="10" bgcolor="white" valign="top">
+<div id="menuBarContainerCargas"> <br>
+    <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flat">
+    <span class="ui-icon ui-icon-triangle-1-s" accesskey="M"></span>Menus Disponíveis do Sistema  </a>
+
+    </div>
+
+    <div id="search-engines" class="hidden">
+    <ul> <li><a href="#">Administração</a> <ul><li><a href="javascript:void(0)" onclick="javascript: montaJanelaNova('administracao/cad_senha.phtml?nivel=1', 'container', 'Alterar Senha', false, false, 900, 600 ) ">Alterar Senha</a></li></ul></li><li><a href="#">Veículos</a> <ul><li><a href="javascript:void(0)" onclick="javascript: montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600 ) ">Escala Programada</a></li></ul></li>
+
+    </ul>
+    </div> <script type="text/javascript" language="javascript"> var l=new Array()
+		   l={} ; 
+		  var h=new Array()
+		  h={} ; </script>
+     <script type="text/javascript">
+
+        $K('.fg-button').hover(
+    		function(){ $K(this).removeClass('ui-state-default').addClass('ui-state-focus'); },
+    		function(){ $K(this).removeClass('ui-state-focus').addClass('ui-state-default'); }
+    	);
+
+        $K(function(){
+
+             $K('#flat').menu({
+			content: $K('#search-engines').html(), // grab content from this page
+                        flyOut: true
+		});
+
+         });
+
+
+    </script>
+
+
+</td>
+
+    </tr>
+    <tr>
+        <td colspan="10" valign="top">
+        <script>
+            if (!$J.browser.msie) {
+                document.write('<br><br>') ;
+            }
+
+        </script><br><br>
+        <div id="divRetornoCadastro">&nbsp;&nbsp; <a class="destaque" href="javascript: CarregaOpcao('centro.php') "> Página Inicial </a> </div>
+
+        <a style="float: right; color: blue; font-size: 10px; visibility: hidden; display: none;">
+            <font style="color: red;float: left;"> Atenção usuários do sistema RIP!!! &nbsp;&nbsp;</font>
+            Qualquer anormalidade nas telas, por gentileza limpe o cache do seu navegador (mozilla ou internet explorer) e entre novamente no sistema.  </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="10" align="center">
+
+            <div id="container" style="height: 99%;"><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable ui-resizable" id="resizable" style="width: 900px; height: auto; display: block;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix" style="cursor: auto;"><span class="ui-dialog-title">Escala Programada</span><a class="ui-dialog-titlebar-close ui-corner-all" title="Fechar" style="cursor: pointer;"><span class="ui-icon ui-icon-closethick"></span></a></div><div class="ui-dialog-content ui-widget-content" id="divBase" style="overflow: scroll;">
+
+
+
+
+
+<style>
+.btnAtualizar{
+height: 20px;
+width: 20px;
+background-image:url(http://rip.nspenha.com.br/retaguarda/imagens/atualizar.png);
+}
+</style>
+
+     <form action="" name="frm" id="frm" onsubmit="javascript : return false ;">
+
+         <table align="center" border="0" cellpadding="0" cellspacing="1" style="width: 840px;" id="tblBaseCadastro">
+        <tbody><tr>
+            <td class="destaque" colspan="4"> Cadastro de Escala Programada  </td>
+        </tr>
+        <tr>
+            <td class="tabelaCadastro">
+
+            <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+                    <li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tabs-1">Cadastro</a></li>
+                    <li class="ui-state-default ui-corner-top"><a href="#tabs-2">Consulta</a></li>
+                </ul>
+
+            <div id="tabs-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+
+                <fieldset style="width: 840px;  ">
+                  <legend> Dados  </legend>
+
+                                    <label style="width: 220px;">
+                      <span style="width: 210px;">Empresa Serviço </span>
+                      <select style="width: 210px; " id="txtEmpresa" name="txtEmpresa">
+                          <option value="" selected=""> Selecione uma empresa </option>
+                                                    <option value="002"> 002 - EXPRESSO PENHA </option>
+                                                    <option value="006"> 006 - PRINCESA DO NORTE </option>
+                                                </select>
+                  </label>
+
+				  <fieldset style="width:760px;background-color:#e9dbaa;">
+                    
+					  <label style="width: 220px;">
+						  <span style="width: 210px;">Empresa Carro </span>
+						  <select style="width: 210px; " id="txtEmpresaCarro" name="txtEmpresaCarro" onchange="javascript:xajax_RetornaCarroSetor(this.value,document.frm.txtSetor.value,document.frm.txtDataViagem.value,document.frm.txtHoraViagem.value);">
+							  <option id="optEmpresaCarro" value="" selected=""> Selecione uma empresa </option>
+							  							  <option value="001"> 001 - PENHA </option>
+							  							  <option value="002"> 002 - EXPRESSO PENHA </option>
+							  							  <option value="006"> 006 - PRINCESA DO NORTE </option>
+							  						  </select>
+					  </label>
+
+					  <label style="width: 250px;">
+						  <span style="width: 240px;"> Veículo </span>
+						  <select style="width: 240px; " id="txtVeiculo" name="txtVeiculo" onchange="javascript:xajax_VerificaAutorizacao(this.value,document.frm.txtEmpresaCarro.value,document.frm.txtEmpresa.value);
+						  xajax_VerificaRevisaoSAP(document.frm.txtEmpresaCarro.value,this.value);">
+							  <option value="" id="optVeiculo"> Selecione uma opção </option>
+						  </select>
+					  </label>
+					  <div id="divManutSAP" style="width:500px;">
+					  </div>
+				  </fieldset>
+				  <fieldset style="width:760px;background-color:#d9e7d5;">
+                    
+					  <label style="width: 220px;">
+						  <span style="width: 210px;">Empresa Motorista </span>
+						  <select style="width: 210px; " id="txtEmpresaMotora" name="txtEmpresaMotora" onchange="javascript:xajax_RetornaFuncionario(this.value,'txtMotorista');">
+							  <option value="" selected=""> Selecione uma empresa </option>
+							  							  <option value="001"> 001 - PENHA </option>
+							  							  <option value="002"> 002 - EXPRESSO PENHA </option>
+							  							  <option value="006"> 006 - PRINCESA DO NORTE </option>
+							  						  </select>
+					  </label>
+					  
+					<label style="width: 340px;">
+						  <span style="width: 330px;">Funcionário </span>
+						  <input type="text" style="width: 320px; " id="txtTeste" name="txtTeste" onkeypress="javascript:xajax_RetornaListaFuncionario(document.frm.txtEmpresaMotora.value,this.value);">
+						   <div id="listafuncionarios" style="visibility: hidden;">
+						   <select style="width: 320px;" id="txtListaFuncionario" name="txtListaFuncionario" size="1" onchange="javascript:document.frm.txtMotorista.value=this.value;" onclick="javascript:document.frm.txtMotorista.value=this.value;document.getElementById('listafuncionarios').style.visibility = 'hidden';document.getElementById('txtListaFuncionario').size = '0';xajax_RetornaNomeFuncionario(document.frm.txtEmpresaMotora.value,this.value);">
+						   <option value="" id="optListaFuncionario"></option>
+						   </select>
+						</div>
+					</label>		 		  					
+					<label style="width:100px;">				  					
+						<span style="width:100px;">Matrícula</span>
+						<input type="text" id="txtMotorista" name="txtMotorista" value="" readonly="" style="width:90px;background-color:#eee;" maxlength="8"> <!-- onchange="javascript:xajax_RetornaNomeFuncionario(document.frm.txtEmpresa.value,this.value);" --> 
+															 
+					</label>	
+				
+					  <!-- <label style="width: 350px;" >
+						  <span style="width: 340px;" >Motorista  </span>
+						  <select style="width: 340px; " id="txtMotorista" name="txtMotorista"  >
+							  <option value="" id="optMotorista" selected > Selecione uma opção </option>
+						  </select>
+					  </label>
+					  <label style="width:30px;">
+						<span><button type="button" class="btnAtualizar" id="btnAtualizarMotorista" alt="Atualiza Motorista" title="Atualiza Motorista"></button></span>
+					  </label> -->
+
+				</fieldset>
+                  <label style="width: 120px;">
+                      <span style="width: 170px;"> Data Viagem </span>
+                      <input id="txtDataViagem" name="txtDataViagem" type="text" value="" style="width: 110px; text-align: center; ">
+                  </label>
+
+                  <label style="width: 100px;">
+                      <span style="width: 170px;"> Hora Viagem </span>
+                      <input id="txtHoraViagem" name="txtHoraViagem" type="text" value="" style="width: 90px; text-align: center; ">
+                  </label>
+                  <label style="width: 100px;">
+                      <span style="width: 170px;"> Serviço Viagem </span>
+                      <input id="txtServicoViagem" name="txtServicoViagem" type="text" value="" disabled="" style="width: 90px; text-align: center; ">
+                  </label>
+
+                  <label style="width: 610px;">
+                      <span style="width: 200px;"> Itinerario </span>
+                      <input id="txtItinerario" name="txtItinerario" type="text" maxlength="40" value="" style="width:500px;" onchange="javascript: this.value = this.value.toUpperCase(); ">
+                  </label>
+
+                  <label style="width: 610px;">
+                      <span style="width: 200px;"> Observação </span>
+                      <input id="txtObservacao" name="txtObservacao" type="text" maxlength="50" value="" style="width:500px;" onchange="javascript: this.value = this.value.toUpperCase(); ">
+                  </label>
+				  <label style="width:150px;">
+					<span style="width: 100px;color:blue;">Carro com Manta</span>
+					<input style="width:30px;" align="left" type="checkbox" name="chkManta" id="chkManta" value="">
+				  </label>
+				  <label style="width:150px;">
+					<span style="width:100px;">Quant. Manta</span>
+					<input id="txtQtManta" name="txtQtManta" value="" align="center" type="text" maxlength="2" style="width:80px;text-align:center;" onkeypress="javascript: ApenasNumeros(true, event); ">
+				  </label>
+                </fieldset>
+
+				<fieldset style="width: 835px;BACKGROUND-COLOR:#cfc3b5;  ">
+                  <legend>Confirme a Saída do Carro da Rodoviaria/Setor - Origem</legend>
+				   <label style="width: 150px;">
+                      <span style="width: 140px;"> Confirma Saída? </span>
+                      <select style="width: 80px; " id="txtCarroConfirmado" name="txtCarroConfirmado" onchange="javascript:xajax_BuscaData(this.value);">
+                          <option value="N">NÃO</option>
+                          <option value="S">SIM</option>
+                      </select>
+                    </label>
+				   <label style="width: 120px;">
+                      <span style="width: 170px;"> Data Saída </span>
+                      <input id="txtDataCarroConfirmado" name="txtDataCarroConfirmado" type="text" value="" style="width: 110px; text-align: center; ">
+                  </label>
+
+                  <label style="width: 100px;">
+                      <span style="width: 170px;"> Hora Saída </span>
+                      <input id="txtHoraCarroConfirmado" name="txtHoraCarroConfirmado" type="text" value="" style="width: 90px; text-align: center; ">
+                  </label>
+				</fieldset>
+                <fieldset style="width:835px;">
+                    <legend>Setor</legend>
+
+                 
+               
+                    <label style="width: 350px; &gt;
+                      &lt;span style=" width:="" 340px;"=""> Setor Origem 
+                      <select style="width: 240px; " id="txtSetor" name="txtSetor">
+                          <option value="" id="optSetor"> Selecione uma opção </option>
+                         <option value="43">CURITIBA - PR</option>                      </select>
+                    </label>
+					<label style="width: 350px; &gt;
+                      &lt;span style=" width:="" 340px;"=""> Setor Destino 
+                      <select style="width: 240px; " id="txtSetorDestino" name="txtSetorDestino">
+                          <option value="" id="optSetor"> Selecione uma opção </option>
+                         <option value="43">CURITIBA - PR</option>                      </select>
+                    </label>
+
+
+            <!--
+			<label style="width:150px;">
+                        <span style="width: 60px;">Domingo</span>
+                        <input style="width:30px;"  align="left" type="checkbox" name="chkDomingo" id="chkDomingo" value="">
+                      </label>
+
+                      <label style="width:150px;">
+                        <span style="width: 60px;">Segunda</span>
+                        <input style="width:30px;"  align="left"  type="checkbox" name="chkSegunda" id="chkSegunda" value="">
+                      </label>
+
+                      <label style="width:150px;">
+                        <span style="width: 60px;">Ter&ccedil;a</span>
+                        <input style="width:30px;"  align="left"  type="checkbox" name="chkTerca" id="chkTerca" value="">
+                      </label>
+
+                      <label style="width:150px;">
+                        <span style="width: 60px;">Quarta</span>
+                        <input style="width:30px;" align="left"  type="checkbox" name="chkQuarta" id="chkQuarta" value="">
+                      </label>
+                       <label style="width:150px;">
+                    <span style="width: 60px;">Quinta</span>
+                    <input style="width:30px;"  align="left" type="checkbox" name="chkQuinta" id="chkQuinta" value="">
+                  </label>
+
+                  <label style="width:150px;">
+                    <span style="width: 60px;">Sexta</span>
+                    <input style="width:30px;"  align="left"  type="checkbox" name="chkSexta" id="chkSexta" value="">
+                  </label>
+
+                  <label style="width:150px;">
+                    <span style="width: 60px;">S&aacute;bado</span>
+                    <input style="width:30px;"  align="left"  type="checkbox" name="chkSabado" id="chkSabado" value="">
+                  </label>
+-->
+
+                </fieldset>
+
+                <fieldset style="width: 835px;  ">
+                  <legend> Status </legend>
+
+                  <label style="width:150px;">
+                    <span style="width: 90px;">Manutenção</span>
+                    <input style="width:30px;" align="left" type="checkbox" name="chkOficina" id="chkOficina" value="">
+                  </label>
+
+                  <label style="width:150px;visibility:hidden;">
+                    <span style="width: 60px;">Eletrica</span>
+                    <input style="width:30px;" align="left" type="checkbox" name="chkEletrica" id="chkEletrica" value="">
+                  </label>
+
+                  <label style="width:150px;visibility:hidden;">
+                    <span style="width: 60px;">Pneus</span>
+                    <input style="width:30px;" align="left" type="checkbox" name="chkPneus" id="chkPneus" value="">
+                  </label>
+
+                  <label style="width:150px;">
+                    <span style="width: 60px;">Limpeza</span>
+                    <input style="width:30px;" align="left" type="checkbox" name="chkLimpeza" id="chkLimpeza" value="" disabled="">
+                  </label>
+
+                </fieldset>
+
+                <fieldset style="width: 835px; background-color: #d1cbcb; ">
+                    <legend> Log alteração </legend>
+
+                    <label style="width: 310px;">
+                      <span>Usuário última alteração</span>
+                      <input id="txtUsuarioLog" name="txtUsuarioLog" type="text" value="JVS001" style="width: 300px; background-color: #ebe6e6; " disabled="">
+                    </label>
+                    <label>
+                      <span style="width: 310px;">Data última alteração</span>
+                      <input id="txtDataUsuarioLog" name="txtDataUsuarioLog" type="text" value="" style="width: 120px; background-color: #ebe6e6; " disabled="">
+                    </label>
+
+                </fieldset>
+
+
+                <input id="txtCodigo" name="txtCodigo" type="hidden" value="">
+                <input id="txtOficina" name="txtOficina" type="hidden" value="N">
+                <input id="txtEletrica" name="txtEletrica" type="hidden" value="N">
+                <input id="txtPneus" name="txtPneus" type="hidden" value="N">
+                <input id="txtLimpeza" name="txtLimpeza" type="hidden" value="N">
+                <input id="txtManta" name="txtManta" type="hidden" value="">
+
+                <input id="txtDomingo" name="txtDomingo" type="hidden" value="">
+                <input id="txtSegunda" name="txtSegunda" type="hidden" value="">
+                <input id="txtTerca" name="txtTerca" type="hidden" value="">
+                <input id="txtQuarta" name="txtQuarta" type="hidden" value="">
+                <input id="txtQuinta" name="txtQuinta" type="hidden" value="">
+                <input id="txtSexta" name="txtSexta" type="hidden" value="">
+                <input id="txtSabado" name="txtSabado" type="hidden" value="">
+                <input id="txtCarroAnterior" name="txtCarroAnterior" type="hidden" value="">
+
+
+
+                <input id="usuarioLog" name="usuarioLog" type="hidden" value="JVS001">
+                <input id="nivel" name="nivel" type="hidden" value="1">
+
+
+                <fieldset style="width: 835px;">
+
+                  <label style="width: 120px; float: right; ">
+                      <span style="width: 120px;"> &nbsp; </span>
+                      <input id="btnLimpar" type="button" value="Limpar" style="width: 100px;" class="btn">
+                  </label>
+
+                  <label style="width: 120px; float: right; ">
+                      <span style="width: 120px;"> &nbsp; </span>
+                      <input id="btnExcluir" type="button" value="Excluir " style="width: 120px;" class="btn">
+                  </label>
+
+                  <label style="width: 120px; float: right; ">
+                      <span style="width: 120px;"> &nbsp; </span>
+                      <input id="btnGravar" type="button" value="Gravar " style="width: 120px;" class="btn">
+                  </label>
+
+                    <br>
+
+                  <label style="width: 500px;">
+                    <span id="retorno"> </span>
+                  </label>
+
+                </fieldset>
+
+
+            </div>
+
+
+                <div id="tabs-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+
+                    <fieldset style="width: 840px; margin-left: 10px; ">
+                        <legend> Critérios de busca </legend>
+
+                        <label style="width: 120px;">
+                          <span style="width: 110px;"> Data Viagem Inicial </span>
+                          <input id="txtPesqDtViagem" name="txtPesqDtViagem" type="text" value="14/02/2026" style="width: 110px; text-align: center; ">
+                        </label>
+                        <label style="width: 120px;">
+                          <span style="width: 110px;"> Data Viagem Final </span>
+                          <input id="txtPesqDtViagemFinal" name="txtPesqDtViagemFinal" type="text" value="" style="width: 110px; text-align: center; ">
+                        </label>
+
+                        <label style="width:110px;">
+                            <span style="width:110px;">Veículo</span>
+                            <input id="txtPesqCarro" name="txtPesqCarro" type="text" maxlength="6" value="" style="width: 110px; text-align: center; ">
+                        </label>
+                        <label style="width:210px;">
+                            <span style="width:210px;">Empresa Serviço</span>
+                                                  <select style="width: 210px; " id="txtPesqEmpresa" name="txtPesqEmpresa" onchange="javascript:xajax_RetornaClasseTotalbus(this.value,document.frm.txtPesqDtViagem.value,document.frm.txtPesqDtViagemFinal.value);">
+                              <option value=""> Selecione uma empresa </option>
+                                                            <option value="002"> 002 - EXPRESSO PENHA </option>
+                                                            <option value="006"> 006 - PRINCESA DO NORTE </option>
+                                                        </select>
+                        </label>
+						<label style="width: 220px;">
+						  <span style="width: 210px;">Empresa Carro </span>
+						  <select style="width: 210px; " id="txtPesqEmpresaCarro" name="txtPesqEmpresaCarro">
+							  <option value="" selected=""> Selecione uma empresa </option>
+							  							  <option value="001"> 001 - PENHA </option>
+							  							  <option value="002"> 002 - EXPRESSO PENHA </option>
+							  							  <option value="006"> 006 - PRINCESA DO NORTE </option>
+							  						  </select>
+					  </label>
+                       
+                        <label style="width: 240px;">
+                          <span style="width: 240px;"> Setor </span>
+                          <select style="width: 240px;" id="txtPesqSetor" name="txtPesqSetor">
+                              <option value="" id="optSetor"> Selecione uma opção </option>
+                    <option value="43">CURITIBA - PR</option>                            
+                          </select>
+                        </label>
+						
+						<label style="width: 200px;">
+						  <span style="width: 190px;"> Classe Totalbus </span>
+						  <select style="width: 190px; " id="txtPesqClasse" name="txtPesqClasse">
+							  <option value="">Todos</option>
+							  
+						  </select>
+						</label>
+						
+						<label style="width: 100px;">
+						  <span style="width: 100px;"> Confirma Saída? </span>
+						  <select style="width: 80px; " id="txtPesqCarroConfirmado" name="txtPesqCarroConfirmado">
+							  <option value="">Todos</option>
+							  <option value="N">Não</option>
+							  <option value="S">Sim</option>
+						  </select>
+						</label>
+						<label style="width: 100px;">
+						  <span style="width: 100px;">Situação Totalbus </span>
+						  <select style="width: 90px; " id="txtPesqSituacao" name="txtPesqSituacao">
+							  <option value="">Todos</option>
+							  <option value="A">Ativo</option>
+							  <option value="C">Cancelado</option>
+							  <option value="E">Excluído</option>
+						  </select>
+						</label>
+						<label style="width: 140px;">
+						  <span style="width: 140px;">Orgão Concedente </span>
+						  <select style="width: 130px; " id="txtPesqOrgao" name="txtPesqOrgao">
+							  <option value="">Todos</option>
+							  <option value="5">AGER/MT</option><option value="27">AGERBA</option><option value="3">ANTT</option><option value="21">ARTESP</option><option value="29">ATR</option><option value="31">DAER</option><option value="19">DER-PB</option><option value="7">DER/BA</option><option value="13">DER/CE</option><option value="8">DER/CE/PB/PA</option><option value="10">DER/ES</option><option value="16">DER/GO</option><option value="6">DER/MG</option><option value="4">DER/MS</option><option value="14">DER/PE</option><option value="2">DER/PR</option><option value="9">DER/RJ</option><option value="28">DER/RO</option><option value="15">DER/SC</option><option value="1">DER/SP</option><option value="12">DER/TO</option><option value="30">DETER</option><option value="20">DETRAN-CE</option><option value="22">DETRO/RJ</option><option value="24">EMTU</option><option value="18">SETRANS - PI</option><option value="17">SINFRA - MA</option>							  
+						  </select>
+						</label>
+						
+                        <label style="width: 100px; ">
+                            <span style="width: 90px;"> &nbsp;  </span>
+                            <input id="btnPesquisar" type="button" value="Pesquisar" onclick="javascript:  CarregaPagina('divResultado', 'php/list/frota/consultaEscalaProgramada.php', document.frm, 'Aguarde...' ) ; " style="width: 80px;" class="btn">
+                        </label>
+
+                        <label style="width: 100px; ">
+                            <span style="width: 90px;"> &nbsp;  </span>
+                            <input id="btnImprimir" type="button" value="Imprimir" onclick="javascript: AbreRelatorio('php/list/frota/rel_prn_consultaEscalaProgramada.php?tiposaida=grafico&amp;dtviagem='+ $('txtPesqDtViagem').value +'&amp;dtfinal='+$('txtPesqDtViagemFinal').value+ '&amp;carro='+$('txtPesqCarro').value + '&amp;empresa='+$('txtPesqEmpresa').value+'&amp;classe='+$('txtPesqClasse').value +'&amp;orgao='+$('txtPesqOrgao').value +'&amp;setor='+$('txtPesqSetor').value+'&amp;empresacarro='+$('txtPesqEmpresaCarro').value+'&amp;idcarroconf='+$('txtPesqCarroConfirmado').value+'&amp;situacaotot='+$('txtPesqSituacao').value ,1280, 600) ; " style="width: 80px;background-color:#bece9f;" class="btn">
+
+                        </label>
+
+                    </fieldset>
+
+                    <fieldset style="width: 840px; margin-left: 10px; ">
+                        <legend>
+                            Resultado da Consulta
+                        </legend>
+
+                        <div id="divResultado" style="width: 830px; overflow: scroll; height: 300px; " class="texto">
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+
+
+
+    
+    
+    
+    
+
+
+    
+    
+
+    
+
+
+    <style>
+
+        A:link {text-decoration: none}
+        A:visited {text-decoration: none}
+        A:active {text-decoration: none}
+
+        .ui-dialog-titlebar
+        {
+            font-size: 12px;
+            height: 15px;
+        }
+
+
+        </style>
+
+
+
+
+
+
+    <table width="99%" align="left" border="0" cellpadding="1" cellspacing="1">
+    <tbody><tr>
+            <th align="center" class="horarioLabel"> </th>
+            <th align="center" class="horarioLabel"> Nº Veiculo </th>
+            <th align="left" class="horarioLabel"> Data Viagem </th>
+            <th align="left" class="horarioLabel"> Hora Viagem </th>
+            <th align="left" class="horarioLabel"> Situação Totalbus </th>
+            <th align="left" class="horarioLabel"> Empresa </th>
+            <th align="left" class="horarioLabel"> Itinerario </th>
+            <th align="left" class="horarioLabel"> Motorista </th>
+    </tr><tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178893); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   64085   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">00:10</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CARLOS GUSTAVO MEDEIROS LIMA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180184); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65215   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">00:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">RIVAIL DE SOUZA VIEIRA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178958); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   58003   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">00:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">JORGE LUIZ PEREIRA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179623); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65025   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">00:40</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">THIAGO HENRIQUE MARTINS DOS SANTOS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180256); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   62005   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">01:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ISAIAS FERREIRA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179222); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65512   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">01:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario">FABIO FERNANDO FERREIRA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179417); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65285   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">06:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ELIANDRO GONCALVES</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(14326157261); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65424   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">06:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario">ANTONIO COELHO DA SILVA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180210); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65518   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">06:15</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">OZANA DE ALMEIDA BATISTA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179270); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   61270   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">06:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">MARCELO DE ANDRADE CUCHABA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179853); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   462208   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">06:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">LUIZ GONZAGA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179197); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   1132   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">06:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario">ALEXANDRE TURISMO</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179444); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65505   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">06:40</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">MARCOS ALBERTO CAVALHEIRO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180239); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65511   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">SILVIO JOSE MIRA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179969); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65506   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO MATEUS DO SUL - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CIRO DE OLIVEIRA SANTOS</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(14208010272); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   1402   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">TRANSTAB TRANSPORTE</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(14282829142); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65517   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:01</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X LAPA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PEDRO LUIZ FAGUNDES</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178717); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65534   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X SANTO ANTONIO DA PLATINA - PR</td><td align="left" class="tabelaHorario">RICARDO DE PAULA RAMOS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179559); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65505   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:20</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ERNANDES FERREIRA DA SILVA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179203); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   462307   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">ISAIAS DA SILVA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178908); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   1396   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CMW TRANSPORTES LTDA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178828); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   18170   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario">MARLAC</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178913); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   462302   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:40</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">DOUGLAS DAL COL</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179045); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   7174   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">07:40</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">CARLOS HENRIQUE MORAES</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178981); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   462207   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">07:50</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ILZA DE SOUZA PARDINHO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180158); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   462309   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">08:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">MAYCON VILELA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179149); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65315   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">08:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X JUNDIAI - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">JACKSON GOMES DA SILVA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178777); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65220   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">08:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X BRASILIA - DF</td><td align="left" class="tabelaHorario">JOSE SERAFIM DE SOUZA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179069); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   1101   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">08:20</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ALEXANDRE TURISMO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180058); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   462206   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">08:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">JOAO CARVALHO DA CRUZ</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179949); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   59006   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">08:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EDI CARLOS ZENI</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179844); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   64205   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">08:50</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">ANA PAOLA BUENO DOS SANTOS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179735); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   59095   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">09:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPEDITO VERGILIO FERREIRA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178706); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65524   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">09:10</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X ABATIA - PR</td><td align="left" class="tabelaHorario">PAULO ROGERIO MAIA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178690); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">09:15</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0"><a title=" Usuario: EDMILSON DANIEL FERREIRA 
+ Agencia: PENHA ADM BPE(01017)
+ Data: 12/02/2026 17:31:15" alt=" Usuario: EDMILSON DANIEL FERREIRA 
+ Agencia: PENHA ADM BPE(01017)
+ Data: 12/02/2026 17:31:15" <span="" style="color:red;font-weight:bold;">CANCELADO</a></td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X IBAITI - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0"></td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178897); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   2054   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">09:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">VM TRANSPORTES LTDA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178789); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   54303   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">09:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SANTO ANTONIO DA PLATINA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">LEANDRO APARECIDO PEREIRA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179988); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   59002   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">09:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">ANTONIO CARLOS DA MAIA MARTINS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179447); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">10:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ANA LUCIA REIS</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(14326157260); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65418   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">10:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario">ANTONIO MOACIR DE FARIAS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180111); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">10:10</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">FAZENDA BEIRA RIO - MS X DOURADOS - MS</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0"></td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179275); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65105   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">10:20</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">LUIZ HENRIQUE CAMARGO DE FREITAS</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178883); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">11:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">MARCOS SOUSA CARVALHO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178845); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">11:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO MATEUS DO SUL - PR</td><td align="left" class="tabelaHorario">ANDERSON DE PAULA E SILVA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179923); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">11:10</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ELIZEU ROBERTO DA SILVA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179359); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65519   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">11:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">ANA MARIA DA SILVA </td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180122); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">12:10</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">WALDIR BENEDITO BARBOSA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178546); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   65531   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">12:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X SANTO ANTONIO DA PLATINA - PR</td><td align="left" class="tabelaHorario">ROGERIO SIQUEIRA VITORINO</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178852); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">12:45</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">GEORGE BRAGA CARVALHO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180048); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">12:50</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">ASLEI DE OLIVEIRA COSTA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179935); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">13:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EMERSON ALETAIF</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179915); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">13:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">LUCIMAR ANTONIO FERREIRA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179540); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">14:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X RIO GRANDE - RS</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CARINE DA SILVA SANTOS FERREIRA DE MELLO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178994); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">14:10</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">VANDERLEI FARIA REZENDE</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180147); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">14:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO MATEUS DO SUL - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">OSVALDO TRAWINSKI DROBNIESKI</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179551); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">14:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">JACYR INACIO DE SOUZA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178917); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">15:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">JONATHAN CARNEIRO SANTOS</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179772); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">15:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SANTANA DO LIVRAMENTO - RS</td><td align="left" class="tabelaHorario">GEAZE ELI MACENO MATOZO</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178580); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65525   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">15:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SANTO ANTONIO DA PLATINA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">LEANDRO APARECIDO DE OLIVEIRA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179055); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">16:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">EDIVALDO APARECIDO ALVES</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991180120); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">16:10</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">DANIEL PINTO DA SILVA</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178802); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">17:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">MAICON RODRIGO NASCIMENTO</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179072); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">17:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">MARCOS ALBERTO CAVALHEIRO</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179396); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">17:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">ERNANDES FERREIRA DA SILVA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178726); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65528   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">18:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X WENCESLAU BRAZ - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ANTONIO FRANCISCO FERRARI</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179094); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">18:50</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X ITAPOA - SC</td><td align="left" class="tabelaHorario">SERGIO MARIANO DA SILVA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179798); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">19:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X SAO MATEUS DO SUL - PR</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">JOSE LEONEL BOCZKOVSKI</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179726); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">19:10</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X GUARATUBA - PR</td><td align="left" class="tabelaHorario">CARLOS HENRIQUE MORAES</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178794); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">   65275   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">19:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X ARACATUBA - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">JESIMIEL BISPO DOS SANTOS</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178671); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   64216   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">21:00</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X UBERLANDIA - MG</td><td align="left" class="tabelaHorario">DENIR CARDOSO DE LIMA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179209); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">21:00</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X PORTO ALEGRE - RS</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">MARCOS ANTONIO FUCK BARP</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179774); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">21:15</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X UMUARAMA - PR</td><td align="left" class="tabelaHorario">GUSTAVO HENRIQUE DE SOUSA ALVES</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179400); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">21:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X VOLTA REDONDA - RJ</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">MARICEO DE OLIVEIRA ALVES</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991178779); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">   51148   </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">22:10</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">PRINCESA DO NORTE</td><td align="left" class="tabelaHorario">CURITIBA - PR X ASSIS - SP</td><td align="left" class="tabelaHorario">CLODOALDO BONIM MACHADO</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179478); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">22:30</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X JUNDIAI - SP</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">PIANOSTUR</td></tr> <tr> <td class="tabelaHorario">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179825); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario">      </td>  <td align="left" class="tabelaHorario">   14/02/2026   </td>  <td align="left" class="tabelaHorario">23:30</td><td align="left" class="tabelaHorario">ATIVO</td><td align="left" class="tabelaHorario">EXPRESSO PENHA</td><td align="left" class="tabelaHorario">CURITIBA - PR X SAO PAULO (TIETE) - SP</td><td align="left" class="tabelaHorario">JULIO CESAR PEREIRA</td></tr> <tr> <td class="tabelaHorario" bgcolor="#F0FFF0">
+		<a href="javascript:void(0);" onclick="javascript:  xajax_RetornaDados(13991179959); "> <img src="imagens/09.gif" border="0"> </a></td> <td align="center" class="tabelaHorario" bgcolor="#F0FFF0">      </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">   14/02/2026   </td>  <td align="left" class="tabelaHorario" bgcolor="#F0FFF0">23:58</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">ATIVO</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">EXPRESSO PENHA</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">CURITIBA - PR X FLORIANOPOLIS - SC</td><td align="left" class="tabelaHorario" bgcolor="#F0FFF0">GEAN EDUARDO DE FARIAS DO ESPIRITO SANTO</td></tr> <tr> <td colspan="10" class="destaque"> Total de registros: 77 </td>  </tr></tbody></table> 
+
+
+
+</div>
+                    </fieldset>
+
+                </div>
+
+            </div>
+
+        </td>
+        </tr>
+        </tbody></table>
+
+     </form>
+
+
+    
+</div></div></div>
+
+    </td>
+    </tr>
+    <tr>
+        <td colspan="10" align="center">
+        <br>
+        <a class="alerta"> Página melhor visualizada na resolução 1024x768  </a>
+
+        </td>
+    </tr>
+    <tr>
+	<td colspan="10"><div id="divRetorno"></div> </td>
+    </tr>
+</tbody></table>
+
+<form name="frmSessao">
+	<div id="divSessao" style="display:none;visibility:hidden;"></div>
+
+</form>
+
+
+<script>
+
+
+    window.setTimeout("CarregaOpcao('centro.php') ; ",100) ;
+
+
+    function AcessaOpcaoRapida(objEvent)
+    {
+        var evt = new CrossKeyPress(objEvent);
+        var keyCode = evt.crossKeyCode;
+
+        if (keyCode == 13)
+        {
+            xajax_AcessoRapidoOpcao( xjx.$('codigoopcao').value , xjx.$('usuario').value , xjx.$('agencia').value , xjx.$('empresa').value ) ;
+        }
+    }
+
+
+
+    function isCurrentBrowser(browserName)
+    {
+    	if(navigator.userAgent.search(browserName) != -1)
+    		return true;
+    	else
+    		return false;
+    }
+
+    if(isCurrentBrowser("Chrome"))
+	{
+        ;//  alert("Você está utilizando o Chrome");
+    }
+	else
+    if(isCurrentBrowser("MSIE") )
+    {
+        //document.frm.btnEnviar.disabled = true;
+    	alert("Para acessar o SISTEMA RIP, por gentileza utilize o MOZILLA FIREFOX ou Google Chrome. \n\nVocê será desconectado.");
+        window.location.href = 'logoff.php' ;
+    }
+    else if(isCurrentBrowser("xSafari"))
+    {
+        alert("Para acessar o SISTEMA RIP, por gentileza utilize o MOZILLA FIREFOX ou Google Chrome. \n\nVocê será desconectado.");
+        window.location.href = 'logoff.php' ;
+    }
+
+
+</script>
+
+
+
+
+
+</body></html>

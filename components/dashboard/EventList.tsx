@@ -17,7 +17,7 @@ interface EventListProps {
     events: Event[];
 }
 
-export default function EventList({ events }: EventListProps) {
+export default function EventDashboardList({ events }: EventListProps) {
     const [now, setNow] = useState(new Date());
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('Todos');
@@ -110,13 +110,33 @@ export default function EventList({ events }: EventListProps) {
         }
     };
 
+    const formatSafe = (dateStr: string | undefined | null, formatStr: string) => {
+        if (!dateStr) return '--:--';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '--:--';
+            return format(d, formatStr);
+        } catch (e) {
+            return '--:--';
+        }
+    };
+
     const getSlaStatus = (event: Event): 'expired' | 'critical' | 'warning' | 'normal' => {
-        if (event.status === 'CONCLUIDO') return 'normal';
-        const diff = differenceInMinutes(new Date(event.liberar_ate_at), now);
-        if (diff < 0) return 'expired';
-        if (diff < 15) return 'critical';
-        if (diff < 30) return 'warning';
-        return 'normal';
+        if (!event || event.status === 'CONCLUIDO') return 'normal';
+        if (!event.liberar_ate_at) return 'normal';
+
+        try {
+            const limitDate = new Date(event.liberar_ate_at);
+            if (isNaN(limitDate.getTime())) return 'normal';
+
+            const diff = differenceInMinutes(limitDate, now);
+            if (diff < 0) return 'expired';
+            if (diff < 15) return 'critical';
+            if (diff < 30) return 'warning';
+            return 'normal';
+        } catch (e) {
+            return 'normal';
+        }
     };
 
     const filteredEvents = events.filter((event) => {
@@ -197,13 +217,13 @@ export default function EventList({ events }: EventListProps) {
                                     </td>
                                     <td className="px-4 py-4">
                                         <span className="text-sm font-medium text-gray-700">
-                                            {format(new Date(event.saida_programada_at), 'HH:mm')}
+                                            {formatSafe(event.saida_programada_at, 'HH:mm')}
                                         </span>
                                     </td>
                                     <td className="px-4 py-4 uppercase">
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-gray-800">
-                                                {format(new Date(event.liberar_ate_at), 'HH:mm')}
+                                                {formatSafe(event.liberar_ate_at, 'HH:mm')}
                                             </span>
                                             {!isCompleted && !isCancelled && sla === 'expired' && (
                                                 <span className="text-[10px] text-red-600 font-extrabold mt-0.5">ESTOURADO</span>

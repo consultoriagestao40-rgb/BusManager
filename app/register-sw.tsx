@@ -8,8 +8,15 @@ export default function RegisterServiceWorker() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((registration) => console.log('Service Worker registrado:', registration))
+        .then((registration) => {
+          console.log('Service Worker registrado:', registration);
+        })
         .catch((error) => console.log('Erro ao registrar Service Worker:', error));
+
+      // Force reload when a new service worker takes over
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
     }
 
     // Lock screen orientation to landscape on mobile devices
