@@ -451,7 +451,12 @@ export default function EventDashboardList({ events }: EventListProps) {
                                 Cancelar
                             </button>
                             <button
-                                onClick={() => handleActionExecute('finish', { observation: finishObs })}
+                                onClick={() => handleActionExecute('finish', {
+                                    check_interno: checkInterno,
+                                    check_externo: checkExterno,
+                                    check_pneus: checkPneus,
+                                    observacao_operacao: finishObs
+                                })}
                                 disabled={processing}
                                 className="flex-[2] py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 shadow-lg shadow-green-200"
                             >
