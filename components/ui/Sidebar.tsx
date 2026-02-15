@@ -38,10 +38,16 @@ export default function Sidebar() {
                 {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </button>
 
-            <div className={`flex items-center justify-center h-16 border-b border-gray-800 ${isCollapsed ? 'px-2' : ''}`}>
-                <span className={`font-bold transition-all duration-300 ${isCollapsed ? 'text-xs text-center' : 'text-xl'}`}>
-                    {isCollapsed ? 'BM' : 'BusManager'}
-                </span>
+            <div className={`flex items-center justify-center h-16 border-b border-gray-800 ${isCollapsed ? 'px-2' : 'px-4'}`}>
+                {isCollapsed ? (
+                    <span className="text-xs font-bold text-center">BM</span>
+                ) : (
+                    <img
+                        src="https://grupojvsserv.com.br/wp-content/uploads/2023/11/logo-horizontal-300px.png"
+                        alt="Grupo JVS"
+                        className="h-8 w-auto object-contain"
+                    />
+                )}
             </div>
 
             <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
