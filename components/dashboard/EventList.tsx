@@ -146,147 +146,160 @@ export default function EventDashboardList({ events }: EventListProps) {
     });
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="flex flex-col min-h-screen bg-gray-100">
             {/* Header Dark - MOBILE ONLY */}
-            <header className="bg-[#1A1A1A] text-white py-4 px-6 md:hidden shadow-md sticky top-0 z-40">
-                <div className="flex justify-between items-center max-w-7xl mx-auto w-full">
-                    <div className="w-10"></div> {/* Spacer */}
-                    <h1 className="text-xl md:text-2xl font-bold text-center tracking-widest uppercase flex-1">
-                        Escala de Limpeza
+            <header className="bg-[#1e293b] text-white py-6 px-6 md:hidden shadow-lg sticky top-0 z-40">
+                <div className="flex flex-col items-center justify-center max-w-7xl mx-auto w-full space-y-4">
+                    <h1 className="text-xl font-bold tracking-wider uppercase text-center">
+                        ESCALA DE LIMPEZA
                     </h1>
-                    <span className="text-[8px] text-gray-500 opacity-50">v1.2.5</span>
+
+                    {/* Search & Filter Container (Floating Look) */}
+                    <div className="w-full bg-gray-200/20 p-2 rounded-2xl backdrop-blur-sm flex gap-2">
+                        <div className="relative flex-1 bg-white rounded-xl shadow-sm">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <input
+                                type="text"
+                                placeholder="Pesquisar..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl text-sm font-medium text-gray-700 placeholder-gray-400 focus:outline-none"
+                            />
+                        </div>
+                        <div className="relative bg-white rounded-xl shadow-sm min-w-[100px]">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="w-full h-full px-4 py-2 bg-transparent rounded-xl text-sm font-bold text-gray-600 focus:outline-none appearance-none"
+                            >
+                                <option value="Todos">Status</option>
+                                <option value="PREVISTO">Previsto</option>
+                                <option value="EM_ANDAMENTO">Andamento</option>
+                                <option value="CONCLUIDO">Concluído</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            {/* Sticky Filters Section - MOBILE ONLY */}
-            <div className="sticky top-[60px] md:hidden z-30 bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                            type="text"
-                            placeholder="Pesquisar..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[140px]"
-                    >
-                        <option value="Todos">Todos</option>
-                        <option value="PREVISTO">Previsto</option>
-                        <option value="EM_ANDAMENTO">Em Andamento</option>
-                        <option value="CONCLUIDO">Concluído</option>
-                        <option value="CANCELADO">Cancelado</option>
-                    </select>
-                </div>
-            </div>
-
             {/* Table Content */}
-            <div className="flex-1 overflow-x-auto">
-                <table className="w-full border-collapse bg-white">
-                    <thead className="bg-gray-100 border-b border-gray-200 sticky top-[120px] md:top-[140px] z-20">
-                        <tr>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Número do Carro</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Hora de Saída</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Meta H-1</th>
-                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
+            <div className="flex-1 px-4 py-4 pb-20">
+                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    {/* Table Header */}
+                    <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 bg-gray-50 border-b border-gray-100 items-center">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Número do Carro</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hora de Saída</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Meta H-1</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Ações</div>
+                    </div>
+
+                    <div className="divide-y divide-gray-100">
                         {filteredEvents.map((event) => {
+                            if (!event || !event.vehicle) return null; // Safety check
+
                             const sla = getSlaStatus(event);
                             const isCancelled = event.status === 'CANCELADO';
                             const isCompleted = event.status === 'CONCLUIDO';
                             const isInProgress = event.status === 'EM_ANDAMENTO';
 
                             return (
-                                <tr key={event.id} className={`hover:bg-gray-50 transition-colors ${isCancelled ? 'opacity-60' : ''}`}>
-                                    <td className="px-4 py-4">
-                                        <div className="flex flex-col">
-                                            <span className={`font-semibold text-gray-900 ${isCancelled ? 'line-through' : ''}`}>
-                                                {event.vehicle.client_vehicle_number}
-                                            </span>
-                                            {event.vehicle.prefix && (
-                                                <span className="text-[10px] text-gray-500 font-medium uppercase">{event.vehicle.prefix}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-4">
-                                        <span className="text-sm font-medium text-gray-700">
-                                            {formatSafe(event.saida_programada_at, 'HH:mm')}
+                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 items-center hover:bg-gray-50 transition-colors ${isCancelled ? 'opacity-60 grayscale' : ''}`}>
+                                    {/* Carro */}
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-gray-900">
+                                            {event.vehicle.client_vehicle_number || '-'}
                                         </span>
-                                    </td>
-                                    <td className="px-4 py-4 uppercase">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-gray-800">
-                                                {formatSafe(event.liberar_ate_at, 'HH:mm')}
+                                    </div>
+
+                                    {/* Hora Saída */}
+                                    <div className="text-sm font-medium text-gray-900">
+                                        {formatSafe(event.saida_programada_at, 'HH:mm')}
+                                    </div>
+
+                                    {/* Meta H-1 */}
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-gray-700">
+                                            {formatSafe(event.liberar_ate_at, 'HH:mm')}
+                                        </span>
+                                        {!isCompleted && !isCancelled && sla === 'expired' && (
+                                            <span className="text-[9px] text-red-600 font-black tracking-tighter uppercase mt-0.5 animate-pulse">
+                                                ESTOURADO
                                             </span>
-                                            {!isCompleted && !isCancelled && sla === 'expired' && (
-                                                <span className="text-[10px] text-red-600 font-extrabold mt-0.5">ESTOURADO</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-4 text-center">
+                                        )}
+                                    </div>
+
+                                    {/* Ações */}
+                                    <div className="text-right">
                                         {!isCancelled && (
                                             <div className="relative inline-block">
                                                 <button
                                                     onClick={() => setShowMenu(showMenu === event.id ? null : event.id)}
-                                                    className={`p-2 rounded-full transition-all ${showMenu === event.id ? 'bg-blue-600 text-white shadow-md scale-110' : 'text-blue-600 hover:bg-blue-50'}`}
+                                                    className={`p-2 rounded-xl transition-all ${showMenu === event.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-blue-600 bg-blue-50'}`}
                                                 >
-                                                    <Bus className="w-6 h-6" />
+                                                    <Bus className="w-5 h-5" />
                                                 </button>
 
                                                 {/* Action Popover */}
                                                 {showMenu === event.id && (
-                                                    <div className="absolute right-0 bottom-full mb-3 md:top-full md:mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in zoom-in duration-200 origin-bottom-right">
-                                                        <div className="p-1">
-                                                            {event.status === 'PREVISTO' && (
-                                                                <button
-                                                                    onClick={() => handleActionTrigger(event, 'start')}
-                                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center gap-3 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
-                                                                >
-                                                                    <Play className="w-4 h-4 text-blue-600" /> Iniciar Limpeza
-                                                                </button>
-                                                            )}
-                                                            {isInProgress && (
-                                                                <button
-                                                                    onClick={() => handleActionTrigger(event, 'finish')}
-                                                                    className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-3 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
-                                                                >
-                                                                    <Check className="w-4 h-4 text-green-600" /> Finalizar Limpeza
-                                                                </button>
-                                                            )}
-                                                            {!isCompleted && (
-                                                                <>
+                                                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center sm:justify-center p-4 bg-black/20 backdrop-blur-sm" onClick={() => setShowMenu(null)}>
+                                                        <div className="bg-white w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 duration-200" onClick={e => e.stopPropagation()}>
+                                                            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                                                                <span className="font-bold text-gray-900">Ações para {event.vehicle.client_vehicle_number}</span>
+                                                                <button onClick={() => setShowMenu(null)} className="text-gray-400 p-1">&times;</button>
+                                                            </div>
+                                                            <div className="p-2 space-y-1">
+                                                                {event.status === 'PREVISTO' && (
                                                                     <button
-                                                                        onClick={() => handleActionTrigger(event, 'swap')}
-                                                                        className="w-full text-left px-4 py-3 hover:bg-orange-50 flex items-center gap-3 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
+                                                                        onClick={() => handleActionTrigger(event, 'start')}
+                                                                        className="w-full text-left px-4 py-3.5 hover:bg-blue-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
                                                                     >
-                                                                        <RefreshCw className="w-4 h-4 text-orange-600" /> Fazer Troca
+                                                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><Play className="w-5 h-5" /></div>
+                                                                        Iniciar Limpeza
                                                                     </button>
+                                                                )}
+                                                                {isInProgress && (
                                                                     <button
-                                                                        onClick={() => handleActionTrigger(event, 'addColaborador')}
-                                                                        className="w-full text-left px-4 py-3 hover:bg-purple-50 flex items-center gap-3 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
+                                                                        onClick={() => handleActionTrigger(event, 'finish')}
+                                                                        className="w-full text-left px-4 py-3.5 hover:bg-green-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
                                                                     >
-                                                                        <UserPlus className="w-4 h-4 text-purple-600" /> Colaboradores
+                                                                        <div className="p-2 bg-green-100 text-green-600 rounded-lg"><Check className="w-5 h-5" /></div>
+                                                                        Finalizar Limpeza
                                                                     </button>
-                                                                </>
-                                                            )}
+                                                                )}
+                                                                {!isCompleted && (
+                                                                    <>
+                                                                        <button
+                                                                            onClick={() => handleActionTrigger(event, 'swap')}
+                                                                            className="w-full text-left px-4 py-3.5 hover:bg-orange-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                        >
+                                                                            <div className="p-2 bg-orange-100 text-orange-600 rounded-lg"><RefreshCw className="w-5 h-5" /></div>
+                                                                            Fazer Troca
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleActionTrigger(event, 'addColaborador')}
+                                                                            className="w-full text-left px-4 py-3.5 hover:bg-purple-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                        >
+                                                                            <div className="p-2 bg-purple-100 text-purple-600 rounded-lg"><UserPlus className="w-5 h-5" /></div>
+                                                                            Colaboradores
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
                                         )}
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             );
                         })}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
 
             {/* Modals Section */}
