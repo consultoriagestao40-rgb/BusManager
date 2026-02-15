@@ -16,7 +16,7 @@ export async function createScheduleVersion(
                 is_active: true
             },
             include: {
-                events: true,
+                events: { include: { swaps: true } },
             },
             orderBy: { version_number: 'desc' }
         });
@@ -42,10 +42,17 @@ export async function createScheduleVersion(
         }
 
         // 3. Process Events & Deduplicate
-        // 3. Process Events & Deduplicate
         const processedEvents: any[] = [];
         const keyCounts = new Map<string, number>();
         const duplicates: string[] = [];
+
+        // Map old events for quick lookup
+        const oldEventsMap = new Map();
+        if (previousVersion?.events) {
+            for (const evt of previousVersion.events) {
+                oldEventsMap.set(evt.event_business_key, evt);
+            }
+        }
 
         for (const event of events) {
             let businessKey = event.event_business_key;
@@ -84,7 +91,7 @@ export async function createScheduleVersion(
             // Use the already corrected date from the parser (which has +3h applied)
             const horaViagemDate = new Date(event.saida_programada_at);
 
-            processedEvents.push({
+            let eventToCreate: any = {
                 ...eventData,
                 event_business_key: businessKey, // Use the potentially suffixed key
                 hora_viagem: horaViagemDate,
@@ -92,7 +99,33 @@ export async function createScheduleVersion(
                 schedule_version_id: newVersion.id,
                 status: 'PREVISTO', // Default
                 liberar_ate_at: new Date(event.saida_programada_at.getTime() - 60 * 60 * 1000) // H-1
-            });
+            };
+
+            // PRESERVE STATE LOGIC
+            if (oldEventsMap.has(businessKey)) {
+                const oldEvent = oldEventsMap.get(businessKey);
+                // Check if event has interactions: Status is not PREVISTO OR has Swaps
+                // Note: oldEvent.swaps comes from the include above
+                const hasSwaps = oldEvent.swaps && oldEvent.swaps.length > 0;
+                const isInteracted = oldEvent.status !== 'PREVISTO' || hasSwaps;
+
+                if (isInteracted) {
+                    // COPY OPERATIONAL STATE
+                    eventToCreate.status = oldEvent.status;
+                    eventToCreate.vehicle_id = oldEvent.vehicle_id; // Keep swapped vehicle
+                    eventToCreate.cleaner_id = oldEvent.cleaner_id;
+                    eventToCreate.started_at = oldEvent.started_at;
+                    eventToCreate.finished_at = oldEvent.finished_at;
+                    eventToCreate.started_by_user_id = oldEvent.started_by_user_id;
+                    eventToCreate.completed_by_user_id = oldEvent.completed_by_user_id;
+                    eventToCreate.check_interno = oldEvent.check_interno;
+                    eventToCreate.check_externo = oldEvent.check_externo;
+                    eventToCreate.check_pneus = oldEvent.check_pneus;
+                    eventToCreate.observacao_operacao = oldEvent.observacao_operacao;
+                }
+            }
+
+            processedEvents.push(eventToCreate);
         }
 
         // Bulk Create Events
