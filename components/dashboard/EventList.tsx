@@ -206,8 +206,15 @@ export default function EventDashboardList({ events }: EventListProps) {
                             const isCompleted = event.status === 'CONCLUIDO';
                             const isInProgress = event.status === 'EM_ANDAMENTO';
 
+                            // Determine Row Background Color
+                            let rowBgClass = 'bg-white hover:bg-gray-50'; // Default
+                            if (isCompleted) rowBgClass = 'bg-green-50/80 border-green-100';
+                            else if (sla === 'expired' && !isCancelled) rowBgClass = 'bg-red-50/80 border-red-100';
+                            else if (sla === 'critical' && !isCancelled) rowBgClass = 'bg-orange-50/80 border-orange-100';
+                            else if (sla === 'warning' && !isCancelled) rowBgClass = 'bg-yellow-50/80 border-yellow-100';
+
                             return (
-                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 items-center hover:bg-gray-50 transition-colors ${isCancelled ? 'opacity-60 grayscale' : ''}`}>
+                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 items-center transition-colors border-b border-gray-100 last:border-0 ${rowBgClass} ${isCancelled ? 'opacity-60 grayscale bg-gray-50' : ''}`}>
                                     {/* Carro */}
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-gray-900">
