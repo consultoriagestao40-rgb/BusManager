@@ -401,7 +401,11 @@ export default function EventDashboardList({ events }: EventListProps) {
                                 Cancelar
                             </button>
                             <button
-                                onClick={() => handleActionExecute('swap', { replacementVehicle: swapVehicle, reason: swapReason, observation: swapObs })}
+                                onClick={() => handleActionExecute('swap', {
+                                    replacementVehicleNumber: swapVehicle,
+                                    motivo: swapReason,
+                                    observacao: swapObs
+                                })}
                                 disabled={!swapVehicle || processing}
                                 className="flex-[2] py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 disabled:opacity-50 shadow-lg shadow-orange-200"
                             >
