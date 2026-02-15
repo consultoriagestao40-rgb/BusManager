@@ -34,9 +34,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         fetchEvents();
-        // Poll every 30 seconds for updates on the selected date
-        const timer = setInterval(fetchEvents, 30000);
-        return () => clearInterval(timer);
+        // Auto-refresh removed as per user request to prevent modal disruption
     }, [currentDate]); // Re-run when date changes
 
     const handlePrevDay = () => setCurrentDate(prev => subDays(prev, 1));
