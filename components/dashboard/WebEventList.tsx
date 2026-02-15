@@ -78,10 +78,19 @@ export default function WebEventList({ events }: { events: Event[] }) {
         if (event.status === 'CONCLUIDO') return 'completed';
         const limitTime = new Date(event.liberar_ate_at);
         const diff = differenceInMinutes(limitTime, now);
-        if (diff < 0) return 'expired';
+        if (diff <= 0) return 'expired';
         if (diff < 60) return 'critical';
         if (diff < 120) return 'warning';
         return 'normal';
+    };
+
+    const getRowClass = (event: Event, sla: string) => {
+        const baseClass = "transition-colors border-b border-gray-100 last:border-0";
+        if (event.status === 'CONCLUIDO') return `${baseClass} bg-green-50 hover:bg-green-100`;
+        if (sla === 'expired') return `${baseClass} bg-red-50 hover:bg-red-100`;
+        if (sla === 'critical') return `${baseClass} bg-orange-50 hover:bg-orange-100`;
+        if (sla === 'warning') return `${baseClass} bg-yellow-50 hover:bg-yellow-100`;
+        return `${baseClass} hover:bg-blue-50/30`;
     };
 
     return (
@@ -105,9 +114,10 @@ export default function WebEventList({ events }: { events: Event[] }) {
                             const sla = getSlaStatus(event);
                             const diff = differenceInMinutes(new Date(event.liberar_ate_at), now);
                             const diffText = diff > 0 ? `${Math.floor(diff / 60)}h ${diff % 60}m` : 'Estourado';
+                            const rowClass = getRowClass(event, sla);
 
                             return (
-                                <tr key={event.id} className="hover:bg-blue-50/30 transition-colors">
+                                <tr key={event.id} className={rowClass}>
                                     <td className="py-4 px-4">
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
