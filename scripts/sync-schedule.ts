@@ -249,20 +249,6 @@ async function run() {
                     // If no popup, we might still be on the same page, so reportPage = page is correct.
                 }
 
-                // Proceed with reportPage
-                // Note: The rest of the script needs to use 'reportPage' instead of 'page'
-                // We will return/assign this wrapper context or simply duplicate the rest here?
-                // Better to replace the subsequent code to use 'reportPage'.
-
-                // --- Update subsequent steps to use reportPage ---
-                // We'll throw an error here to force the "catch" if we want to stop, 
-                // but actually we want to CONTINUE.
-                // Since rewrite is blocked by size, I'll update the variable name in the next chunk.
-
-                // HACK: We need to make 'page' refer to the new page for the rest of the script 
-                // OR update the following lines. 
-                // Simplest way: reassign 'page' variable if possible? 
-                // 'page' is declared with 'let' at the top.
                 if (reportPage !== page) {
                     page = reportPage;
                 }
@@ -386,9 +372,9 @@ async function run() {
                     if (targetFrame) {
                         console.log('Executing montaJanelaNova via JS in target frame...');
                         await targetFrame.evaluate(() => {
-                            // @ts-ignore
+                            // @ts-expect-error - check global function
                             if (typeof montaJanelaNova === 'function') {
-                                // @ts-ignore
+                                // @ts-expect-error - call global function
                                 montaJanelaNova('php/html/frota/cadEscalaProgramada.php?nivel=1', 'container', 'Escala Programada', false, false, 900, 600);
                             } else {
                                 throw new Error('montaJanelaNova function not found in target frame');
@@ -407,7 +393,7 @@ async function run() {
                                     console.log(`Report found in frame after JS execution: ${frame.url()}`);
                                     break;
                                 }
-                            } catch (e) { }
+                            } catch { }
                         }
                     }
                 } catch (jsExecErr) {
@@ -425,7 +411,7 @@ async function run() {
                         const html = await page.content();
                         fs.writeFileSync('error-page-final.html', html);
                         await page.screenshot({ path: 'error-state-final.png', fullPage: true });
-                    } catch (e) { }
+                    } catch { }
 
                     throw new Error('Report page (Pesquisar/Imprimir) not found in any frame even after JS execution fallback.');
                 } else {
@@ -541,7 +527,7 @@ async function run() {
                 const html = await page.content();
                 fs.writeFileSync('error-page.html', html);
                 log('HTML dump saved to error-page.html');
-            } catch (htmlErr) { }
+            } catch { }
         }
         if (browser) await browser.close();
         process.exit(1);

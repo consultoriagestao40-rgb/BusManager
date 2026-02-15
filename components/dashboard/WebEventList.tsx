@@ -128,7 +128,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     </td>
                                     <td className="py-4 px-4 text-center">
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' :
-                                                event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                                            event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
                                             }`}>
                                             {event.status}
                                         </span>
@@ -179,7 +179,111 @@ export default function WebEventList({ events }: { events: Event[] }) {
                 </div>
             )}
 
-            {/* Other modals would go here, omitting for brevity in this initial restore */}
+            {/* Swap Modal */}
+            {swapModalOpen && selectedEvent && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                        <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
+
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Novo Número</label>
+                                <input
+                                    type="text"
+                                    value={swapVehicle}
+                                    onChange={(e) => setSwapVehicle(e.target.value)}
+                                    placeholder="Ex: 62005"
+                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Motivo</label>
+                                <select
+                                    value={swapReason}
+                                    onChange={(e) => setSwapReason(e.target.value)}
+                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="QUEBRA">Quebra</option>
+                                    <option value="RODIZIO">Rodízio</option>
+                                    <option value="RESERVA">Carro Reserva</option>
+                                    <option value="OUTRO">Outro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Observações</label>
+                                <textarea
+                                    value={swapObs}
+                                    onChange={(e) => setSwapObs(e.target.value)}
+                                    rows={3}
+                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button onClick={() => setSwapModalOpen(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                            <button
+                                onClick={() => handleAction(selectedEvent.id, 'swap', { replacementVehicleNumber: swapVehicle, motivo: swapReason, observacao: swapObs })}
+                                disabled={!swapVehicle || processing}
+                                className="flex-1 py-2 bg-orange-600 text-white font-bold rounded-lg disabled:opacity-50"
+                            >
+                                {processing ? 'Trocando...' : 'Trocar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Finish Modal */}
+            {finishModalOpen && selectedEvent && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                        <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+
+                        <div className="space-y-3 mb-6">
+                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="checkbox" checked={checkInterno} onChange={(e) => setCheckInterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                <span className="text-sm font-semibold text-gray-700">Limpeza Interna OK</span>
+                            </label>
+                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="checkbox" checked={checkExterno} onChange={(e) => setCheckExterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                <span className="text-sm font-semibold text-gray-700">Limpeza Externa OK</span>
+                            </label>
+                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                <span className="text-sm font-semibold text-gray-700">Calibragem Pneus OK</span>
+                            </label>
+
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
+                                <textarea
+                                    value={finishObs}
+                                    onChange={(e) => setFinishObs(e.target.value)}
+                                    placeholder="Opcional..."
+                                    rows={2}
+                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button onClick={() => setFinishModalOpen(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                            <button
+                                onClick={() => handleAction(selectedEvent.id, 'finish', {
+                                    check_interno: checkInterno,
+                                    check_externo: checkExterno,
+                                    check_pneus: checkPneus,
+                                    observacao_operacao: finishObs
+                                })}
+                                disabled={processing}
+                                className="flex-1 py-2 bg-green-600 text-white font-bold rounded-lg disabled:opacity-50"
+                            >
+                                {processing ? 'Finalizando...' : 'Finalizar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

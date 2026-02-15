@@ -209,7 +209,7 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Previstos</p>
                         <p className="text-4xl font-black text-gray-800">{events.filter((e: any) => e.status === 'PREVISTO').length}</p>
                     </div>
-                    <div className="bg-[#EBF5FF] p-5 rounded-2xl border-l-[6px] border-blue-400 shadow-xl shadow-blue-100/50 transform hover:-translate-y-1 transition-all">
+                    <div className="bg-[#EBF5FF] p-5 rounded-2xl border-l-[6px] border-blue-400 shadow-xl shadow-blue-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowInProgressModal(true)}>
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Em Andamento</p>
                         <p className="text-4xl font-black text-blue-800">{inProgressList.length}</p>
                     </div>
