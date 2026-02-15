@@ -147,9 +147,10 @@ export default function EventDashboardList({ events }: EventListProps) {
 
     return (
         // Added negative margins to counteract the padding from DashboardLayout
-        <div className="flex flex-col min-h-screen bg-gray-100 -m-2 sm:-m-4 md:m-0">
+        // Added pt-[180px] to account for the fixed header height on mobile
+        <div className="flex flex-col min-h-screen bg-gray-100 -m-2 sm:-m-4 md:m-0 pt-[180px] md:pt-0">
             {/* Header Dark - MOBILE ONLY */}
-            <header className="bg-[#1e293b] text-white py-6 px-6 md:hidden shadow-lg sticky top-0 z-40 w-full">
+            <header className="bg-[#1e293b] text-white py-6 px-6 md:hidden shadow-lg fixed top-0 left-0 right-0 z-50 w-full">
                 <div className="flex flex-col items-center justify-center max-w-7xl mx-auto w-full space-y-4">
                     <h1 className="text-xl font-bold tracking-wider uppercase text-center">
                         ESCALA DE LIMPEZA
