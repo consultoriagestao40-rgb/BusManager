@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Bus, Search, Play, Check, RefreshCw, UserPlus } from 'lucide-react';
+import { Bus, Search, Play, Check, RefreshCw, UserPlus, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Event {
     id: string;
@@ -18,6 +19,7 @@ interface EventListProps {
 }
 
 export default function EventDashboardList({ events }: EventListProps) {
+    const router = useRouter();
     const [now, setNow] = useState(new Date());
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('Todos');
@@ -110,6 +112,17 @@ export default function EventDashboardList({ events }: EventListProps) {
         }
     };
 
+    const handleLogout = async () => {
+        if (!confirm('Deseja realmente sair?')) return;
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            router.push('/login');
+        } catch (e) {
+            console.error(e);
+            alert('Erro ao sair');
+        }
+    };
+
     const formatSafe = (dateStr: string | undefined | null, formatStr: string) => {
         if (!dateStr) return '--:--';
         try {
@@ -152,9 +165,18 @@ export default function EventDashboardList({ events }: EventListProps) {
             {/* Header Dark - MOBILE ONLY */}
             <header className="bg-[#1e293b] text-white py-6 px-6 md:hidden shadow-lg fixed top-0 left-0 right-0 z-50 w-full">
                 <div className="flex flex-col items-center justify-center max-w-7xl mx-auto w-full space-y-4">
-                    <h1 className="text-xl font-bold tracking-wider uppercase text-center">
-                        ESCALA DE LIMPEZA
-                    </h1>
+                    <div className="flex items-center justify-between w-full">
+                        <div className="w-8"></div> {/* Spacer to center title */}
+                        <h1 className="text-xl font-bold tracking-wider uppercase text-center">
+                            ESCALA DE LIMPEZA
+                        </h1>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 hover:bg-white/10 rounded-full transition-colors text-red-400"
+                        >
+                            <LogOut className="w-6 h-6" />
+                        </button>
+                    </div>
 
                     {/* Search & Filter Container (Floating Look) */}
                     <div className="w-full bg-gray-200/20 p-2 rounded-2xl backdrop-blur-sm flex gap-2">
