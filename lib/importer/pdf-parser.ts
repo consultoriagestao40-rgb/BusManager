@@ -59,8 +59,7 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 // FIX: Add 3 hours to compensate for UTC-3 input being treated as UTC
                 scheduleDate = addHours(scheduleDate, 3);
 
-                // CRITICAL DEBUG: Leak this info to the API response so we can see it in GH Logs
-                errors.push(`DEBUG: Veiculo ${evt.vehicleId} | Texto: ${evt.timeStr} | Base: ${debugInit} | Final: ${scheduleDate.toISOString()} | RawLine: "${evt.rawBuffer[0] || 'N/A'}"`);
+                scheduleDate = addHours(scheduleDate, 3);
 
                 // Extract Metadata from Buffer
                 let driverName: string | undefined;
@@ -171,8 +170,7 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 // If line has a date but didn't match startRegex, it might be a malformed event line
                 if (datePattern.test(line)) {
                     // Heuristic: If it has a date, it might be an event. 
-                    // Log it so we can see why it didn't match eventStartRegex.
-                    errors.push(`Linha ignorada (falha no Regex): "${line}"`);
+                    console.log(`Linha ignorada (falha no Regex): "${line}"`);
                 }
 
                 if (currentEventStr) {

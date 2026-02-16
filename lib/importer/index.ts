@@ -53,8 +53,12 @@ export async function processImport(
             throw new Error(`Unsupported file type: ${mimeType}`);
         }
 
-        if (!parseResult.success) {
+        if (!parseResult.success && parseResult.events.length === 0) {
             throw new Error(parseResult.errors.join(', '));
+        }
+
+        if (parseResult.errors.length > 0) {
+            console.warn(`Avisos ocorridos durante o parsing do PDF: ${parseResult.errors.length}`);
         }
 
         // 5. Create Version & Events
