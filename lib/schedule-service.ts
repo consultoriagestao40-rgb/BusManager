@@ -203,14 +203,16 @@ async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEven
             // then V2 needs to contain that event with status=CANCELLED.
 
             // Let's adopt the strategy: Copy the old event to the new version, but set status = CANCELLED.
+            const {
+                id, created_at, updated_at,
+                swaps, vehicle, cleaner, started_by, completed_by,
+                ...baseEventData
+            } = oldEvent as any;
 
             const cancelledEventData = {
-                ...oldEvent,
-                id: undefined, // Let it generate new ID
+                ...baseEventData,
                 schedule_version_id: newVersion.id,
-                status: 'CANCELADO',
-                updated_at: undefined,
-                created_at: undefined
+                status: 'CANCELADO'
             };
 
             await tx.cleaningEvent.create({ data: cancelledEventData });
