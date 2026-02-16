@@ -11,8 +11,8 @@ const CLIENT_AGENCY = process.env.CLIENT_AGENCY || '000000';
 const CLIENT_USER = process.env.CLIENT_USER || 'JVS001';
 const CLIENT_PASS = process.env.CLIENT_PASS || 'JVS@2026';
 
-const APP_URL = process.env.APP_URL || 'https://bus-manager-nine.vercel.app'; // Update if domain changes
-const APP_EMAIL = process.env.APP_EMAIL || 'cristiano.godoi@hotmail.com'; // User to perform the upload
+const APP_URL = process.env.APP_URL || 'https://bus-manager-nine.vercel.app';
+const APP_EMAIL = process.env.APP_EMAIL || 'admin@example.com';
 const APP_PASSWORD = process.env.APP_PASSWORD || '123456';
 
 async function run() {

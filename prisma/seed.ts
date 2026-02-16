@@ -18,6 +18,18 @@ async function main() {
         },
     });
 
+    // Cristiano (Main User / Bot)
+    await prisma.user.upsert({
+        where: { email: 'cristiano.godoi@hotmail.com' },
+        update: {},
+        create: {
+            email: 'cristiano.godoi@hotmail.com',
+            name: 'Cristiano Silva',
+            password_hash: passwordHash,
+            role: Role.ADMIN,
+        },
+    });
+
     // Supervisor
     await prisma.user.upsert({
         where: { email: 'supervisor@example.com' },
