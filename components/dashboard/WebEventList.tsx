@@ -121,7 +121,6 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     <td className="py-4 px-4">
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
-                                            <span className="text-[10px] text-gray-400">UTC: {new Date(event.hora_viagem).toISOString().slice(11, 16)}</span>
                                         </div>
                                     </td>
                                     <td className="py-4 px-4">

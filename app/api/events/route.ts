@@ -27,8 +27,18 @@ export async function GET(request: Request) {
 
         // Prisma SQLite date handling can be tricky.
         // We use range for safety to cover the "day".
-        const start = startOfDay(targetDate);
-        const end = endOfDay(targetDate);
+        // FIX: Events are stored as UTC + 3h (e.g. 22:00 BRT -> 01:00 UTC Next Day).
+        // So we need to shift the query window significantly.
+        // If we want "Today", we want 00:00 BRT to 23:59 BRT.
+        // Corresponding UTC storage: 03:00 UTC (Current Day) to 02:59 UTC (Next Day).
+        // 3 hours = 3 * 60 * 60 * 1000 = 10800000 ms.
+        // startOfDay(targetDate) is 00:00 UTC of targetDate.
+
+        // Actually, just add 3 hours to the UTC start/end.
+        // Date-fns addHours handles this on the Date object.
+        const { addHours } = require('date-fns');
+        const start = addHours(startOfDay(targetDate), 3);
+        const end = addHours(endOfDay(targetDate), 3);
 
         const events = await prisma.cleaningEvent.findMany({
             where: {
