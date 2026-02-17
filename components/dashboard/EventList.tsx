@@ -335,8 +335,8 @@ export default function EventDashboardList({ events }: EventListProps) {
 
             {/* Modals Section */}
             {startModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setStartModalOpen(false)}>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-2 text-gray-900">Iniciar Limpeza</h3>
                         <p className="text-gray-500 mb-6 text-sm">Selecione o encarregado para o carro <span className="font-bold text-blue-600">{selectedEvent.vehicle.client_vehicle_number}</span>.</p>
 
@@ -376,8 +376,8 @@ export default function EventDashboardList({ events }: EventListProps) {
             )}
 
             {swapModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setSwapModalOpen(false)}>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-6 text-gray-900">Trocar Veículo</h3>
 
                         <div className="space-y-4">
@@ -439,8 +439,8 @@ export default function EventDashboardList({ events }: EventListProps) {
             )}
 
             {finishModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setFinishModalOpen(false)}>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-4 text-gray-900">Finalizar Limpeza</h3>
 
                         <div className="space-y-4">
@@ -494,8 +494,8 @@ export default function EventDashboardList({ events }: EventListProps) {
             )}
 
             {colaboradorModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setColaboradorModalOpen(false)}>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-6 text-gray-900">Adicionar Colaborador</h3>
                         <p className="text-sm text-gray-500 mb-4">Recurso em desenvolvimento...</p>
                         <button

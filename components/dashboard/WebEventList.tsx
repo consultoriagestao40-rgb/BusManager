@@ -163,8 +163,8 @@ export default function WebEventList({ events }: { events: Event[] }) {
 
             {/* Start Modal */}
             {startModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-                    <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setStartModalOpen(false)}>
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Iniciar Limpeza</h3>
                         <p className="text-sm text-gray-600 mb-4">Veículo: {selectedEvent.vehicle.client_vehicle_number}</p>
                         <select
@@ -191,8 +191,8 @@ export default function WebEventList({ events }: { events: Event[] }) {
 
             {/* Swap Modal */}
             {swapModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-                    <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setSwapModalOpen(false)}>
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Trocar Veículo</h3>
 
                         <div className="space-y-4 mb-6">
@@ -246,8 +246,8 @@ export default function WebEventList({ events }: { events: Event[] }) {
 
             {/* Finish Modal */}
             {finishModalOpen && selectedEvent && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-                    <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setFinishModalOpen(false)}>
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
 
                         <div className="space-y-3 mb-6">
