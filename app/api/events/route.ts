@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { parseISO, startOfDay, endOfDay, subHours } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, subHours, addHours } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -34,9 +34,6 @@ export async function GET(request: Request) {
         // 3 hours = 3 * 60 * 60 * 1000 = 10800000 ms.
         // startOfDay(targetDate) is 00:00 UTC of targetDate.
 
-        // Actually, just add 3 hours to the UTC start/end.
-        // Date-fns addHours handles this on the Date object.
-        const { addHours } = require('date-fns');
         const start = addHours(startOfDay(targetDate), 3);
         const end = addHours(endOfDay(targetDate), 3);
 
