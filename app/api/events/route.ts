@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { parseISO, startOfDay, endOfDay } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, subHours } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -17,15 +17,16 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const dateParam = searchParams.get('date');
 
-        // Default to today if no date provided
-        const targetDate = dateParam ? parseISO(dateParam) : new Date();
+        // Default to today if no date provided.
+        // FIX: Server is UTC. Brazil is UTC-3.
+        // If it's 22:00 BRT, it's 01:00 UTC Next Day.
+        // We want "Today" to be relative to Brazil (UTC-3).
+        const now = new Date();
+        const brazilNow = subHours(now, 3);
+        const targetDate = dateParam ? parseISO(dateParam) : brazilNow;
 
         // Prisma SQLite date handling can be tricky.
-        // Ideally we store as DateTime. 
-        // For "Data Viagem", we might need to query by range to cover the "day".
-        // Or if we stored as strict midnight Date, exact match might work.
-        // Let's use range for safety.
-
+        // We use range for safety to cover the "day".
         const start = startOfDay(targetDate);
         const end = endOfDay(targetDate);
 

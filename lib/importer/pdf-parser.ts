@@ -59,8 +59,6 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
                 // FIX: Add 3 hours to compensate for UTC-3 input being treated as UTC
                 scheduleDate = addHours(scheduleDate, 3);
 
-                scheduleDate = addHours(scheduleDate, 3);
-
                 // Extract Metadata from Buffer
                 let driverName: string | undefined;
                 let serviceId: string | undefined;
