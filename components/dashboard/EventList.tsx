@@ -168,7 +168,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                     <div className="flex items-center justify-between w-full">
                         <div className="w-8"></div> {/* Spacer to center title */}
                         <h1 className="text-xl font-bold tracking-wider uppercase text-center">
-                            ESCALA DE LIMPEZA <span className="text-[10px] text-gray-400">v2.0</span>
+                            ESCALA DE LIMPEZA <span className="text-[10px] text-gray-400">v2.1</span>
                         </h1>
                         <button
                             onClick={handleLogout}
