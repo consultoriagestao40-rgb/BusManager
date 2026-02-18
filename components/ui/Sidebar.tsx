@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Upload, History, Users, Settings, LogOut, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -9,22 +9,43 @@ import { useRouter } from 'next/navigation';
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true); // Default collapsed
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetch('/api/auth/me')
+            .then((res) => {
+                if (res.ok) return res.json();
+                return null;
+            })
+            .then((data) => {
+                if (data?.user) setUserRole(data.user.role);
+            });
+    }, []);
 
     const handleLogout = async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
         router.push('/login');
     };
 
-    const menuItems = [
-        { name: 'Operação', href: '/dashboard', icon: Home },
-        { name: 'Importar', href: '/dashboard/import', icon: Upload },
-        { name: 'KPIs', href: '/dashboard/kpi', icon: TrendingUp },
-        { name: 'Histórico', href: '/dashboard/history', icon: History },
-        { name: 'Colaboradores', href: '/dashboard/cleaners', icon: Users },
-        { name: 'Usuários', href: '/dashboard/users', icon: Settings },
-        { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
+    const allMenuItems = [
+        { name: 'Operação', href: '/dashboard', icon: Home, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
+        { name: 'Importar', href: '/dashboard/import', icon: Upload, roles: ['ADMIN', 'MANAGER'] },
+        { name: 'KPIs', href: '/dashboard/kpi', icon: TrendingUp, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
+        { name: 'Histórico', href: '/dashboard/history', icon: History, roles: ['ADMIN', 'MANAGER'] },
+        { name: 'Colaboradores', href: '/dashboard/cleaners', icon: Users, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
+        { name: 'Usuários', href: '/dashboard/users', icon: Settings, roles: ['ADMIN'] },
+        { name: 'Configurações', href: '/dashboard/settings', icon: Settings, roles: ['ADMIN'] },
     ];
+
+    // Filter menu based on role
+    // If role is not loaded yet, show nothing or default (safe to show nothing)
+    const menuItems = allMenuItems.filter(item => {
+        if (!userRole) return false;
+        return item.roles.includes(userRole);
+    });
+
+    if (!userRole) return null; // Or a skeleton
 
     return (
         <div

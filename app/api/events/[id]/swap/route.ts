@@ -17,10 +17,22 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { replacementVehicleNumber, motivo, observacao } = await request.json();
+        let { replacementVehicleNumber, motivo, observacao } = await request.json();
 
         if (!replacementVehicleNumber || !motivo) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // FIX: Map frontend reasons to backend Enum if they don't exist
+        // Backend supports: QUEBRA, ONIBUS_NAO_CHEGOU_NO_HORARIO, MANUTENCAO, OUTROS
+        // Frontend sends: QUEBRA, RODIZIO, RESERVA, OUTRO
+        const validReasons = ['QUEBRA', 'ONIBUS_NAO_CHEGOU_NO_HORARIO', 'MANUTENCAO', 'OUTROS'];
+
+        if (!validReasons.includes(motivo)) {
+            // Append original reason to observation
+            observacao = `[Motivo: ${motivo}] ${observacao || ''}`;
+            // Fallback to OUTROS
+            motivo = 'OUTROS';
         }
 
         const event = await prisma.cleaningEvent.findUnique({
