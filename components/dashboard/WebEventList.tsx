@@ -213,6 +213,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="QUEBRA">Quebra</option>
+                                    <option value="ATRAZO">Atrazo</option>
                                     <option value="RODIZIO">Rodízio</option>
                                     <option value="RESERVA">Carro Reserva</option>
                                     <option value="OUTRO">Outro</option>

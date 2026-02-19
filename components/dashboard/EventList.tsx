@@ -399,6 +399,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                                     <option value="QUEBRA">Quebra</option>
+                                    <option value="ATRAZO">Atrazo</option>
                                     <option value="RODIZIO">Rodízio</option>
                                     <option value="RESERVA">Carro Reserva</option>
                                     <option value="OUTRO">Outro</option>
