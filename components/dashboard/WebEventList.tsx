@@ -260,7 +260,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
                             </label>
                             <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                                 <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
-                                <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado</span>
+                                <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado OK</span>
                             </label>
 
                             <div>
