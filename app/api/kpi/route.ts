@@ -150,6 +150,34 @@ export async function GET(request: Request) {
             };
         });
 
+        // 6. Swap Reason Ranking
+        const swapReasonMap = new Map<string, number>();
+
+        events.forEach((event: any) => {
+            if (event.swaps && event.swaps.length > 0) {
+                event.swaps.forEach((swap: any) => {
+                    let reason = swap.motivo;
+
+                    // Extract real reason from observation if it was mapped to OUTROS
+                    if (reason === 'OUTROS' && swap.observacao && swap.observacao.includes('[Motivo:')) {
+                        const match = swap.observacao.match(/\[Motivo: (.*?)\]/);
+                        if (match && match[1]) {
+                            reason = match[1];
+                        }
+                    }
+
+                    // Beautify reason text
+                    reason = reason.charAt(0).toUpperCase() + reason.slice(1).toLowerCase().replace(/_/g, ' ');
+
+                    swapReasonMap.set(reason, (swapReasonMap.get(reason) || 0) + 1);
+                });
+            }
+        });
+
+        const swapRanking = Array.from(swapReasonMap.entries())
+            .map(([reason, count]) => ({ reason, count }))
+            .sort((a, b) => b.count - a.count);
+
         return NextResponse.json({
             daily: dailyStats,
             performance: {
@@ -157,7 +185,8 @@ export async function GET(request: Request) {
                 byCleaner: cleanerStats
             },
             monthly: monthlyStats,
-            cumulative: cumulativeStats
+            cumulative: cumulativeStats,
+            swapRanking: swapRanking
         });
 
     } catch (error) {

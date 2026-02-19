@@ -265,6 +265,23 @@ export default function KPIDashboard() {
                 </div>
             </div>
 
+            {/* Charts Row 4: Swap Reasons Ranking */}
+            <div className="bg-white p-6 rounded shadow">
+                <h3 className="text-lg font-bold text-gray-700 mb-6">Ranking de Motivos de Troca</h3>
+                <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart layout="vertical" data={data.swapRanking}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                            <XAxis type="number" allowDecimals={false} />
+                            <YAxis dataKey="reason" type="category" width={150} tick={{ fontSize: 12 }} />
+                            <Tooltip cursor={{ fill: 'transparent' }} />
+                            <Legend />
+                            <Bar dataKey="count" name="Quantidade de Trocas" fill="#f97316" radius={[0, 4, 4, 0]} barSize={30} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
         </div>
     );
 }
