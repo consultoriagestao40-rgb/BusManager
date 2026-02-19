@@ -454,7 +454,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                             </label>
                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                                 <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                <span className="text-sm font-semibold text-gray-700">Calibragem Pneus OK</span>
+                                <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado</span>
                             </label>
 
                             <div>
