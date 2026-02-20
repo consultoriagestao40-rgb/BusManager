@@ -276,13 +276,13 @@ export default function EventDashboardList({ events }: EventListProps) {
 
                                                 {/* Action Popover */}
                                                 {showMenu === event.id && (
-                                                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center sm:justify-center p-4 bg-black/20 backdrop-blur-sm" onClick={() => setShowMenu(null)}>
-                                                        <div className="bg-white w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 duration-200" onClick={e => e.stopPropagation()}>
+                                                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center sm:justify-center bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setShowMenu(null)}>
+                                                        <div className="bg-white w-full max-w-sm mx-auto sm:rounded-2xl rounded-t-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-200" onClick={e => e.stopPropagation()}>
                                                             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                                                                <span className="font-bold text-gray-900">Ações para {event.vehicle.client_vehicle_number}</span>
-                                                                <button onClick={() => setShowMenu(null)} className="text-gray-400 p-1">&times;</button>
+                                                                <span className="font-bold text-gray-900">Ações - {event.vehicle.client_vehicle_number}</span>
+                                                                <button onClick={() => setShowMenu(null)} className="text-gray-400 p-2 hover:bg-gray-200 rounded-full transition-colors">&times;</button>
                                                             </div>
-                                                            <div className="p-2 space-y-1">
+                                                            <div className="p-3 space-y-2">
                                                                 {event.status === 'PREVISTO' && (
                                                                     <button
                                                                         onClick={() => handleActionTrigger(event, 'start')}
@@ -319,6 +319,9 @@ export default function EventDashboardList({ events }: EventListProps) {
                                                                         </button>
                                                                     </>
                                                                 )}
+                                                            </div>
+                                                            <div className="p-4 bg-gray-50 border-t border-gray-100 sm:hidden">
+                                                                <button onClick={() => setShowMenu(null)} className="w-full py-3 bg-gray-200 text-gray-700 rounded-xl font-bold">Cancelar</button>
                                                             </div>
                                                         </div>
                                                     </div>
