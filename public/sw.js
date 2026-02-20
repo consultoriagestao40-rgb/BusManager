@@ -1,4 +1,4 @@
-const CACHE_NAME = 'busmanager-v2.1';
+const CACHE_NAME = 'busmanager-v2.2';
 const urlsToCache = [
     '/dashboard',
     '/api/events',
@@ -13,11 +13,29 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
+// Use Network First strategy instead of Cache First to prevent broken CSS/JS hashes
 self.addEventListener('fetch', (event) => {
+    // Exclude API calls and Next.js hot-reloading from caching aggressively
+    if (event.request.url.includes('/api/') || event.request.url.includes('/_next/webpack-hmr')) {
+        return;
+    }
+
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
+        fetch(event.request)
+            .then((response) => {
+                // If the fetch succeeds, clone it and put it in the cache for offline use
+                if (response && response.status === 200 && response.type === 'basic') {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                }
+                return response;
+            })
+            .catch(() => {
+                // Network failed, fall back to cache
+                return caches.match(event.request);
+            })
     );
 });
 

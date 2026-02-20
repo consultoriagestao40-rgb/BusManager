@@ -100,6 +100,7 @@ export default function EventDashboardList({ events }: EventListProps) {
             });
 
             if (res.ok) {
+                alert('Ação registrada com sucesso!');
                 window.location.reload();
             } else {
                 alert('Erro ao processar ação');
