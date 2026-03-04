@@ -11,6 +11,9 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 export default function DashboardPage() {
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [events, setEvents] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const fetchEvents = async () => {
