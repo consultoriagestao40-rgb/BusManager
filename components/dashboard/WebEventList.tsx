@@ -11,6 +11,7 @@ interface Event {
     status: string;
     swaps: any[];
     cleaner?: { name: string };
+    no_patio: boolean;
 }
 
 export default function WebEventList({ events }: { events: Event[] }) {
@@ -52,7 +53,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
         }
     };
 
-    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap', data?: any) => {
+    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'no-patio', data?: any) => {
         if (processing) return;
         setProcessing(true);
         try {
@@ -105,6 +106,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
                             <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">H-1 (Meta)</th>
                             <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">Colaborador</th>
                             <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">SLA</th>
+                            <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">Pátio</th>
                             <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">Status</th>
                             <th className="py-4 px-4 text-right text-xs font-black uppercase tracking-wider">Ações</th>
                         </tr>
@@ -134,6 +136,14 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     <td className="py-4 px-4 text-sm font-medium text-gray-700">{event.cleaner?.name || '-'}</td>
                                     <td className={`py-4 px-4 text-center text-sm font-bold ${sla === 'expired' ? 'text-red-600' : 'text-green-600'}`}>
                                         {sla === 'completed' ? <CheckCircle className="w-5 h-5 mx-auto text-green-500" /> : diffText}
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={event.no_patio}
+                                            onChange={() => handleAction(event.id, 'no-patio', { no_patio: !event.no_patio })}
+                                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                        />
                                     </td>
                                     <td className="py-4 px-4 text-center">
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' :
@@ -213,7 +223,8 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="QUEBRA">Quebra</option>
-                                    <option value="ATRAZO">Atrazo</option>
+                                    <option value="CARRO_NAO_ESTA_NO_PATIO">Carro não está no pátio</option>
+                                    <option value="ONIBUS_NAO_CHEGOU_NO_HORARIO">Atrazo</option>
                                     <option value="RODIZIO">Rodízio</option>
                                     <option value="RESERVA">Carro Reserva</option>
                                     <option value="OUTRO">Outro</option>

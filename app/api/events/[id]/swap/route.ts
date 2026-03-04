@@ -26,7 +26,7 @@ export async function POST(
         // FIX: Map frontend reasons to backend Enum if they don't exist
         // Backend supports: QUEBRA, ONIBUS_NAO_CHEGOU_NO_HORARIO, MANUTENCAO, OUTROS
         // Frontend sends: QUEBRA, RODIZIO, RESERVA, OUTRO
-        const validReasons = ['QUEBRA', 'ONIBUS_NAO_CHEGOU_NO_HORARIO', 'MANUTENCAO', 'OUTROS'];
+        const validReasons = ['QUEBRA', 'ONIBUS_NAO_CHEGOU_NO_HORARIO', 'MANUTENCAO', 'CARRO_NAO_ESTA_NO_PATIO', 'OUTROS'];
 
         if (!validReasons.includes(motivo)) {
             // Append original reason to observation

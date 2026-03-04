@@ -12,6 +12,7 @@ interface Event {
     status: string;
     swaps: any[];
     cleaner?: { name: string };
+    no_patio: boolean;
 }
 
 interface EventListProps {
@@ -82,6 +83,7 @@ export default function EventDashboardList({ events }: EventListProps) {
             setSwapModalOpen(true);
         }
         if (action === 'addColaborador') setColaboradorModalOpen(true);
+        if (action === 'no-patio') handleActionExecute('no-patio', { no_patio: !event.no_patio });
     };
 
     const handleActionExecute = async (action: string, data?: any) => {
@@ -215,10 +217,11 @@ export default function EventDashboardList({ events }: EventListProps) {
             <div className="flex-1 px-4 py-4 pb-20">
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                     {/* Table Header */}
-                    <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 bg-gray-50 border-b border-gray-100 items-center">
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 p-4 bg-gray-50 border-b border-gray-100 items-center">
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Número do Carro</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hora de Saída</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Meta H-1</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">No Pátio</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Ações</div>
                     </div>
 
@@ -239,7 +242,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                             else if (sla === 'warning' && !isCancelled) rowBgClass = 'bg-yellow-50/80 border-yellow-100';
 
                             return (
-                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_auto] gap-2 p-4 items-center transition-colors border-b border-gray-100 last:border-0 ${rowBgClass} ${isCancelled ? 'opacity-60 grayscale bg-gray-50' : ''}`}>
+                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 p-4 items-center transition-colors border-b border-gray-100 last:border-0 ${rowBgClass} ${isCancelled ? 'opacity-60 grayscale bg-gray-50' : ''}`}>
                                     {/* Carro */}
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-gray-900">
@@ -262,6 +265,19 @@ export default function EventDashboardList({ events }: EventListProps) {
                                                 ESTOURADO
                                             </span>
                                         )}
+                                    </div>
+
+                                    {/* Pátio Checkbox - Mobile View */}
+                                    <div className="flex items-center justify-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={event.no_patio}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                handleActionTrigger(event, 'no-patio');
+                                            }}
+                                            className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                        />
                                     </div>
 
                                     {/* Ações */}
@@ -403,6 +419,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                                     <option value="QUEBRA">Quebra</option>
+                                    <option value="CARRO_NAO_ESTA_NO_PATIO">Carro não está no pátio</option>
                                     <option value="ATRAZO">Atrazo</option>
                                     <option value="RODIZIO">Rodízio</option>
                                     <option value="RESERVA">Carro Reserva</option>

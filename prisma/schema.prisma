@@ -91,6 +91,7 @@ model CleaningEvent {
   check_externo        Boolean?
   check_pneus          Boolean?
   observacao_operacao  String?
+  no_patio             Boolean         @default(true)
   schedule_version_id  String
   event_business_key   String
   cleaner_id           String?
@@ -193,5 +194,6 @@ enum SwapReason {
   QUEBRA
   ONIBUS_NAO_CHEGOU_NO_HORARIO
   MANUTENCAO
+  CARRO_NAO_ESTA_NO_PATIO
   OUTROS
 }
