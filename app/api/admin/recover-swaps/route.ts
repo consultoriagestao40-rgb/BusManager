@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, subHours, parseISO } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -15,15 +15,18 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        console.log('--- Iniciando Recuperação de Trocas via API ---');
+        const { searchParams } = new URL(request.url);
+        const dateParam = searchParams.get('date');
 
-        // Data de hoje
-        const today = new Date(); // No servidor pegamos o "agora"
-        // Ajuste para Horário de Brasília se necessário, mas startOfDay usa local do server.
-        const start = startOfDay(today);
-        const end = endOfDay(today);
+        // Logic consistent with dashboard events API
+        const now = new Date();
+        const brazilNow = subHours(now, 3);
+        const targetDate = dateParam ? parseISO(dateParam) : brazilNow;
 
-        // 1. Encontrar a versão ATIVA de hoje
+        const start = startOfDay(targetDate);
+        const end = endOfDay(targetDate);
+
+        // 1. Encontrar a versão ATIVA
         const activeVersion = await prisma.scheduleVersion.findFirst({
             where: {
                 data_viagem: { gte: start, lte: end },
@@ -32,7 +35,12 @@ export async function GET(request: Request) {
         });
 
         if (!activeVersion) {
-            return NextResponse.json({ error: 'Nenhuma versão ativa encontrada para hoje.' }, { status: 404 });
+            return NextResponse.json({
+                error: 'Nenhuma versão ativa encontrada para a data selecionada.',
+                date: targetDate.toISOString(),
+                start: start.toISOString(),
+                end: end.toISOString()
+            }, { status: 404 });
         }
 
         // 2. Mapear eventos ativos pela business key
@@ -41,7 +49,7 @@ export async function GET(request: Request) {
         });
         const activeEventsMap = new Map(activeEvents.map(e => [e.event_business_key, e.id]));
 
-        // 3. Encontrar todas as trocas de hoje que estão em versões INATIVAS
+        // 3. Encontrar todas as trocas que estão em versões INATIVAS
         const lostSwaps = await prisma.swap.findMany({
             where: {
                 original_event: {
@@ -55,6 +63,7 @@ export async function GET(request: Request) {
         });
 
         let migratedCount = 0;
+        const errors = [];
 
         // 4. Migrar cada troca
         for (const swap of lostSwaps) {
@@ -67,13 +76,21 @@ export async function GET(request: Request) {
                     data: { original_event_id: newEventId }
                 });
                 migratedCount++;
+            } else {
+                errors.push(`Troca ${swap.id}: Evento ${businessKey} não encontrado na versão ativa ${activeVersion.version_number}`);
             }
         }
 
         return NextResponse.json({
             success: true,
-            message: `Recuperação concluída: ${migratedCount} trocas migradas para a versão ${activeVersion.version_number}.`,
-            count: migratedCount
+            date: targetDate.toISOString(),
+            activeVersion: {
+                id: activeVersion.id,
+                number: activeVersion.version_number
+            },
+            foundSwaps: lostSwaps.length,
+            migratedCount: migratedCount,
+            errors: errors.length > 0 ? errors : undefined
         });
 
     } catch (error: any) {
