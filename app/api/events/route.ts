@@ -66,26 +66,30 @@ export async function GET(request: Request) {
         // 3. Ensure all swaps are represented in the active events
         // If a swap is linked to an event that is now inactive, we find its active counterpart
         const eventsWithAllSwaps = events.map(event => {
-            const extraSwaps = allSwapsToday.filter(s =>
-                s.original_event.event_business_key === event.event_business_key &&
-                !event.swaps.some(existing => existing.id === s.id)
-            );
+            try {
+                const extraSwaps = allSwapsToday.filter(s =>
+                    s.original_event?.event_business_key === event.event_business_key &&
+                    !(event.swaps || []).some((existing: any) => existing.id === s.id)
+                );
 
-            if (extraSwaps.length > 0) {
-                return {
-                    ...event,
-                    swaps: [...event.swaps, ...extraSwaps]
-                };
+                if (extraSwaps.length > 0) {
+                    return {
+                        ...event,
+                        swaps: [...(event.swaps || []), ...extraSwaps]
+                    };
+                }
+            } catch (e) {
+                console.error('Error merging swaps for event:', event.id, e);
             }
             return event;
         });
 
         return NextResponse.json({ events: eventsWithAllSwaps });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Events API error:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: 'Internal server error', details: error.message },
             { status: 500 }
         );
     }

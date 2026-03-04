@@ -11,22 +11,25 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 export default function DashboardPage() {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchEvents = async () => {
         // Don't set loading to true on background refreshes if we already have data
         if (events.length === 0) setLoading(true);
+        setError(null);
 
         try {
             const res = await fetch(`/api/events?date=${format(currentDate, 'yyyy-MM-dd')}`);
             if (res.ok) {
                 const data = await res.json();
                 setEvents(data.events);
+            } else {
+                const data = await res.json().catch(() => ({}));
+                setError(data.details || data.error || 'Erro ao carregar escala');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
+            setError(error.message || 'Erro de conexão');
         } finally {
             setLoading(false);
         }
@@ -258,9 +261,24 @@ export default function DashboardPage() {
                     </div>
 
                     <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
-                    <WebEventList events={filteredEvents} />
                 </div>
             </div>
+
+            {error && (
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-xl">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="ml-3">
+                            <p className="text-sm text-red-700 font-bold">{error}</p>
+                            <button onClick={fetchEvents} className="mt-2 text-xs text-red-600 underline hover:text-red-800">Tentar novamente</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* --- MOBILE/PWA VERSION (New Redesign) --- */}
             <div className="md:hidden">
