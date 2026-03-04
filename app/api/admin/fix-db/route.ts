@@ -29,18 +29,21 @@ export async function GET(request: Request) {
             return NextResponse.json(diagnostics, { status: 500 });
         }
 
-        // 2. Schema Sync & Reset
+        // 2. Schema Sync & Force Reset
         try {
             // Ensure at_yard exists with default false
-            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`).catch(() => { });
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`).catch(() => { });
 
-            // Ensure default is false for future imports
-            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`);
+            // Force all existing records to false
+            const result = await prisma.cleaningEvent.updateMany({
+                data: { at_yard: false }
+            });
 
-            // Force all existing records to false for a clean start
-            await prisma.$executeRawUnsafe(`UPDATE "CleaningEvent" SET "at_yard" = false;`);
-
-            diagnostics.schemaFix = "Ensured 'at_yard' column exists and reset all records to false.";
+            diagnostics.atYardReset = {
+                fixed: result.count,
+                status: "SUCCESS"
+            };
         } catch (e: any) {
             diagnostics.schemaError = e.message;
         }
