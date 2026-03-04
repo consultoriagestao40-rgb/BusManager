@@ -13,48 +13,60 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const diagnostics: any = {};
+        const diagnostics: any = {
+            timestamp: new Date().toISOString(),
+            databaseUrl: process.env.POSTGRES_PRISMA_URL ? 'Defined (Hidden)' : 'NOT DEFINED'
+        };
 
-        // 1. Check if we can query CleaningEvent
+        // 1. Connection Check
         try {
-            const count = await prisma.cleaningEvent.count();
-            diagnostics.cleaningEventCount = count;
-
-            // Check if no_patio exists
-            const oneEvent = await prisma.cleaningEvent.findFirst();
-            diagnostics.noPatioExists = oneEvent ? ('no_patio' in oneEvent) : 'no events to check';
+            await prisma.$queryRaw`SELECT 1`;
+            diagnostics.connection = "OK";
         } catch (e: any) {
-            diagnostics.cleaningEventError = e.message;
-
-            // 2. If it fails with "column does not exist", try to FIX IT
-            if (e.message.includes('column "no_patio" does not exist')) {
-                diagnostics.attemptingFix = "Adding missing column 'no_patio'...";
-                try {
-                    await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "no_patio" BOOLEAN DEFAULT true;`);
-                    diagnostics.fixResult = "Column 'no_patio' added successfully.";
-
-                    // Also try adding the enum value if it's missing (Postgres specific)
-                    try {
-                        await prisma.$executeRawUnsafe(`ALTER TYPE "SwapReason" ADD VALUE IF NOT EXISTS 'CARRO_NAO_ESTA_NO_PATIO';`);
-                        diagnostics.enumFixResult = "Enum value added successfully.";
-                    } catch (e2: any) {
-                        diagnostics.enumFixError = e2.message;
-                    }
-                } catch (fixError: any) {
-                    diagnostics.fixError = fixError.message;
-                }
-            }
+            diagnostics.connectionError = e.message;
+            return NextResponse.json(diagnostics, { status: 500 });
         }
 
-        // 3. Check ScheduleVersions
+        // 2. Schema Check & Fix
         try {
-            const activeVersions = await prisma.scheduleVersion.findMany({
-                where: { is_active: true }
-            });
-            diagnostics.activeVersionsCount = activeVersions.length;
-            diagnostics.activeVersions = activeVersions.map(v => ({ id: v.id, date: v.data_viagem, v: v.version_number }));
+            // Check table names
+            const tables: any = await prisma.$queryRaw`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
+            diagnostics.tables = tables.map((t: any) => t.table_name);
+
+            // Attempt to add column
+            try {
+                await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "no_patio" BOOLEAN DEFAULT true;`);
+                diagnostics.noPatioFix = "Ensured 'no_patio' column exists.";
+            } catch (e: any) {
+                diagnostics.noPatioError = e.message;
+            }
+
+            // Attempt to add enum value
+            try {
+                // Check if value exists first (ADD VALUE IF NOT EXISTS is only PG 10+)
+                // For simplicity, we just try and catch
+                await prisma.$executeRawUnsafe(`ALTER TYPE "SwapReason" ADD VALUE 'CARRO_NAO_ESTA_NO_PATIO';`);
+                diagnostics.enumFix = "Added 'CARRO_NAO_ESTA_NO_PATIO' to SwapReason.";
+            } catch (e: any) {
+                if (e.message.includes('already exists')) {
+                    diagnostics.enumFix = "Enum value already exists.";
+                } else {
+                    diagnostics.enumError = e.message;
+                }
+            }
         } catch (e: any) {
-            diagnostics.scheduleVersionError = e.message;
+            diagnostics.schemaError = e.message;
+        }
+
+        // 3. Data Check
+        try {
+            const count = await prisma.cleaningEvent.count();
+            diagnostics.totalEvents = count;
+
+            const activeVersion = await prisma.scheduleVersion.findFirst({ where: { is_active: true } });
+            diagnostics.activeVersion = activeVersion ? { id: activeVersion.id, date: activeVersion.data_viagem } : "NONE";
+        } catch (e: any) {
+            diagnostics.dataError = e.message;
         }
 
         return NextResponse.json(diagnostics);
