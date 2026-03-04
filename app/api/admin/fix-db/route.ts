@@ -29,18 +29,18 @@ export async function GET(request: Request) {
             return NextResponse.json(diagnostics, { status: 500 });
         }
 
-        // 2. Schema Sync (Field Rename)
+        // 2. Schema Sync & Reset
         try {
-            // First, check if no_patio exists and rename it to at_yard if it does
-            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" RENAME COLUMN "no_patio" TO "at_yard";`).catch(() => { });
-
-            // Then ensure at_yard exists with default false
+            // Ensure at_yard exists with default false
             await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
 
-            // If we just added it, or after rename, ensure default is false
+            // Ensure default is false for future imports
             await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`);
 
-            diagnostics.schemaFix = "Ensured 'at_yard' column exists and default is false.";
+            // Force all existing records to false for a clean start
+            await prisma.$executeRawUnsafe(`UPDATE "CleaningEvent" SET "at_yard" = false;`);
+
+            diagnostics.schemaFix = "Ensured 'at_yard' column exists and reset all records to false.";
         } catch (e: any) {
             diagnostics.schemaError = e.message;
         }
