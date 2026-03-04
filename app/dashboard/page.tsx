@@ -237,9 +237,14 @@ export default function DashboardPage() {
             if (res.ok) {
                 setNewVehicleNumber('');
                 fetchYardItems();
+                alert('Veículo cadastrado no pátio com sucesso!');
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao cadastrar: ${errorData.error || 'Erro desconhecido'}`);
             }
         } catch (error) {
             console.error('Error adding yard vehicle:', error);
+            alert('Erro de conexão ao cadastrar veículo no pátio.');
         }
     };
 
@@ -418,8 +423,8 @@ export default function DashboardPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.status === 'LIMPO'
-                                                                ? 'bg-green-100 text-green-700'
-                                                                : 'bg-amber-100 text-amber-700'
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : 'bg-amber-100 text-amber-700'
                                                             }`}>
                                                             {item.status}
                                                         </span>
