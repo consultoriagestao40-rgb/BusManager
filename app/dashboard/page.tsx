@@ -15,6 +15,11 @@ export default function DashboardPage() {
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'schedule' | 'yard'>('schedule');
+    const [yardItems, setYardItems] = useState<any[]>([]);
+    const [yardLoading, setYardLoading] = useState(false);
+    const [newVehicleNumber, setNewVehicleNumber] = useState('');
+    const [newVehicleStatus, setNewVehicleStatus] = useState<'SUJO' | 'LIMPO'>('SUJO');
 
     const fetchEvents = async () => {
         // Don't set loading to true on background refreshes if we already have data
@@ -38,10 +43,25 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchYardItems = async () => {
+        setYardLoading(true);
+        try {
+            const res = await fetch('/api/yard');
+            if (res.ok) {
+                const data = await res.json();
+                setYardItems(data.yardItems);
+            }
+        } catch (error) {
+            console.error('Error fetching yard inventory:', error);
+        } finally {
+            setYardLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchEvents();
-        // Auto-refresh removed as per user request to prevent modal disruption
-    }, [currentDate]); // Re-run when date changes
+        if (activeTab === 'yard') fetchYardItems();
+    }, [currentDate, activeTab]); // Re-run when date or tab changes
 
     const handlePrevDay = () => setCurrentDate(prev => subDays(prev, 1));
     const handleNextDay = () => setCurrentDate(prev => addDays(prev, 1));
@@ -200,6 +220,42 @@ export default function DashboardPage() {
         XLSX.writeFile(wb, `escala_limpeza_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
     };
 
+    const handleAddYardVehicle = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newVehicleNumber) return;
+
+        try {
+            const res = await fetch('/api/yard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vehicle_number: newVehicleNumber,
+                    status: newVehicleStatus
+                })
+            });
+
+            if (res.ok) {
+                setNewVehicleNumber('');
+                fetchYardItems();
+            }
+        } catch (error) {
+            console.error('Error adding yard vehicle:', error);
+        }
+    };
+
+    const handleRemoveYardVehicle = async (id: string) => {
+        if (!confirm('Remover veículo do pátio?')) return;
+
+        try {
+            const res = await fetch(`/api/yard?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchYardItems();
+            }
+        } catch (error) {
+            console.error('Error removing yard vehicle:', error);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* --- DESKTOP VERSION (Original Designer) --- */}
@@ -247,40 +303,149 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Main Content Area (Original Filters & Table) */}
-                <div className="space-y-6">
-                    <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="flex-1 flex gap-3">
-                            <div className="bg-gray-50 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 group focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-                                <Search size={18} className="text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Pesquisar por carro, empresa, motorista..."
-                                    value={mainSearch}
-                                    onChange={(e) => setMainSearch(e.target.value)}
-                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none w-full"
-                                />
+                {/* Tab Switcher */}
+                <div className="flex gap-4 mb-6 border-b border-gray-200">
+                    <button
+                        onClick={() => setActiveTab('schedule')}
+                        className={`pb-3 px-6 text-sm font-bold transition-all ${activeTab === 'schedule' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Escala de Limpeza
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('yard')}
+                        className={`pb-3 px-6 text-sm font-bold transition-all ${activeTab === 'yard' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Estoque do Pátio
+                    </button>
+                </div>
+
+                {activeTab === 'schedule' ? (
+                    /* Main Content Area (Original Filters & Table) */
+                    <div className="space-y-6">
+                        <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="flex-1 flex gap-3">
+                                <div className="bg-gray-50 flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 group focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+                                    <Search size={18} className="text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Pesquisar por carro, empresa, motorista..."
+                                        value={mainSearch}
+                                        onChange={(e) => setMainSearch(e.target.value)}
+                                        className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 outline-none w-full"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="bg-white px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                >
+                                    <option value="TODOS">Todos Status</option>
+                                    <option value="PREVISTO">Previsto</option>
+                                    <option value="EM_ANDAMENTO">Em Andamento</option>
+                                    <option value="CONCLUIDO">Concluído</option>
+                                </select>
+                                <button onClick={exportMainToPDF} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-red-700 shadow-md shadow-red-100 transition-all"><FileText size={16} /> PDF</button>
+                                <button onClick={exportMainToExcel} className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-green-700 shadow-md shadow-green-100 transition-all"><Table size={16} /> Excel</button>
                             </div>
                         </div>
-                        <div className="flex gap-3">
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="bg-white px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
-                            >
-                                <option value="TODOS">Todos Status</option>
-                                <option value="PREVISTO">Previsto</option>
-                                <option value="EM_ANDAMENTO">Em Andamento</option>
-                                <option value="CONCLUIDO">Concluído</option>
-                            </select>
-                            <button onClick={exportMainToPDF} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-red-700 shadow-md shadow-red-100 transition-all"><FileText size={16} /> PDF</button>
-                            <button onClick={exportMainToExcel} className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-green-700 shadow-md shadow-green-100 transition-all"><Table size={16} /> Excel</button>
+
+                        <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
+                        <WebEventList events={filteredEvents} />
+                    </div>
+                ) : (
+                    /* Yard Inventory Content */
+                    <div className="space-y-6">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Cadastrar Veículo no Pátio</h3>
+                            <form onSubmit={handleAddYardVehicle} className="flex flex-col md:flex-row gap-4 items-end">
+                                <div className="space-y-1.5 flex-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Número do Carro</label>
+                                    <input
+                                        type="text"
+                                        value={newVehicleNumber}
+                                        onChange={(e) => setNewVehicleNumber(e.target.value)}
+                                        placeholder="Ex: 2700"
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                                    />
+                                </div>
+                                <div className="space-y-1.5 w-40">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
+                                    <select
+                                        value={newVehicleStatus}
+                                        onChange={(e) => setNewVehicleStatus(e.target.value as any)}
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                                    >
+                                        <option value="SUJO">Sujo</option>
+                                        <option value="LIMPO">Limpo</option>
+                                    </select>
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-black hover:bg-blue-700 transition-all shadow-md shadow-blue-100"
+                                >
+                                    Adicionar ao Pátio
+                                </button>
+                            </form>
+                        </div>
+
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                                <h3 className="font-black text-gray-800 uppercase tracking-widest text-xs">Veículos no Pátio</h3>
+                                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] font-black">{yardItems.length} VEÍCULOS</span>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="border-b border-gray-100">
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso no Pátio</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {yardItems.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium">Nenhum veículo no pátio momento.</td>
+                                            </tr>
+                                        ) : (
+                                            yardItems.map((item) => (
+                                                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        <span className="text-lg font-black text-gray-800">{item.vehicle.client_vehicle_number}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.status === 'LIMPO'
+                                                                ? 'bg-green-100 text-green-700'
+                                                                : 'bg-amber-100 text-amber-700'
+                                                            }`}>
+                                                            {item.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className="text-sm font-medium text-gray-500">
+                                                            {format(new Date(item.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <button
+                                                            onClick={() => handleRemoveYardVehicle(item.id)}
+                                                            className="text-red-500 hover:text-red-700 text-xs font-black uppercase tracking-widest"
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-
-                    <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
-                    <WebEventList events={filteredEvents} />
-                </div>
+                )}
             </div>
 
             {error && (

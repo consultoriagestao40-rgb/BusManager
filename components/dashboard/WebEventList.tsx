@@ -24,6 +24,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
     const [finishModalOpen, setFinishModalOpen] = useState(false);
     const [swapModalOpen, setSwapModalOpen] = useState(false);
     const [cleaners, setCleaners] = useState<any[]>([]);
+    const [yardItems, setYardItems] = useState<any[]>([]);
     const [selectedCleaner, setSelectedCleaner] = useState('');
     const [swapVehicle, setSwapVehicle] = useState('');
     const [swapReason, setSwapReason] = useState('QUEBRA');
@@ -38,8 +39,21 @@ export default function WebEventList({ events }: { events: Event[] }) {
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 60000);
         fetchCleaners();
+        fetchYardItems();
         return () => clearInterval(timer);
     }, []);
+
+    const fetchYardItems = async () => {
+        try {
+            const res = await fetch('/api/yard');
+            if (res.ok) {
+                const data = await res.json();
+                setYardItems(data.yardItems);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const fetchCleaners = async () => {
         try {
@@ -206,7 +220,20 @@ export default function WebEventList({ events }: { events: Event[] }) {
 
                         <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Novo Número</label>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Selecionar do Pátio</label>
+                                <select
+                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                                    onChange={(e) => setSwapVehicle(e.target.value)}
+                                    value={swapVehicle}
+                                >
+                                    <option value="">-- Digite manualmente ou selecione --</option>
+                                    {yardItems.map(item => (
+                                        <option key={item.id} value={item.vehicle.client_vehicle_number}>
+                                            {item.vehicle.client_vehicle_number} ({item.status})
+                                        </option>
+                                    ))}
+                                </select>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ou Digite o Número</label>
                                 <input
                                     type="text"
                                     value={swapVehicle}

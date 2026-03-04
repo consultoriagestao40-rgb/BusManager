@@ -35,6 +35,7 @@ model Vehicle {
   events                         CleaningEvent[]
   replacement_swaps              Swap[]          @relation("ReplacementVehicle")
   original_swaps                 Swap[]          @relation("OriginalVehicle")
+  yard_inventory                 YardInventory[]
 }
 
 model ScheduleImport {
@@ -155,6 +156,22 @@ model AuditLog {
   timestamp   DateTime @default(now())
   details     Json?
   user        User?    @relation(fields: [user_id], references: [id])
+}
+
+model YardInventory {
+  id          String            @id @default(uuid())
+  vehicle_id  String
+  status      YardVehicleStatus @default(SUJO)
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+  vehicle     Vehicle           @relation(fields: [vehicle_id], references: [id])
+
+  @@index([created_at])
+}
+
+enum YardVehicleStatus {
+  SUJO
+  LIMPO
 }
 
 enum Role {

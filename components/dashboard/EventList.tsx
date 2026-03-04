@@ -36,7 +36,9 @@ export default function EventDashboardList({ events }: EventListProps) {
 
     // Lists for modals
     const [cleaners, setCleaners] = useState<any[]>([]);
+    const [yardItems, setYardItems] = useState<any[]>([]);
     const [selectedCleaner, setSelectedCleaner] = useState('');
+    const [showYardModal, setShowYardModal] = useState(false);
 
     // State for actions
     const [swapVehicle, setSwapVehicle] = useState('');
@@ -50,8 +52,21 @@ export default function EventDashboardList({ events }: EventListProps) {
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 60000); // Update every minute
         fetchCleaners();
+        fetchYardItems();
         return () => clearInterval(timer);
     }, []);
+
+    const fetchYardItems = async () => {
+        try {
+            const res = await fetch('/api/yard');
+            if (res.ok) {
+                const data = await res.json();
+                setYardItems(data.yardItems);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const fetchCleaners = async () => {
         try {
@@ -106,6 +121,30 @@ export default function EventDashboardList({ events }: EventListProps) {
                 window.location.reload();
             } else {
                 alert('Erro ao processar ação');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleManualProgram = async (vehicleId: string) => {
+        setProcessing(true);
+        try {
+            const res = await fetch('/api/events/manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle_id: vehicleId })
+            });
+
+            if (res.ok) {
+                alert('Carro programado com sucesso!');
+                window.location.reload();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Erro ao programar');
             }
         } catch (e) {
             console.error(e);
@@ -180,6 +219,15 @@ export default function EventDashboardList({ events }: EventListProps) {
                             <LogOut className="w-6 h-6" />
                         </button>
                     </div>
+
+                    {/* NEW: Add from Yard Button */}
+                    <button
+                        onClick={() => setShowYardModal(true)}
+                        className="w-full bg-blue-600 p-3 rounded-xl flex items-center justify-center gap-2 font-black text-sm shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                    >
+                        <RefreshCw className="w-4 h-4 animate-spin-slow" />
+                        PROGRAMAR DO PÁTIO
+                    </button>
 
                     {/* Search & Filter Container (Floating Look) */}
                     <div className="w-full bg-gray-200/20 p-2 rounded-2xl backdrop-blur-sm flex gap-2">
@@ -402,7 +450,20 @@ export default function EventDashboardList({ events }: EventListProps) {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Novo Número</label>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Selecionar do Pátio</label>
+                                <select
+                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+                                    onChange={(e) => setSwapVehicle(e.target.value)}
+                                    value={swapVehicle}
+                                >
+                                    <option value="">-- Manual ou Selecione --</option>
+                                    {yardItems.map(item => (
+                                        <option key={item.id} value={item.vehicle.client_vehicle_number}>
+                                            {item.vehicle.client_vehicle_number} ({item.status})
+                                        </option>
+                                    ))}
+                                </select>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Ou Digite o Número</label>
                                 <input
                                     type="text"
                                     value={swapVehicle}
@@ -523,6 +584,48 @@ export default function EventDashboardList({ events }: EventListProps) {
                         <button
                             onClick={() => setColaboradorModalOpen(false)}
                             className="w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Yard Selection Modal (Manual Programming) */}
+            {showYardModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setShowYardModal(false)}>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 text-gray-900">Programar do Pátio</h3>
+                        <p className="text-sm text-gray-500 mb-6">Selecione um carro que está no estoque do pátio para adicionar à escala de hoje.</p>
+
+                        <div className="space-y-3">
+                            {yardItems.length === 0 ? (
+                                <p className="text-center py-8 text-gray-400 font-medium">Nenhum carro no pátio.</p>
+                            ) : (
+                                yardItems.map(item => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => handleManualProgram(item.vehicle.id)}
+                                        disabled={processing}
+                                        className="w-full p-4 bg-gray-50 hover:bg-blue-50 border border-gray-100 rounded-2xl flex justify-between items-center transition-all group"
+                                    >
+                                        <div className="flex flex-col items-start">
+                                            <span className="text-lg font-black text-gray-800 group-hover:text-blue-700">{item.vehicle.client_vehicle_number}</span>
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.status === 'LIMPO' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                {item.status}
+                                            </span>
+                                        </div>
+                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Play className="w-5 h-5 fill-current" />
+                                        </div>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setShowYardModal(false)}
+                            className="w-full mt-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
                         >
                             Fechar
                         </button>

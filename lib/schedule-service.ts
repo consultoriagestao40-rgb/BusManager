@@ -85,6 +85,11 @@ export async function createScheduleVersion(
                 });
             }
 
+            // Remove from Yard Inventory if it exists there
+            await tx.yardInventory.deleteMany({
+                where: { vehicle_id: vehicle.id }
+            });
+
             // Exclude client_vehicle_number as it's not in the CleaningEvent model
             const { client_vehicle_number, ...eventData } = event;
 

@@ -78,6 +78,11 @@ export async function POST(
             }
         });
 
+        // Remove replacement from Yard Inventory if it exists there
+        await prisma.yardInventory.deleteMany({
+            where: { vehicle_id: replacementVehicle.id }
+        });
+
         return NextResponse.json({ event: updatedEvent, swap });
 
     } catch (error) {
