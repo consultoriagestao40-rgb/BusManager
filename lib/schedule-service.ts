@@ -226,7 +226,15 @@ async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEven
                 status: 'CANCELADO'
             };
 
-            await tx.cleaningEvent.create({ data: cancelledEventData });
+            const newCancelledEvent = await tx.cleaningEvent.create({ data: cancelledEventData });
+
+            // MIGRATE SWAPS for removed events
+            if (oldEvent.swaps && oldEvent.swaps.length > 0) {
+                await tx.swap.updateMany({
+                    where: { original_event_id: oldEvent.id },
+                    data: { original_event_id: newCancelledEvent.id }
+                });
+            }
 
             await tx.scheduleChangeLog.create({
                 data: {
