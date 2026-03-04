@@ -340,7 +340,7 @@ export default function DashboardPage() {
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                                                 {swap.motivo}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">
+                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-md break-words">
                                                 {swap.observacao || '-'}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 {format(new Date(event.saida_programada_at), 'HH:mm')}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">
+                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-md break-words">
                                                 {event.empresa || '-'}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm">
