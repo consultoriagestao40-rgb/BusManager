@@ -12,7 +12,7 @@ interface Event {
     status: string;
     swaps: any[];
     cleaner?: { name: string };
-    no_patio: boolean;
+    at_yard: boolean;
 }
 
 interface EventListProps {
@@ -83,7 +83,7 @@ export default function EventDashboardList({ events }: EventListProps) {
             setSwapModalOpen(true);
         }
         if (action === 'addColaborador') setColaboradorModalOpen(true);
-        if (action === 'no-patio') handleActionExecute('no-patio', { no_patio: !event.no_patio });
+        if (action === 'at-yard') handleActionExecute('at-yard', { at_yard: !event.at_yard });
     };
 
     const handleActionExecute = async (action: string, data?: any) => {
@@ -221,7 +221,7 @@ export default function EventDashboardList({ events }: EventListProps) {
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Número do Carro</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hora de Saída</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Meta H-1</div>
-                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">No Pátio</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Pátio</div>
                         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Ações</div>
                     </div>
 
@@ -271,10 +271,10 @@ export default function EventDashboardList({ events }: EventListProps) {
                                     <div className="flex items-center justify-center">
                                         <input
                                             type="checkbox"
-                                            checked={event.no_patio}
+                                            checked={event.at_yard}
                                             onChange={(e) => {
                                                 e.stopPropagation();
-                                                handleActionTrigger(event, 'no-patio');
+                                                handleActionTrigger(event, 'at-yard');
                                             }}
                                             className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                         />

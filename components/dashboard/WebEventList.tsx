@@ -11,7 +11,7 @@ interface Event {
     status: string;
     swaps: any[];
     cleaner?: { name: string };
-    no_patio: boolean;
+    at_yard: boolean;
 }
 
 export default function WebEventList({ events }: { events: Event[] }) {
@@ -53,7 +53,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
         }
     };
 
-    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'no-patio', data?: any) => {
+    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'at-yard', data?: any) => {
         if (processing) return;
         setProcessing(true);
         try {
@@ -140,8 +140,8 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     <td className="py-4 px-4 text-center">
                                         <input
                                             type="checkbox"
-                                            checked={event.no_patio}
-                                            onChange={() => handleAction(event.id, 'no-patio', { no_patio: !event.no_patio })}
+                                            checked={event.at_yard}
+                                            onChange={() => handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
                                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                         />
                                     </td>

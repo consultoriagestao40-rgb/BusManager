@@ -91,7 +91,7 @@ model CleaningEvent {
   check_externo        Boolean?
   check_pneus          Boolean?
   observacao_operacao  String?
-  no_patio             Boolean         @default(true)
+  at_yard             Boolean         @default(false)
   schedule_version_id  String
   event_business_key   String
   cleaner_id           String?

@@ -17,21 +17,21 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { no_patio } = await request.json();
+        const { at_yard } = await request.json();
 
-        if (typeof no_patio !== 'boolean') {
-            return NextResponse.json({ error: 'Invalid no_patio value' }, { status: 400 });
+        if (typeof at_yard !== 'boolean') {
+            return NextResponse.json({ error: 'Invalid at_yard value' }, { status: 400 });
         }
 
         const updatedEvent = await prisma.cleaningEvent.update({
             where: { id },
-            data: { no_patio }
+            data: { at_yard }
         });
 
         return NextResponse.json({ event: updatedEvent });
 
     } catch (error: any) {
-        console.error('No Patio Toggle Error:', error);
+        console.error('At Yard Toggle Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

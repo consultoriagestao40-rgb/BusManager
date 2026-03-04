@@ -29,7 +29,23 @@ export async function GET(request: Request) {
             return NextResponse.json(diagnostics, { status: 500 });
         }
 
-        // 2. Data Health Check
+        // 2. Schema Sync (Field Rename)
+        try {
+            // First, check if no_patio exists and rename it to at_yard if it does
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" RENAME COLUMN "no_patio" TO "at_yard";`).catch(() => { });
+
+            // Then ensure at_yard exists with default false
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
+
+            // If we just added it, or after rename, ensure default is false
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`);
+
+            diagnostics.schemaFix = "Ensured 'at_yard' column exists and default is false.";
+        } catch (e: any) {
+            diagnostics.schemaError = e.message;
+        }
+
+        // 3. Data Health Check
         try {
             const count = await prisma.cleaningEvent.count();
             diagnostics.totalEvents = count;
