@@ -109,7 +109,8 @@ export async function GET(request: Request) {
                     id: r.id,
                     vehicle: r.vehicle.client_vehicle_number,
                     versionId: r.schedule_version.id,
-                    data_viagem: r.data_viagem
+                    data_viagem: r.data_viagem,
+                    at_yard: (r as any).at_yard // Explicitly check for debugging
                 }));
             } else {
                 // If empty, let's find WHY. Are there ANY events for today?
