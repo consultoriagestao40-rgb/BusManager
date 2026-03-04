@@ -15,7 +15,8 @@ export async function GET(request: Request) {
 
         const diagnostics: any = {
             timestamp: new Date().toISOString(),
-            databaseUrl: process.env.POSTGRES_PRISMA_URL ? 'Defined (Hidden)' : 'NOT DEFINED'
+            serverTime: new Date().toLocaleString(),
+            databaseUrl: process.env.POSTGRES_PRISMA_URL ? 'Defined' : 'NOT DEFINED'
         };
 
         // 1. Connection Check
@@ -27,46 +28,58 @@ export async function GET(request: Request) {
             return NextResponse.json(diagnostics, { status: 500 });
         }
 
-        // 2. Schema Check & Fix
-        try {
-            // Check table names
-            const tables: any = await prisma.$queryRaw`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
-            diagnostics.tables = tables.map((t: any) => t.table_name);
-
-            // Attempt to add column
-            try {
-                await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "no_patio" BOOLEAN DEFAULT true;`);
-                diagnostics.noPatioFix = "Ensured 'no_patio' column exists.";
-            } catch (e: any) {
-                diagnostics.noPatioError = e.message;
-            }
-
-            // Attempt to add enum value
-            try {
-                // Check if value exists first (ADD VALUE IF NOT EXISTS is only PG 10+)
-                // For simplicity, we just try and catch
-                await prisma.$executeRawUnsafe(`ALTER TYPE "SwapReason" ADD VALUE 'CARRO_NAO_ESTA_NO_PATIO';`);
-                diagnostics.enumFix = "Added 'CARRO_NAO_ESTA_NO_PATIO' to SwapReason.";
-            } catch (e: any) {
-                if (e.message.includes('already exists')) {
-                    diagnostics.enumFix = "Enum value already exists.";
-                } else {
-                    diagnostics.enumError = e.message;
-                }
-            }
-        } catch (e: any) {
-            diagnostics.schemaError = e.message;
-        }
-
-        // 3. Data Check
+        // 2. Data Health Check
         try {
             const count = await prisma.cleaningEvent.count();
             diagnostics.totalEvents = count;
 
-            const activeVersion = await prisma.scheduleVersion.findFirst({ where: { is_active: true } });
-            diagnostics.activeVersion = activeVersion ? { id: activeVersion.id, date: activeVersion.data_viagem } : "NONE";
+            // Look for any event from today (Brazil Time)
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+            const todayEventsCount = await prisma.cleaningEvent.count({
+                where: { data_viagem: { gte: start, lte: end } }
+            });
+            diagnostics.todayEventsCount = todayEventsCount;
+
+            const activeVersionsToday = await prisma.scheduleVersion.findMany({
+                where: {
+                    data_viagem: { gte: start, lte: end },
+                    is_active: true
+                }
+            });
+            diagnostics.activeVersionsToday = activeVersionsToday.length;
+
+            // Latest 3 versions in the system
+            const latestVersions = await prisma.scheduleVersion.findMany({
+                orderBy: { data_viagem: 'desc' },
+                take: 3
+            });
+            diagnostics.latestVersions = latestVersions.map(v => ({ date: v.data_viagem, active: v.is_active }));
+
         } catch (e: any) {
             diagnostics.dataError = e.message;
+        }
+
+        // 3. Test exact Dashboard Query
+        try {
+            const testStart = new Date();
+            testStart.setHours(0, 0, 0, 0);
+            const testEnd = new Date();
+            testEnd.setHours(23, 59, 59, 999);
+
+            await prisma.cleaningEvent.findMany({
+                where: {
+                    data_viagem: { gte: testStart, lte: testEnd },
+                    schedule_version: { is_active: true }
+                },
+                include: { vehicle: true, swaps: true },
+                take: 1
+            });
+            diagnostics.dashboardQueryTest = "SUCCESS";
+        } catch (e: any) {
+            diagnostics.dashboardQueryError = e.message;
         }
 
         return NextResponse.json(diagnostics);
