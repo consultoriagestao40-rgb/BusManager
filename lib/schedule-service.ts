@@ -130,10 +130,21 @@ export async function createScheduleVersion(
 
         // Bulk Create Events
         if (processedEvents.length > 0) {
-            // Prisma createMany is not supported nicely with SQLite interaction in transaction sometimes?
-            // SQLite supports createMany in recent versions.
             for (const evt of processedEvents) {
-                await tx.cleaningEvent.create({ data: evt });
+                // Determine if we need to migrate swaps
+                const businessKey = evt.event_business_key;
+                const oldEvent = oldEventsMap.get(businessKey);
+                const hasSwaps = oldEvent?.swaps && oldEvent.swaps.length > 0;
+
+                const newEvent = await tx.cleaningEvent.create({ data: evt });
+
+                // MIGRATE SWAPS
+                if (hasSwaps) {
+                    await tx.swap.updateMany({
+                        where: { original_event_id: oldEvent.id },
+                        data: { original_event_id: newEvent.id }
+                    });
+                }
             }
         }
 
