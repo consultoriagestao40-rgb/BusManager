@@ -63,11 +63,13 @@ export default function DashboardPage() {
     const [showSwapsModal, setShowSwapsModal] = useState(false);
     const [showInProgressModal, setShowInProgressModal] = useState(false);
     const [showCancelledModal, setShowCancelledModal] = useState(false);
+    const [showCompletedModal, setShowCompletedModal] = useState(false);
 
     // Search states
     const [cancelledSearch, setCancelledSearch] = useState('');
     const [inProgressSearch, setInProgressSearch] = useState('');
     const [swapsSearch, setSwapsSearch] = useState('');
+    const [completedSearch, setCompletedSearch] = useState('');
 
     // Main table search and filter
     const [mainSearch, setMainSearch] = useState('');
@@ -86,12 +88,22 @@ export default function DashboardPage() {
     const swapsList = getAllSwaps();
     const inProgressList = events.filter((e: any) => e.status === 'EM_ANDAMENTO');
     const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
+    const completedList = events.filter((e: any) => e.status === 'CONCLUIDO');
 
     // Filtered lists
     const filteredCancelled = cancelledList.filter((e: any) => {
         const searchLower = cancelledSearch.toLowerCase();
         return (
             e.vehicle.client_vehicle_number?.toString().includes(searchLower) ||
+            e.empresa?.toLowerCase().includes(searchLower)
+        );
+    });
+
+    const filteredCompleted = completedList.filter((e: any) => {
+        const searchLower = completedSearch.toLowerCase();
+        return (
+            e.vehicle.client_vehicle_number?.toString().includes(searchLower) ||
+            e.cleaner?.name?.toLowerCase().includes(searchLower) ||
             e.empresa?.toLowerCase().includes(searchLower)
         );
     });
@@ -221,9 +233,9 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Em Andamento</p>
                         <p className="text-4xl font-black text-blue-800">{inProgressList.length}</p>
                     </div>
-                    <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all">
+                    <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCompletedModal(true)}>
                         <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos</p>
-                        <p className="text-4xl font-black text-green-800">{events.filter((e: any) => e.status === 'CONCLUIDO').length}</p>
+                        <p className="text-4xl font-black text-green-800">{completedList.length}</p>
                     </div>
                     <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCancelledModal(true)}>
                         <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>
@@ -507,6 +519,93 @@ export default function DashboardPage() {
                         <div className="mt-6 flex justify-end">
                             <button
                                 onClick={() => setShowCancelledModal(false)}
+                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showCompletedModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+                        <div className="mb-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-gray-800">Veículos Concluídos</h3>
+                                <button
+                                    onClick={() => setShowCompletedModal(false)}
+                                    className="text-gray-500 hover:text-gray-700 font-bold text-xl"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div className="flex gap-3 items-center">
+                                <Search size={18} className="text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Pesquisar por carro, colaborador, empresa..."
+                                    value={completedSearch}
+                                    onChange={(e) => setCompletedSearch(e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                            </div>
+                        </div>
+
+                        {completedList.length === 0 ? (
+                            <p className="text-center text-gray-500 py-8">Nenhum veículo concluído hoje.</p>
+                        ) : (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Colaborador</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Início</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fim</th>
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Interno</th>
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Externo</th>
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pneus</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Observação</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredCompleted.map((event: any) => (
+                                        <tr key={event.id}>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
+                                                {event.vehicle.client_vehicle_number}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                                {event.cleaner?.name || '-'}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                {event.started_at ? format(new Date(event.started_at), 'HH:mm') : '-'}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                {event.finished_at ? format(new Date(event.finished_at), 'HH:mm') : '-'}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_interno ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_externo ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_pneus ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
+                                            </td>
+                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs break-words">
+                                                {event.observacao_operacao || '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                onClick={() => setShowCompletedModal(false)}
                                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
                             >
                                 Fechar
