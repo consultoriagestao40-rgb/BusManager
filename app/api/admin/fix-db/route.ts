@@ -62,22 +62,48 @@ export async function GET(request: Request) {
             diagnostics.dataError = e.message;
         }
 
-        // 3. Test exact Dashboard Query
+        // 3. Test exact Dashboard Query with Real Date
         try {
-            const testStart = new Date();
-            testStart.setHours(0, 0, 0, 0);
-            const testEnd = new Date();
-            testEnd.setHours(23, 59, 59, 999);
+            const dateStr = new Date().toISOString().split('T')[0]; // "2026-03-04"
+            const targetDate = parseISO(dateStr);
+            const start = startOfDay(targetDate);
+            const end = endOfDay(targetDate);
 
-            await prisma.cleaningEvent.findMany({
+            diagnostics.queryWindow = { start, end };
+
+            const results = await prisma.cleaningEvent.findMany({
                 where: {
-                    data_viagem: { gte: testStart, lte: testEnd },
+                    data_viagem: { gte: start, lte: end },
                     schedule_version: { is_active: true }
                 },
-                include: { vehicle: true, swaps: true },
-                take: 1
+                include: {
+                    vehicle: { select: { client_vehicle_number: true } },
+                    schedule_version: { select: { id: true, is_active: true } }
+                },
+                take: 5
             });
-            diagnostics.dashboardQueryTest = "SUCCESS";
+
+            diagnostics.dashboardQueryCount = results.length;
+            if (results.length > 0) {
+                diagnostics.sampleEvents = results.map(r => ({
+                    id: r.id,
+                    vehicle: r.vehicle.client_vehicle_number,
+                    versionId: r.schedule_version.id,
+                    data_viagem: r.data_viagem
+                }));
+            } else {
+                // If empty, let's find WHY. Are there ANY events for today?
+                const anyEventsToday = await prisma.cleaningEvent.findMany({
+                    where: { data_viagem: { gte: start, lte: end } },
+                    include: { schedule_version: { select: { is_active: true } } },
+                    take: 5
+                });
+                diagnostics.anyEventsToday = anyEventsToday.map(r => ({
+                    id: r.id,
+                    active: r.schedule_version.is_active,
+                    data_viagem: r.data_viagem
+                }));
+            }
         } catch (e: any) {
             diagnostics.dashboardQueryError = e.message;
         }
