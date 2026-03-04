@@ -264,6 +264,7 @@ export default function DashboardPage() {
                     </div>
 
                     <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
+                    <WebEventList events={filteredEvents} />
                 </div>
             </div>
 
