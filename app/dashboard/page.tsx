@@ -142,7 +142,11 @@ export default function DashboardPage() {
             e.empresa?.toLowerCase().includes(searchLower) ||
             e.motorista?.toLowerCase().includes(searchLower)
         );
-        const matchesStatus = statusFilter === 'TODOS' || e.status === statusFilter;
+
+        // Hide CANCELADO from main list unless explicitly selected (but we are removing the option)
+        const isCancelled = e.status === 'CANCELADO';
+        const matchesStatus = statusFilter === 'TODOS' ? !isCancelled : e.status === statusFilter;
+
         return matchesSearch && matchesStatus;
     });
 
@@ -256,7 +260,6 @@ export default function DashboardPage() {
                                 <option value="PREVISTO">Previsto</option>
                                 <option value="EM_ANDAMENTO">Em Andamento</option>
                                 <option value="CONCLUIDO">Concluído</option>
-                                <option value="CANCELADO">Cancelado</option>
                             </select>
                             <button onClick={exportMainToPDF} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-red-700 shadow-md shadow-red-100 transition-all"><FileText size={16} /> PDF</button>
                             <button onClick={exportMainToExcel} className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-green-700 shadow-md shadow-green-100 transition-all"><Table size={16} /> Excel</button>
