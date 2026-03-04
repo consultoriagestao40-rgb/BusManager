@@ -32,16 +32,11 @@ export async function GET(request: Request) {
         const start = startOfDay(targetDate);
         const end = endOfDay(targetDate);
 
+        // 1. Get active events for the day
         const events = await prisma.cleaningEvent.findMany({
             where: {
-                data_viagem: {
-                    gte: start,
-                    lte: end
-                },
-                // We only want the events from the ACTIVE version for this day.
-                schedule_version: {
-                    is_active: true
-                }
+                data_viagem: { gte: start, lte: end },
+                schedule_version: { is_active: true }
             },
             include: {
                 vehicle: true,
@@ -53,12 +48,39 @@ export async function GET(request: Request) {
                     }
                 }
             },
-            orderBy: {
-                hora_viagem: 'asc'
+            orderBy: { hora_viagem: 'asc' }
+        });
+
+        // 2. Get ALL swaps for the day (including those on inactive versions)
+        const allSwapsToday = await prisma.swap.findMany({
+            where: {
+                original_event: { data_viagem: { gte: start, lte: end } }
+            },
+            include: {
+                replacement_vehicle: true,
+                original_vehicle: true,
+                original_event: { select: { event_business_key: true } }
             }
         });
 
-        return NextResponse.json({ events });
+        // 3. Ensure all swaps are represented in the active events
+        // If a swap is linked to an event that is now inactive, we find its active counterpart
+        const eventsWithAllSwaps = events.map(event => {
+            const extraSwaps = allSwapsToday.filter(s =>
+                s.original_event.event_business_key === event.event_business_key &&
+                !event.swaps.some(existing => existing.id === s.id)
+            );
+
+            if (extraSwaps.length > 0) {
+                return {
+                    ...event,
+                    swaps: [...event.swaps, ...extraSwaps]
+                };
+            }
+            return event;
+        });
+
+        return NextResponse.json({ events: eventsWithAllSwaps });
 
     } catch (error) {
         console.error('Events API error:', error);
