@@ -85,10 +85,19 @@ export async function createScheduleVersion(
                 });
             }
 
-            // Remove from Yard Inventory if it exists there
-            await tx.yardInventory.deleteMany({
+            // Check if vehicle is in Yard Inventory and if it's already CLEAN
+            const yardStock = await tx.yardInventory.findFirst({
                 where: { vehicle_id: vehicle.id }
             });
+
+            const isAlreadyClean = yardStock?.status === 'LIMPO';
+
+            // Remove from Yard Inventory if it exists there (baixar do estoque)
+            if (yardStock) {
+                await tx.yardInventory.delete({
+                    where: { id: yardStock.id }
+                });
+            }
 
             // Exclude client_vehicle_number as it's not in the CleaningEvent model
             const { client_vehicle_number, ...eventData } = event;
@@ -96,8 +105,15 @@ export async function createScheduleVersion(
             // Use the already corrected date from the parser (which has +3h applied)
             const horaViagemDate = new Date(event.saida_programada_at);
 
+            // If already clean, add alert to observation
+            const baseObservation = event.observacao_cliente || '';
+            const finalObservation = isAlreadyClean
+                ? `⚠️ Veículo já estava limpo no pátio. ${baseObservation}`.trim()
+                : baseObservation;
+
             let eventToCreate: any = {
                 ...eventData,
+                observacao_cliente: finalObservation,
                 event_business_key: businessKey, // Use the potentially suffixed key
                 hora_viagem: horaViagemDate,
                 vehicle_id: vehicle.id,

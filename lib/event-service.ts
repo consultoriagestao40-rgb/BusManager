@@ -32,7 +32,7 @@ export async function completeEvent(
         }
     }
 
-    return await prisma.cleaningEvent.update({
+    const updatedEvent = await prisma.cleaningEvent.update({
         where: { id: eventId },
         data: {
             status: 'CONCLUIDO',
@@ -44,6 +44,14 @@ export async function completeEvent(
             observacao_operacao: data.observacao_operacao
         }
     });
+
+    // Update Yard Inventory status if vehicle is in yard stock
+    await prisma.yardInventory.updateMany({
+        where: { vehicle_id: updatedEvent.vehicle_id },
+        data: { status: 'LIMPO' }
+    });
+
+    return updatedEvent;
 }
 
 export async function swapVehicle(

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import { jsPDF } from 'jspdf';
@@ -248,6 +248,28 @@ export default function DashboardPage() {
         }
     };
 
+    const handleManualProgram = async (vehicleId: string) => {
+        try {
+            const res = await fetch('/api/events/manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle_id: vehicleId })
+            });
+
+            if (res.ok) {
+                alert('Carro programado com sucesso!');
+                fetchYardItems();
+                fetchEvents();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao programar: ${errorData.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            console.error('Error manual programming:', error);
+            alert('Erro de conexão ao programar carro.');
+        }
+    };
+
     const handleRemoveYardVehicle = async (id: string) => {
         if (!confirm('Remover veículo do pátio?')) return;
 
@@ -434,10 +456,16 @@ export default function DashboardPage() {
                                                             {format(new Date(item.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-right">
+                                                    <td className="px-6 py-4 text-right flex justify-end gap-3 items-center">
+                                                        <button
+                                                            onClick={() => handleManualProgram(item.vehicle.id)}
+                                                            className="px-3 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-blue-700 transition-all flex items-center gap-1"
+                                                        >
+                                                            <Play size={10} fill="currentColor" /> Programar
+                                                        </button>
                                                         <button
                                                             onClick={() => handleRemoveYardVehicle(item.id)}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-black uppercase tracking-widest"
+                                                            className="text-red-500 hover:text-red-700 text-[10px] font-black uppercase tracking-wider"
                                                         >
                                                             Remover
                                                         </button>

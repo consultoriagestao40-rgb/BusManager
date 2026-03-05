@@ -58,10 +58,9 @@ export async function POST(request: Request) {
             }
         });
 
-        // 4. Remove from Yard Inventory
-        await prisma.yardInventory.deleteMany({
-            where: { vehicle_id }
-        });
+        // 4. (REMOVED) Remove from Yard Inventory
+        // Requirement changed: Manual programming keeps the car in the yard for stock control.
+        // It will only be updated to 'LIMPO' when the cleaning is finished.
 
         return NextResponse.json(event);
     } catch (error: any) {
