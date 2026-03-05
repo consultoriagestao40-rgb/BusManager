@@ -13,6 +13,8 @@ interface Event {
     swaps: any[];
     cleaner?: { name: string };
     at_yard: boolean;
+    revisar?: boolean;
+    observacao_operacao?: string;
 }
 
 interface EventListProps {
@@ -525,6 +527,17 @@ export default function EventDashboardList({ events }: EventListProps) {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300" onClick={() => setFinishModalOpen(false)}>
                     <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-4 text-gray-900">Finalizar Limpeza</h3>
+
+                        {selectedEvent.revisar && (
+                            <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                                <p className="text-xs font-black text-orange-800 uppercase flex items-center gap-2">
+                                    <RefreshCw className="w-4 h-4 animate-spin" /> Conferência Necessária
+                                </p>
+                                <p className="text-xs text-orange-700 mt-1.5 font-bold italic leading-relaxed">
+                                    {selectedEvent.observacao_operacao || 'Este veículo foi recuperado do pátio já limpo.'}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="space-y-4">
                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">

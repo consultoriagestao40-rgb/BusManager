@@ -58,32 +58,21 @@ export async function POST(
             });
         }
 
-        // Create Swap Record
-        const swap = await prisma.swap.create({
-            data: {
-                original_event_id: id,
-                original_vehicle_id: event.vehicle_id,
-                replacement_vehicle_id: replacementVehicle.id,
-                motivo: motivo,
-                observacao: observacao,
-                created_by_user_id: user.id
-            }
+        // Use centralized event service for swap logic
+        const { swapVehicle } = await import('@/lib/event-service');
+        await swapVehicle(id, user.id, {
+            replacement_vehicle_id: replacementVehicle.id,
+            motivo: motivo,
+            observacao: observacao
         });
 
-        // Update Event with new Vehicle
-        const updatedEvent = await prisma.cleaningEvent.update({
+        // Fetch updated event to return
+        const updatedEvent = await prisma.cleaningEvent.findUnique({
             where: { id },
-            data: {
-                vehicle_id: replacementVehicle.id
-            }
+            include: { vehicle: true }
         });
 
-        // Remove replacement from Yard Inventory if it exists there
-        await prisma.yardInventory.deleteMany({
-            where: { vehicle_id: replacementVehicle.id }
-        });
-
-        return NextResponse.json({ event: updatedEvent, swap });
+        return NextResponse.json({ event: updatedEvent });
 
     } catch (error) {
         console.error('Swap Event Error:', error);

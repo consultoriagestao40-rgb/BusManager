@@ -107,8 +107,11 @@ export async function swapVehicle(
                         check_interno: true,
                         check_externo: true,
                         check_pneus: true,
+                        revisar: true,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
-                    } : {})
+                    } : {
+                        revisar: false
+                    })
                 }
             });
 

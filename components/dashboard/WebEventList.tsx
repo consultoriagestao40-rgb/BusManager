@@ -12,6 +12,8 @@ interface Event {
     swaps: any[];
     cleaner?: { name: string };
     at_yard: boolean;
+    revisar?: boolean;
+    observacao_operacao?: string;
 }
 
 export default function WebEventList({ events }: { events: Event[] }) {
@@ -141,8 +143,18 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                     </td>
                                     <td className="py-4 px-4">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-extrabold text-gray-900">{event.vehicle.client_vehicle_number}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-extrabold text-gray-900">{event.vehicle.client_vehicle_number}</span>
+                                                {(event as any).revisar && (
+                                                    <span className="text-[9px] bg-orange-500 text-white px-1.5 py-0.5 rounded-full font-black animate-pulse">REVISAR</span>
+                                                )}
+                                            </div>
                                             {event.vehicle.prefix && <span className="text-[10px] bg-blue-100 text-blue-800 px-1 py-0.5 rounded w-fit">{event.vehicle.prefix}</span>}
+                                            {event.observacao_operacao && (
+                                                <span className="text-[10px] text-orange-600 font-bold italic line-clamp-1" title={event.observacao_operacao}>
+                                                    {event.observacao_operacao}
+                                                </span>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="py-4 px-4 text-sm text-gray-700">{format(new Date(event.saida_programada_at), 'HH:mm')}</td>
@@ -287,6 +299,17 @@ export default function WebEventList({ events }: { events: Event[] }) {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setFinishModalOpen(false)}>
                     <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+
+                        {selectedEvent.revisar && (
+                            <div className="mb-4 p-3 bg-orange-100 border border-orange-200 rounded-lg">
+                                <p className="text-xs font-black text-orange-800 uppercase flex items-center gap-2">
+                                    <RefreshCw className="w-3 h-3 animate-spin" /> Conferência Necessária
+                                </p>
+                                <p className="text-[11px] text-orange-700 mt-1 font-medium">
+                                    {selectedEvent.observacao_operacao || 'Este veículo foi recuperado do pátio já limpo.'}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="space-y-3 mb-6">
                             <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
