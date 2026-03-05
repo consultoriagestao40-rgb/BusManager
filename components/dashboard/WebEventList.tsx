@@ -188,7 +188,7 @@ export default function WebEventList({ events, autoOpenEventId }: { events: Even
                                             onChange={() => handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
                                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                         />
-                                        鼓鼓                                    </td>
+                                    </td>
                                     <td className="py-4 px-4 text-center">
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' :
                                             event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
