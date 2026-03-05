@@ -128,13 +128,13 @@ export default function WebEventList({ events, autoOpenEventId }: { events: Even
                 <table className="w-full min-w-full border-collapse">
                     <thead className="bg-[#2563eb] text-white">
                         <tr>
-                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">Hora</th>
+                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider hidden lg:table-cell">Hora</th>
                             <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">Carro</th>
-                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">Saída</th>
-                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">H-1 (Meta)</th>
+                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider hidden xl:table-cell">Saída</th>
+                            <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider hidden lg:table-cell">H-1 (Meta)</th>
                             <th className="py-4 px-4 text-left text-xs font-black uppercase tracking-wider">Colaborador</th>
                             <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">SLA</th>
-                            <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">Pátio</th>
+                            <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider hidden md:table-cell">Pátio</th>
                             <th className="py-4 px-4 text-center text-xs font-black uppercase tracking-wider">Status</th>
                             <th className="py-4 px-4 text-right text-xs font-black uppercase tracking-wider">Ações</th>
                         </tr>
@@ -148,7 +148,7 @@ export default function WebEventList({ events, autoOpenEventId }: { events: Even
 
                             return (
                                 <tr key={event.id} className={rowClass}>
-                                    <td className="py-4 px-4">
+                                    <td className="py-4 px-4 hidden lg:table-cell">
                                         <div className="flex flex-col">
                                             {!event.event_business_key?.startsWith('MANUAL-') && (
                                                 <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
@@ -171,24 +171,24 @@ export default function WebEventList({ events, autoOpenEventId }: { events: Even
                                             )}
                                         </div>
                                     </td>
-                                    <td className="py-4 px-4 text-sm text-gray-700">
+                                    <td className="py-4 px-4 text-sm text-gray-700 hidden xl:table-cell">
                                         {!event.event_business_key?.startsWith('MANUAL-') && format(new Date(event.saida_programada_at), 'HH:mm')}
                                     </td>
-                                    <td className="py-4 px-4 text-sm text-gray-700">
+                                    <td className="py-4 px-4 text-sm text-gray-700 hidden lg:table-cell">
                                         {format(new Date(event.liberar_ate_at), 'HH:mm')}
                                     </td>
                                     <td className="py-4 px-4 text-sm font-medium text-gray-700">{event.cleaner?.name || '-'}</td>
                                     <td className={`py-4 px-4 text-center text-sm font-bold ${sla === 'expired' ? 'text-red-600' : 'text-green-600'}`}>
                                         {sla === 'completed' ? <CheckCircle className="w-5 h-5 mx-auto text-green-500" /> : diffText}
                                     </td>
-                                    <td className="py-4 px-4 text-center">
+                                    <td className="py-4 px-4 text-center hidden md:table-cell">
                                         <input
                                             type="checkbox"
                                             checked={event.at_yard}
                                             onChange={() => handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
                                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                         />
-                                    </td>
+                                        鼓鼓                                    </td>
                                     <td className="py-4 px-4 text-center">
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' :
                                             event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'

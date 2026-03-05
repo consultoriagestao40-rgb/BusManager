@@ -317,7 +317,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Original Colored Metric Cards (Vibrant like Foto 02) */}
-                <div className="grid grid-cols-6 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     <div className="bg-white p-5 rounded-2xl border-l-[6px] border-blue-600 shadow-xl shadow-blue-50/50 transform hover:-translate-y-1 transition-all">
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total</p>
                         <p className="text-4xl font-black text-blue-900">{events.length}</p>
@@ -443,9 +443,9 @@ export default function DashboardPage() {
                                         <tr className="border-b border-gray-100">
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Faxineiro</th>
-                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Última Limpeza</th>
-                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso no Pátio</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center hidden lg:table-cell">Faxineiro</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center hidden xl:table-cell">Última Limpeza</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden lg:table-cell">Ingresso no Pátio</th>
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
                                         </tr>
                                     </thead>
@@ -470,17 +470,17 @@ export default function DashboardPage() {
                                                             {item.status}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-center">
+                                                    <td className="px-6 py-4 text-center hidden lg:table-cell">
                                                         <span className="text-[11px] font-bold text-gray-600">
                                                             {item.last_cleaner_name || '--'}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-center">
+                                                    <td className="px-6 py-4 text-center hidden xl:table-cell">
                                                         <span className="text-[11px] font-medium text-gray-500">
                                                             {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "HH:mm 'em' dd/MM", { locale: ptBR }) : '--:--'}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4">
+                                                    <td className="px-6 py-4 hidden lg:table-cell">
                                                         <span className="text-sm font-medium text-gray-500">
                                                             {format(new Date(item.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                                                         </span>
