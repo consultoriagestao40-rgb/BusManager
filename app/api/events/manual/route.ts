@@ -88,7 +88,16 @@ export async function POST(request: Request) {
 
         return NextResponse.json(event);
     } catch (error: any) {
-        console.error('Manual Programming API error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        console.error('Manual Programming API error details:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            meta: error.meta
+        });
+        return NextResponse.json({
+            error: 'Erro interno no servidor',
+            details: error.message,
+            code: error.code
+        }, { status: 500 });
     }
 }
