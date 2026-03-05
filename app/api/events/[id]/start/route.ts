@@ -41,7 +41,8 @@ export async function POST(
                 status: 'EM_ANDAMENTO',
                 started_at: new Date(),
                 started_by_user_id: user.id,
-                cleaner_id: cleanerId
+                cleaner_id: cleanerId,
+                at_yard: true
             }
         });
 

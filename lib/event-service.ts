@@ -7,7 +7,8 @@ export async function startEvent(eventId: string, userId: string) {
         data: {
             status: 'EM_ANDAMENTO',
             started_at: new Date(),
-            started_by_user_id: userId
+            started_by_user_id: userId,
+            at_yard: true
         }
     });
 }
