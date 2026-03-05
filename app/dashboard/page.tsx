@@ -266,7 +266,17 @@ export default function DashboardPage() {
                 setAutoOpenEventId(event.id);
             } else {
                 const errorData = await res.json().catch(() => ({}));
-                alert(`Erro ao programar: ${errorData.error || 'Erro desconhecido'}`);
+
+                // User requirement: If already programmed, still go to the start modal
+                if (res.status === 400 && errorData.eventId) {
+                    fetchYardItems();
+                    fetchEvents();
+                    setActiveTab('schedule');
+                    setAutoOpenEventId(errorData.eventId);
+                    return;
+                }
+
+                alert(`Erro ao programar: ${errorData.error || errorData.details || 'Erro desconhecido'}`);
             }
         } catch (error) {
             console.error('Error manual programming:', error);

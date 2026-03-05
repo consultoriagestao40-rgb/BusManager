@@ -46,11 +46,18 @@ export async function GET(request: Request) {
         await runSql("Add at_yard column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
         await runSql("Add revisar column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "revisar" BOOLEAN DEFAULT false;`);
 
-        await runSql("Create YardVehicleStatus Enum", `
+        await runSql("Create/Update YardVehicleStatus Enum", `
             DO $$ BEGIN
-                CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'LIMPO');
-            EXCEPTION
-                WHEN duplicate_object THEN null;
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'YardVehicleStatus') THEN
+                    CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'EM_ANDAMENTO', 'LIMPO');
+                ELSE
+                    -- Try to add the value if it doesn't exist
+                    BEGIN
+                        ALTER TYPE "YardVehicleStatus" ADD VALUE 'EM_ANDAMENTO';
+                    EXCEPTION
+                        WHEN duplicate_object THEN null;
+                    END;
+                END IF;
             END $$;
         `);
 

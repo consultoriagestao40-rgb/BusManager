@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { startOfDay, endOfDay, subHours } from 'date-fns';
 
 export async function GET() {
     try {
@@ -22,18 +23,35 @@ export async function GET() {
             }
         });
 
-        // Enrich with cleaner names
-        const enrichedItems = await Promise.all(yardItems.map(async (item) => {
-            if (!item.last_cleaner_id) return { ...item, last_cleaner_name: null };
+        // Current Brazil Day
+        const now = new Date();
+        const brazilNow = subHours(now, 3);
+        const start = startOfDay(brazilNow);
+        const end = endOfDay(brazilNow);
 
-            const cleaner = await prisma.user.findUnique({
+        // Enrich with cleaner names
+        const enrichedItems = await Promise.all(yardItems.map(async (item: any) => {
+            const cleaner = item.last_cleaner_id ? await prisma.user.findUnique({
                 where: { id: item.last_cleaner_id },
                 select: { name: true }
+            }) : null;
+
+            // Check if there is an active programming for TODAY
+            const activeEvent = await prisma.cleaningEvent.findFirst({
+                where: {
+                    vehicle_id: item.vehicle_id,
+                    data_viagem: { gte: start, lte: end },
+                    status: { in: ['PREVISTO', 'EM_ANDAMENTO'] }
+                },
+                select: { id: true, status: true }
             });
 
             return {
                 ...item,
-                last_cleaner_name: cleaner?.name || 'Faxineiro não identificado'
+                // Status "virtual" override: if there is an active event, it's EM_ANDAMENTO for UI purposes
+                status: activeEvent ? 'EM_ANDAMENTO' : item.status,
+                last_cleaner_name: cleaner?.name || (item.last_cleaner_id ? 'Faxineiro não identificado' : null),
+                active_event_id: activeEvent?.id
             };
         }));
 
