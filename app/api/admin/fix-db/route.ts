@@ -6,16 +6,14 @@ import { parseISO, startOfDay, endOfDay } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
-        const { searchParams } = new URL(request.url);
-        const secret = searchParams.get('secret');
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth_token')?.value;
+        const user = token ? await getUserFromToken(token) : null;
 
-        if (secret !== 'antigravity_fix_2024') {
-            const cookieStore = await cookies();
-            const token = cookieStore.get('auth_token')?.value;
-            const user = token ? await getUserFromToken(token) : null;
-
-            if (!user || user.role !== 'ADMIN') {
-                return NextResponse.json({ error: 'Unauthorized', secret_received: secret ? 'PRESENT' : 'MISSING' }, { status: 401 });
+        if (!user || user.role !== 'ADMIN') {
+            const { searchParams } = new URL(request.url);
+            if (searchParams.get('secret') !== 'antigravity_fix_2024') {
+                return NextResponse.json({ error: 'Unauthorized', hint: 'Logue como ADMIN ou use ?secret=...' }, { status: 401 });
             }
         }
 
