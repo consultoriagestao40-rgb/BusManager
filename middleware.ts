@@ -5,13 +5,13 @@ import { verifyJWT } from '@/lib/auth';
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Exclude public paths
+    // Exclude public paths and emergency database fix
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api/auth') ||
         pathname === '/login' ||
         pathname.includes('.') ||
-        (pathname === '/api/admin/fix-db' && request.nextUrl.searchParams.get('secret') === 'antigravity_fix_2024')
+        pathname === '/api/admin/fix-db'
     ) {
         return NextResponse.next();
     }
