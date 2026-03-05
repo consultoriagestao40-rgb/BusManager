@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { startOfDay, endOfDay, subHours } from 'date-fns';
+import { startOfDay, endOfDay, subHours, addHours } from 'date-fns';
 
 export async function POST(request: Request) {
     try {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
                 data_viagem: start,
                 hora_viagem: now,
                 saida_programada_at: now,
-                liberar_ate_at: now,
+                liberar_ate_at: addHours(now, 1),
                 status: 'PREVISTO',
                 empresa: empresa || 'MANUAL',
                 motorista: motorista || '-',
