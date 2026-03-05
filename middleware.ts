@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/api/auth') ||
         pathname === '/login' ||
         pathname.includes('.') ||
-        (pathname === '/api/admin/fix-db' && request.nextUrl.searchParams.get('secret') === 'antigravity_fix_2024')
+        pathname === '/api/admin/fix-db'
     ) {
         return NextResponse.next();
     }
