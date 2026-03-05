@@ -17,7 +17,7 @@ interface Event {
     event_business_key?: string;
 }
 
-export default function WebEventList({ events }: { events: Event[] }) {
+export default function WebEventList({ events, autoOpenEventId }: { events: Event[], autoOpenEventId?: string | null }) {
     const [now, setNow] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -45,6 +45,16 @@ export default function WebEventList({ events }: { events: Event[] }) {
         fetchYardItems();
         return () => clearInterval(timer);
     }, []);
+
+    useEffect(() => {
+        if (autoOpenEventId) {
+            const event = events.find(e => e.id === autoOpenEventId);
+            if (event && event.status === 'PREVISTO') {
+                setSelectedEvent(event);
+                setStartModalOpen(true);
+            }
+        }
+    }, [autoOpenEventId, events]);
 
     const fetchYardItems = async () => {
         try {
@@ -105,6 +115,7 @@ export default function WebEventList({ events }: { events: Event[] }) {
     const getRowClass = (event: Event, sla: string) => {
         const baseClass = "transition-colors border-b border-gray-100 last:border-0";
         if (event.status === 'CONCLUIDO') return `${baseClass} bg-green-50 hover:bg-green-100`;
+        if (event.status === 'EM_ANDAMENTO') return `${baseClass} bg-blue-50/50 hover:bg-blue-100/50`;
         if (sla === 'expired') return `${baseClass} bg-red-50 hover:bg-red-100`;
         if (sla === 'critical') return `${baseClass} bg-orange-50 hover:bg-orange-100`;
         if (sla === 'warning') return `${baseClass} bg-yellow-50 hover:bg-yellow-100`;

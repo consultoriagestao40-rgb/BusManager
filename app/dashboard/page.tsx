@@ -20,6 +20,7 @@ export default function DashboardPage() {
     const [yardLoading, setYardLoading] = useState(false);
     const [newVehicleNumber, setNewVehicleNumber] = useState('');
     const [newVehicleStatus, setNewVehicleStatus] = useState<'SUJO' | 'LIMPO'>('SUJO');
+    const [autoOpenEventId, setAutoOpenEventId] = useState<string | null>(null);
 
     const fetchEvents = async () => {
         // Don't set loading to true on background refreshes if we already have data
@@ -257,9 +258,12 @@ export default function DashboardPage() {
             });
 
             if (res.ok) {
-                alert('Carro programado com sucesso!');
+                const event = await res.json();
                 fetchYardItems();
                 fetchEvents();
+                // Sequence for the user: Switch tab and open the modal
+                setActiveTab('schedule');
+                setAutoOpenEventId(event.id);
             } else {
                 const errorData = await res.json().catch(() => ({}));
                 alert(`Erro ao programar: ${errorData.error || 'Erro desconhecido'}`);
@@ -372,6 +376,7 @@ export default function DashboardPage() {
                                     <option value="PREVISTO">Previsto</option>
                                     <option value="EM_ANDAMENTO">Em Andamento</option>
                                     <option value="CONCLUIDO">Concluído</option>
+                                    <option value="CANCELADO">Cancelado</option>
                                 </select>
                                 <button onClick={exportMainToPDF} className="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-red-700 shadow-md shadow-red-100 transition-all"><FileText size={16} /> PDF</button>
                                 <button onClick={exportMainToExcel} className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black flex items-center gap-2 hover:bg-green-700 shadow-md shadow-green-100 transition-all"><Table size={16} /> Excel</button>
@@ -379,7 +384,7 @@ export default function DashboardPage() {
                         </div>
 
                         <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
-                        <WebEventList events={filteredEvents} />
+                        <WebEventList events={filteredEvents} autoOpenEventId={autoOpenEventId} />
                     </div>
                 ) : (
                     /* Yard Inventory Content */
@@ -448,7 +453,9 @@ export default function DashboardPage() {
                                                     <td className="px-6 py-4 text-center">
                                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${item.status === 'LIMPO'
                                                             ? 'bg-green-100 text-green-700'
-                                                            : 'bg-amber-100 text-amber-700'
+                                                            : item.status === 'EM_ANDAMENTO'
+                                                                ? 'bg-blue-100 text-blue-700'
+                                                                : 'bg-gray-100 text-gray-700'
                                                             }`}>
                                                             {item.status}
                                                         </span>
@@ -471,7 +478,11 @@ export default function DashboardPage() {
                                                     <td className="px-6 py-4 text-right flex justify-end gap-3 items-center">
                                                         <button
                                                             onClick={() => handleManualProgram(item.vehicle.id)}
-                                                            className="px-3 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-blue-700 transition-all flex items-center gap-1"
+                                                            disabled={item.status === 'EM_ANDAMENTO'}
+                                                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${item.status === 'EM_ANDAMENTO'
+                                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                }`}
                                                         >
                                                             <Play size={10} fill="currentColor" /> Programar
                                                         </button>

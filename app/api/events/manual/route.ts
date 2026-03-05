@@ -38,7 +38,23 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No active schedule for today' }, { status: 400 });
         }
 
-        // 3. Create Cleaning Event
+        // 3. Prevent duplicate active programming for this vehicle TODAY
+        const existingEvent = await prisma.cleaningEvent.findFirst({
+            where: {
+                vehicle_id,
+                data_viagem: { gte: start, lte: end },
+                status: { in: ['PREVISTO', 'EM_ANDAMENTO'] }
+            }
+        });
+
+        if (existingEvent) {
+            return NextResponse.json({
+                error: 'Este veículo já possui uma programação ativa para hoje.',
+                eventId: existingEvent.id
+            }, { status: 400 });
+        }
+
+        // 4. Create Cleaning Event
         const event = await prisma.cleaningEvent.create({
             data: {
                 vehicle_id,
@@ -59,9 +75,11 @@ export async function POST(request: Request) {
             }
         });
 
-        // 4. (REMOVED) Remove from Yard Inventory
-        // Requirement changed: Manual programming keeps the car in the yard for stock control.
-        // It will only be updated to 'LIMPO' when the cleaning is finished.
+        // 5. Update Yard Inventory status to EM_ANDAMENTO
+        await prisma.yardInventory.updateMany({
+            where: { vehicle_id },
+            data: { status: 'EM_ANDAMENTO' }
+        });
 
         return NextResponse.json(event);
     } catch (error: any) {
