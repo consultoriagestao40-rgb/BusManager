@@ -15,6 +15,7 @@ interface Event {
     at_yard: boolean;
     revisar?: boolean;
     observacao_operacao?: string;
+    event_business_key?: string;
 }
 
 interface EventListProps {
@@ -302,7 +303,7 @@ export default function EventDashboardList({ events }: EventListProps) {
 
                                     {/* Hora Saída */}
                                     <div className="text-sm font-medium text-gray-900">
-                                        {formatSafe(event.saida_programada_at, 'HH:mm')}
+                                        {!event.event_business_key?.startsWith('MANUAL-') && formatSafe(event.saida_programada_at, 'HH:mm')}
                                     </div>
 
                                     {/* Meta H-1 */}

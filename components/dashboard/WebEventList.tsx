@@ -14,6 +14,7 @@ interface Event {
     at_yard: boolean;
     revisar?: boolean;
     observacao_operacao?: string;
+    event_business_key?: string;
 }
 
 export default function WebEventList({ events }: { events: Event[] }) {
@@ -138,7 +139,9 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                 <tr key={event.id} className={rowClass}>
                                     <td className="py-4 px-4">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
+                                            {!event.event_business_key?.startsWith('MANUAL-') && (
+                                                <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="py-4 px-4">
@@ -157,8 +160,12 @@ export default function WebEventList({ events }: { events: Event[] }) {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="py-4 px-4 text-sm text-gray-700">{format(new Date(event.saida_programada_at), 'HH:mm')}</td>
-                                    <td className="py-4 px-4 text-sm text-gray-700">{format(new Date(event.liberar_ate_at), 'HH:mm')}</td>
+                                    <td className="py-4 px-4 text-sm text-gray-700">
+                                        {!event.event_business_key?.startsWith('MANUAL-') && format(new Date(event.saida_programada_at), 'HH:mm')}
+                                    </td>
+                                    <td className="py-4 px-4 text-sm text-gray-700">
+                                        {format(new Date(event.liberar_ate_at), 'HH:mm')}
+                                    </td>
                                     <td className="py-4 px-4 text-sm font-medium text-gray-700">{event.cleaner?.name || '-'}</td>
                                     <td className={`py-4 px-4 text-center text-sm font-bold ${sla === 'expired' ? 'text-red-600' : 'text-green-600'}`}>
                                         {sla === 'completed' ? <CheckCircle className="w-5 h-5 mx-auto text-green-500" /> : diffText}
