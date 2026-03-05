@@ -65,6 +65,9 @@ export async function GET(request: Request) {
 
         await runSql("Add Index for created_at", `CREATE INDEX IF NOT EXISTS "YardInventory_created_at_idx" ON "YardInventory"("created_at");`);
 
+        await runSql("Add last_cleaned_at to YardInventory", `ALTER TABLE "YardInventory" ADD COLUMN IF NOT EXISTS "last_cleaned_at" TIMESTAMP(3);`);
+        await runSql("Add last_cleaner_id to YardInventory", `ALTER TABLE "YardInventory" ADD COLUMN IF NOT EXISTS "last_cleaner_id" TEXT;`);
+
         // 3. List Tables Diagnostic
         let tables: string[] = [];
         try {
