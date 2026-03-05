@@ -30,48 +30,65 @@ export async function GET(request: Request) {
         }
 
         // 2. Schema Sync & Force Reset
+        const schemaLogs: string[] = [];
         try {
-            // a) Original at_yard column check
-            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`).catch(() => { });
-            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`).catch(() => { });
+            // a) at_yard column check
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`)
+                .then(() => schemaLogs.push("at_yard column OK"))
+            await prisma.$executeRawUnsafe(`ALTER TABLE "CleaningEvent" ALTER COLUMN "at_yard" SET DEFAULT false;`)
+                .then(() => schemaLogs.push("at_yard default OK"))
 
-            // b) Create YardInventory Status Enum if not exists (Postgres specific)
+            // b) Create YardInventory Status Enum
             await prisma.$executeRawUnsafe(`
-                    DO $$ BEGIN
-                        CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'LIMPO');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `).catch((e) => { console.log("Enum exists or error:", e.message); });
+                        DO $$ BEGIN
+                            CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'LIMPO');
+                        EXCEPTION
+                            WHEN duplicate_object THEN null;
+                        END $$;
+                    `).then(() => schemaLogs.push("Enum YardVehicleStatus OK"))
 
-            // c) Create YardInventory table if not exists
+            // c) Create YardInventory table
             await prisma.$executeRawUnsafe(`
-                    CREATE TABLE IF NOT EXISTS "YardInventory" (
-                        "id" TEXT NOT NULL,
-                        "vehicle_id" TEXT NOT NULL,
-                        "status" "YardVehicleStatus" NOT NULL DEFAULT 'SUJO',
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        "updated_at" TIMESTAMP(3) NOT NULL,
+                        CREATE TABLE IF NOT EXISTS "YardInventory" (
+                            "id" TEXT NOT NULL,
+                            "vehicle_id" TEXT NOT NULL,
+                            "status" "YardVehicleStatus" NOT NULL DEFAULT 'SUJO',
+                            "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            "updated_at" TIMESTAMP(3) NOT NULL,
 
-                        CONSTRAINT "YardInventory_pkey" PRIMARY KEY ("id"),
-                        CONSTRAINT "YardInventory_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "Vehicle"("id") ON DELETE RESTRICT ON UPDATE CASCADE
-                    );
-                `).catch((e) => { console.log("Table create error:", e.message); });
+                            CONSTRAINT "YardInventory_pkey" PRIMARY KEY ("id")
+                        );
+                    `).then(() => schemaLogs.push("Table YardInventory OK"))
 
-            // d) Create index for inventory
-            await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "YardInventory_created_at_idx" ON "YardInventory"("created_at");`).catch(() => { });
+            // Add foreign key separately
+            await prisma.$executeRawUnsafe(`
+                    ALTER TABLE "YardInventory" 
+                    ADD CONSTRAINT "YardInventory_vehicle_id_fkey" 
+                    FOREIGN KEY ("vehicle_id") REFERENCES "Vehicle"("id") 
+                    ON DELETE RESTRICT ON UPDATE CASCADE;
+                `).catch(() => schemaLogs.push("FK YardInventory might already exist"));
 
-            // Force all existing records to false (existing functionality)
+            // d) Create index
+            await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "YardInventory_created_at_idx" ON "YardInventory"("created_at");`)
+                .then(() => schemaLogs.push("Index YardInventory OK"))
+
+            diagnostics.prismaCheck = {
+                yardInventoryOnClient: typeof (prisma as any).yardInventory !== 'undefined'
+            };
+
+            // Force all existing records to false
             const result = await prisma.cleaningEvent.updateMany({
-                data: { at_yard: false }
+                data: { at_yard: false } as any
             });
 
             diagnostics.schemaFix = {
                 atYardReset: result.count,
-                status: "SUCCESS"
+                status: "SUCCESS",
+                logs: schemaLogs
             };
         } catch (e: any) {
             diagnostics.schemaError = e.message;
+            diagnostics.schemaLogs = schemaLogs;
         }
 
         // 3. Data Health Check

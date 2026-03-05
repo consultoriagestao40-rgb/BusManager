@@ -25,7 +25,7 @@ export async function GET() {
         return NextResponse.json({ yardItems });
     } catch (error: any) {
         console.error('Yard API GET error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: `Internal server error: ${error.message}` }, { status: 500 });
     }
 }
 
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         return NextResponse.json(yardItem);
     } catch (error: any) {
         console.error('Yard API POST error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: `Internal server error: ${error.message}` }, { status: 500 });
     }
 }
 
