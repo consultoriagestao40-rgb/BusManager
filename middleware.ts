@@ -5,13 +5,12 @@ import { verifyJWT } from '@/lib/auth';
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Exclude public paths and emergency database fix
+    // Exclude public paths
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api/auth') ||
         pathname === '/login' ||
-        pathname.includes('.') ||
-        pathname === '/api/admin/fix-db'
+        pathname.includes('.') // public files like favicon.ico
     ) {
         return NextResponse.next();
     }
