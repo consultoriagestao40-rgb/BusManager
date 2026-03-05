@@ -46,20 +46,28 @@ export async function GET(request: Request) {
         await runSql("Add at_yard column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
         await runSql("Add revisar column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "revisar" BOOLEAN DEFAULT false;`);
 
-        await runSql("Create/Update YardVehicleStatus Enum", `
-            DO $$ BEGIN
-                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'YardVehicleStatus') THEN
-                    CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'EM_ANDAMENTO', 'LIMPO');
-                ELSE
-                    -- Try to add the value if it doesn't exist
-                    BEGIN
-                        ALTER TYPE "YardVehicleStatus" ADD VALUE 'EM_ANDAMENTO';
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END;
-                END IF;
-            END $$;
-        `);
+        // Check and update Enum
+        try {
+            // First try to create it if it doesn't exist
+            await runSql("Create YardVehicleStatus Enum", `
+                DO $$ BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'YardVehicleStatus') THEN
+                        CREATE TYPE "YardVehicleStatus" AS ENUM ('SUJO', 'LIMPO');
+                    END IF;
+                END $$;
+            `);
+
+            // Then try to add the new value individually (cannot be in a DO block)
+            const start = Date.now();
+            await prisma.$executeRawUnsafe(`ALTER TYPE "YardVehicleStatus" ADD VALUE 'EM_ANDAMENTO';`);
+            schemaLogs.push({ name: "Add EM_ANDAMENTO value", status: "SUCCESS", duration: `${Date.now() - start}ms` });
+        } catch (e: any) {
+            if (e.message.includes('already exists')) {
+                schemaLogs.push({ name: "Add EM_ANDAMENTO value", status: "SUCCESS", note: "Already exists" });
+            } else {
+                schemaLogs.push({ name: "Add EM_ANDAMENTO value", status: "ERROR", error: e.message });
+            }
+        }
 
         await runSql("Create YardInventory Table", `
             CREATE TABLE IF NOT EXISTS "YardInventory" (

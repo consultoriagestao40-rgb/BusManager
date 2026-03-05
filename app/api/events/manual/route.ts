@@ -75,11 +75,16 @@ export async function POST(request: Request) {
             }
         });
 
-        // 5. Update Yard Inventory status to EM_ANDAMENTO
-        await prisma.yardInventory.updateMany({
-            where: { vehicle_id },
-            data: { status: 'EM_ANDAMENTO' }
-        });
+        // 5. Update Yard Inventory status to EM_ANDAMENTO (Resilient update)
+        try {
+            await prisma.yardInventory.updateMany({
+                where: { vehicle_id },
+                data: { status: 'EM_ANDAMENTO' as any }
+            });
+        } catch (yardError) {
+            console.error('Failed to update yard status but event was created:', yardError);
+            // We don't fail the whole request if only the yard stock update fails
+        }
 
         return NextResponse.json(event);
     } catch (error: any) {
