@@ -107,9 +107,25 @@ export async function createScheduleVersion(
 
             // If already clean, add alert to observation
             const baseObservation = event.observacao_cliente || '';
-            const finalObservation = isAlreadyClean
-                ? `⚠️ Veículo já estava limpo no pátio. ${baseObservation}`.trim()
-                : baseObservation;
+            let finalObservation = baseObservation;
+
+            if (isAlreadyClean && yardStock) {
+                // Try to find cleaner name if available
+                let cleanerName = 'Faxineiro não identificado';
+                if (yardStock.last_cleaner_id) {
+                    const cleanerUser = await tx.user.findUnique({
+                        where: { id: yardStock.last_cleaner_id },
+                        select: { name: true }
+                    });
+                    if (cleanerUser) cleanerName = cleanerUser.name;
+                }
+
+                const cleanedTime = yardStock.last_cleaned_at
+                    ? new Date(yardStock.last_cleaned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                    : '--:--';
+
+                finalObservation = `⚠️ Veículo já estava LIMPO no pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${baseObservation}`.trim();
+            }
 
             let eventToCreate: any = {
                 ...eventData,

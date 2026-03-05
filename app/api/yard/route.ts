@@ -15,14 +15,29 @@ export async function GET() {
 
         const yardItems = await prisma.yardInventory.findMany({
             include: {
-                vehicle: true
+                vehicle: true,
             },
             orderBy: {
                 created_at: 'desc'
             }
         });
 
-        return NextResponse.json({ yardItems });
+        // Enrich with cleaner names
+        const enrichedItems = await Promise.all(yardItems.map(async (item) => {
+            if (!item.last_cleaner_id) return { ...item, last_cleaner_name: null };
+
+            const cleaner = await prisma.user.findUnique({
+                where: { id: item.last_cleaner_id },
+                select: { name: true }
+            });
+
+            return {
+                ...item,
+                last_cleaner_name: cleaner?.name || 'Faxineiro não identificado'
+            };
+        }));
+
+        return NextResponse.json({ yardItems: enrichedItems });
     } catch (error: any) {
         console.error('Yard API GET error:', error);
         return NextResponse.json({ error: `Internal server error: ${error.message}` }, { status: 500 });

@@ -159,12 +159,14 @@ model AuditLog {
 }
 
 model YardInventory {
-  id          String            @id @default(uuid())
-  vehicle_id  String
-  status      YardVehicleStatus @default(SUJO)
-  created_at  DateTime          @default(now())
-  updated_at  DateTime          @updatedAt
-  vehicle     Vehicle           @relation(fields: [vehicle_id], references: [id])
+  id              String            @id @default(uuid())
+  vehicle_id      String
+  status          YardVehicleStatus @default(SUJO)
+  last_cleaned_at DateTime?
+  last_cleaner_id String?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  vehicle         Vehicle           @relation(fields: [vehicle_id], references: [id])
 
   @@index([created_at])
 }

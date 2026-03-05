@@ -428,6 +428,8 @@ export default function DashboardPage() {
                                         <tr className="border-b border-gray-100">
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Faxineiro</th>
+                                            <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Última Limpeza</th>
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso no Pátio</th>
                                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
                                         </tr>
@@ -435,7 +437,7 @@ export default function DashboardPage() {
                                     <tbody className="divide-y divide-gray-50">
                                         {yardItems.length === 0 ? (
                                             <tr>
-                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium">Nenhum veículo no pátio momento.</td>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-medium">Nenhum veículo no pátio momento.</td>
                                             </tr>
                                         ) : (
                                             yardItems.map((item) => (
@@ -449,6 +451,16 @@ export default function DashboardPage() {
                                                             : 'bg-amber-100 text-amber-700'
                                                             }`}>
                                                             {item.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className="text-[11px] font-bold text-gray-600">
+                                                            {item.last_cleaner_name || '--'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className="text-[11px] font-medium text-gray-500">
+                                                            {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "HH:mm 'em' dd/MM", { locale: ptBR }) : '--:--'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4">

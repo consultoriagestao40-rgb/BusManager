@@ -48,7 +48,11 @@ export async function completeEvent(
     // Update Yard Inventory status if vehicle is in yard stock
     await prisma.yardInventory.updateMany({
         where: { vehicle_id: updatedEvent.vehicle_id },
-        data: { status: 'LIMPO' }
+        data: {
+            status: 'LIMPO',
+            last_cleaned_at: updatedEvent.finished_at,
+            last_cleaner_id: updatedEvent.completed_by_user_id
+        }
     });
 
     return updatedEvent;
@@ -84,13 +88,36 @@ export async function swapVehicle(
 
         // Update Event Vehicle if replacement provided
         if (data.replacement_vehicle_id) {
+            // Check if replacement is already clean in yard stock
+            const yardItem = await tx.yardInventory.findFirst({
+                where: { vehicle_id: data.replacement_vehicle_id }
+            });
+
+            const isAlreadyClean = yardItem?.status === 'LIMPO';
+
             await tx.cleaningEvent.update({
                 where: { id: eventId },
                 data: {
-                    vehicle_id: data.replacement_vehicle_id
-                    // Note: SLA times (saida_programada_at) remain unchanged as per requirement
+                    vehicle_id: data.replacement_vehicle_id,
+                    // Automated completion if pre-cleaned
+                    ...(isAlreadyClean ? {
+                        status: 'CONCLUIDO',
+                        finished_at: yardItem.last_cleaned_at || new Date(),
+                        completed_by_user_id: yardItem.last_cleaner_id || userId,
+                        check_interno: true,
+                        check_externo: true,
+                        check_pneus: true,
+                        observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
+                    } : {})
                 }
             });
+
+            // If we use a yard item in a swap, it MUST be removed from inventory
+            if (yardItem) {
+                await tx.yardInventory.delete({
+                    where: { id: yardItem.id }
+                });
+            }
         }
     });
 }
