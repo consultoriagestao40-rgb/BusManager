@@ -191,6 +191,60 @@ export default function DashboardPage() {
         XLSX.writeFile(wb, `cancelados_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
     };
 
+    const exportCompletedToPDF = () => {
+        const doc = new jsPDF('l', 'mm', 'a4'); // Paisagem para caber mais colunas
+        doc.text('Relatório de Veículos Concluídos', 14, 15);
+        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')}`, 14, 22);
+
+        const tableData = filteredCompleted.map((e: any) => [
+            e.vehicle.client_vehicle_number,
+            e.cleaner?.name || '-',
+            e.started_at ? format(new Date(e.started_at), 'HH:mm') : '-',
+            e.finished_at ? format(new Date(e.finished_at), 'HH:mm') : '-',
+            '', // Interno (bolinha)
+            '', // Externo (bolinha)
+            '', // Pneus (bolinha)
+            e.observacao_operacao || '-'
+        ]);
+
+        autoTable(doc, {
+            head: [['Carro', 'Colaborador', 'Início', 'Fim', 'Int.', 'Ext.', 'Pneus', 'Observação']],
+            body: tableData,
+            startY: 28,
+            didDrawCell: (data) => {
+                // Desenhar bolinhas nas colunas 4, 5 e 6
+                if (data.section === 'body' && [4, 5, 6].includes(data.column.index)) {
+                   const event = filteredCompleted[data.row.index];
+                   let checked = false;
+                   if (data.column.index === 4) checked = event.check_interno;
+                   if (data.column.index === 5) checked = event.check_externo;
+                   if (data.column.index === 6) checked = event.check_pneus;
+
+                   const posX = data.cell.x + data.cell.width / 2;
+                   const posY = data.cell.y + data.cell.height / 2;
+
+                   if (checked) {
+                       doc.setFillColor(34, 197, 94); // Verde (tailwind green-500)
+                   } else {
+                       doc.setFillColor(229, 231, 235); // Cinza (tailwind gray-200)
+                   }
+                   doc.circle(posX, posY, 2, 'F');
+                }
+            },
+            styles: { fontSize: 9, cellPadding: 3 },
+            columnStyles: {
+                0: { fontStyle: 'bold' },
+                4: { cellWidth: 15, halign: 'center' },
+                5: { cellWidth: 15, halign: 'center' },
+                6: { cellWidth: 15, halign: 'center' },
+                7: { cellWidth: 'auto' }
+            }
+        });
+
+        doc.save(`concluidos_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
+    };
+
+
     // Main table filtering
     const filteredEvents = events.filter((e: any) => {
         const searchLower = mainSearch.toLowerCase();
@@ -804,7 +858,7 @@ export default function DashboardPage() {
                                 </button>
                             </div>
 
-                            <div className="flex gap-3 items-center">
+                            <div className="flex gap-3 items-center flex-1">
                                 <Search size={18} className="text-gray-400" />
                                 <input
                                     type="text"
@@ -813,6 +867,12 @@ export default function DashboardPage() {
                                     onChange={(e) => setCompletedSearch(e.target.value)}
                                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                 />
+                                <button
+                                    onClick={exportCompletedToPDF}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2"
+                                >
+                                    <FileText size={16} /> PDF
+                                </button>
                             </div>
                         </div>
 
