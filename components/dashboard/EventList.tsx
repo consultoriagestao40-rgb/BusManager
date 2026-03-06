@@ -20,9 +20,10 @@ interface Event {
 
 interface EventListProps {
     events: Event[];
+    userRole?: string;
 }
 
-export default function EventDashboardList({ events }: EventListProps) {
+export default function EventDashboardList({ events, userRole }: EventListProps) {
     const router = useRouter();
     const [now, setNow] = useState(new Date());
     const [searchTerm, setSearchTerm] = useState('');
@@ -324,16 +325,18 @@ export default function EventDashboardList({ events }: EventListProps) {
                                             type="checkbox"
                                             checked={event.at_yard}
                                             onChange={(e) => {
+                                                if (userRole === 'CLIENT') return;
                                                 e.stopPropagation();
                                                 handleActionTrigger(event, 'at-yard');
                                             }}
-                                            className="w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                            className={`w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 ${userRole === 'CLIENT' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                                            disabled={userRole === 'CLIENT'}
                                         />
                                     </div>
 
                                     {/* Ações */}
                                     <div className="text-right">
-                                        {!isCancelled && (
+                                        {!isCancelled && userRole !== 'CLIENT' && (
                                             <div className="relative inline-block">
                                                 <button
                                                     onClick={() => setShowMenu(showMenu === event.id ? null : event.id)}

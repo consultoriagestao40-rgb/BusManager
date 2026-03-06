@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -21,6 +22,23 @@ export default function DashboardPage() {
     const [newVehicleNumber, setNewVehicleNumber] = useState('');
     const [newVehicleStatus, setNewVehicleStatus] = useState<'SUJO' | 'LIMPO'>('SUJO');
     const [autoOpenEventId, setAutoOpenEventId] = useState<string | null>(null);
+    const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+    const router = useRouter();
+
+    const fetchUser = async () => {
+        try {
+            const res = await fetch('/api/auth/me');
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+            } else {
+                router.push('/login');
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+        }
+    };
+    const canEdit = user?.role !== 'CLIENT';
 
     const fetchEvents = async () => {
         // Don't set loading to true on background refreshes if we already have data
@@ -60,9 +78,15 @@ export default function DashboardPage() {
     };
 
     useEffect(() => {
-        fetchEvents();
-        if (activeTab === 'yard') fetchYardItems();
-    }, [currentDate, activeTab]); // Re-run when date or tab changes
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            fetchEvents();
+            if (activeTab === 'yard') fetchYardItems();
+        }
+    }, [currentDate, activeTab, user]); // Re-run when date or tab changes
 
     const handlePrevDay = () => setCurrentDate(prev => subDays(prev, 1));
     const handleNextDay = () => setCurrentDate(prev => addDays(prev, 1));
@@ -311,9 +335,11 @@ export default function DashboardPage() {
                         </div>
                         <button onClick={handleNextDay} className="p-1 hover:bg-gray-100 rounded-lg"><ChevronRight size={20} /></button>
                     </div>
-                    <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
-                        Nova Importação
-                    </a>
+                    {canEdit && (
+                        <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
+                            Nova Importação
+                        </a>
+                    )}
                 </div>
 
                 {/* Original Colored Metric Cards (Vibrant like Foto 02) */}
@@ -399,39 +425,40 @@ export default function DashboardPage() {
                 ) : (
                     /* Yard Inventory Content */
                     <div className="space-y-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">Cadastrar Veículo no Pátio</h3>
-                            <form onSubmit={handleAddYardVehicle} className="flex flex-col md:flex-row gap-4 items-end">
-                                <div className="space-y-1.5 flex-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Número do Carro</label>
-                                    <input
-                                        type="text"
-                                        value={newVehicleNumber}
-                                        onChange={(e) => setNewVehicleNumber(e.target.value)}
-                                        placeholder="Ex: 2700"
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
-                                    />
-                                </div>
-                                <div className="space-y-1.5 w-40">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
-                                    <select
-                                        value={newVehicleStatus}
-                                        onChange={(e) => setNewVehicleStatus(e.target.value as any)}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                        {canEdit && (
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-800 mb-4">Cadastrar Veículo no Pátio</h3>
+                                <form onSubmit={handleAddYardVehicle} className="flex flex-col md:flex-row gap-4 items-end">
+                                    <div className="space-y-1.5 flex-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Número do Carro</label>
+                                        <input
+                                            type="text"
+                                            value={newVehicleNumber}
+                                            onChange={(e) => setNewVehicleNumber(e.target.value)}
+                                            placeholder="Ex: 2700"
+                                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5 w-40">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
+                                        <select
+                                            value={newVehicleStatus}
+                                            onChange={(e) => setNewVehicleStatus(e.target.value as any)}
+                                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                                        >
+                                            <option value="SUJO">Sujo</option>
+                                            <option value="LIMPO">Limpo</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-black hover:bg-blue-700 transition-all shadow-md shadow-blue-100"
                                     >
-                                        <option value="SUJO">Sujo</option>
-                                        <option value="LIMPO">Limpo</option>
-                                    </select>
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-black hover:bg-blue-700 transition-all shadow-md shadow-blue-100"
-                                >
-                                    Adicionar ao Pátio
-                                </button>
-                            </form>
-                        </div>
-
+                                        Adicionar ao Pátio
+                                    </button>
+                                </form>
+                            </div>
+                        )}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                                 <h3 className="font-black text-gray-800 uppercase tracking-widest text-xs">Veículos no Pátio</h3>
@@ -486,22 +513,26 @@ export default function DashboardPage() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right flex justify-end gap-3 items-center">
-                                                        <button
-                                                            onClick={() => handleManualProgram(item.vehicle.id)}
-                                                            disabled={item.status === 'EM_ANDAMENTO'}
-                                                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${item.status === 'EM_ANDAMENTO'
-                                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
-                                                                }`}
-                                                        >
-                                                            <Play size={10} fill="currentColor" /> Programar
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleRemoveYardVehicle(item.id)}
-                                                            className="text-red-500 hover:text-red-700 text-[10px] font-black uppercase tracking-wider"
-                                                        >
-                                                            Remover
-                                                        </button>
+                                                        {canEdit && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleManualProgram(item.vehicle.id)}
+                                                                    disabled={item.status === 'EM_ANDAMENTO'}
+                                                                    className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${item.status === 'EM_ANDAMENTO'
+                                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                        }`}
+                                                                >
+                                                                    <Play size={10} fill="currentColor" /> Programar
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRemoveYardVehicle(item.id)}
+                                                                    className="text-red-500 hover:text-red-700 text-[10px] font-black uppercase tracking-wider"
+                                                                >
+                                                                    Remover
+                                                                </button>
+                                                            </>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))

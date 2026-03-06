@@ -18,6 +18,9 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
+        }
         const event = await prisma.cleaningEvent.findUnique({
             where: { id }
         });

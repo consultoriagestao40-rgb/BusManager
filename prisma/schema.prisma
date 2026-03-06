@@ -182,6 +182,7 @@ enum Role {
   OPERATOR
   SUPERVISOR
   ADMIN
+  CLIENT
 }
 
 enum ImportStatus {

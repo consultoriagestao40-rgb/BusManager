@@ -72,6 +72,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
+        }
+
         const { vehicle_number, status } = await request.json();
 
         if (!vehicle_number) {
@@ -128,6 +132,10 @@ export async function DELETE(request: Request) {
 
         if (!user || user.role === 'OPERATOR') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);

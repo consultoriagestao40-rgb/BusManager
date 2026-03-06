@@ -17,7 +17,7 @@ interface Event {
     event_business_key?: string;
 }
 
-export default function WebEventList({ events, autoOpenEventId }: { events: Event[], autoOpenEventId?: string | null }) {
+export default function WebEventList({ events, autoOpenEventId, userRole }: { events: Event[], autoOpenEventId?: string | null, userRole?: string }) {
     const [now, setNow] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -185,26 +185,31 @@ export default function WebEventList({ events, autoOpenEventId }: { events: Even
                                         <input
                                             type="checkbox"
                                             checked={event.at_yard}
-                                            onChange={() => handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
-                                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                            onChange={() => userRole !== 'CLIENT' && handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
+                                            className={`w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${userRole === 'CLIENT' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                                            disabled={userRole === 'CLIENT'}
                                         />
-                                    </td>
+                                                                            </td>
                                     <td className="py-4 px-4 text-center">
                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${event.status === 'CONCLUIDO' ? 'bg-green-100 text-green-700' :
                                             event.status === 'EM_ANDAMENTO' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
                                             }`}>
                                             {event.status}
                                         </span>
-                                    </td>
+                                                                            </td>
                                     <td className="py-4 px-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            {event.status === 'PREVISTO' && (
-                                                <button onClick={() => { setSelectedEvent(event); setStartModalOpen(true); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><Play className="w-5 h-5" /></button>
+                                            {userRole !== 'CLIENT' && (
+                                                <>
+                                                    {event.status === 'PREVISTO' && (
+                                                        <button onClick={() => { setSelectedEvent(event); setStartModalOpen(true); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><Play className="w-5 h-5" /></button>
+                                                    )}
+                                                    {event.status === 'EM_ANDAMENTO' && (
+                                                        <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
+                                                    )}
+                                                                                                        <button onClick={() => { setSelectedEvent(event); setSwapModalOpen(true); }} className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg"><RefreshCw className="w-5 h-5" /></button>
+                                                </>
                                             )}
-                                            {event.status === 'EM_ANDAMENTO' && (
-                                                <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
-                                            )}
-                                            <button onClick={() => { setSelectedEvent(event); setSwapModalOpen(true); }} className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg"><RefreshCw className="w-5 h-5" /></button>
                                         </div>
                                     </td>
                                 </tr>

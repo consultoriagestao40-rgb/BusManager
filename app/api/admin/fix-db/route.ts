@@ -43,6 +43,7 @@ export async function GET(request: Request) {
         }
 
         // 2. Schema Sync
+        await runSql("Add CLIENT role", `ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'CLIENT';`);
         await runSql("Add at_yard column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
         await runSql("Add revisar column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "revisar" BOOLEAN DEFAULT false;`);
 

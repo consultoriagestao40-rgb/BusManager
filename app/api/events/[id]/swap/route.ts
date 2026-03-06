@@ -17,6 +17,10 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
+        }
+        
         let { replacementVehicleNumber, motivo, observacao } = await request.json();
 
         if (!replacementVehicleNumber || !motivo) {
