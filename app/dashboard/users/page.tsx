@@ -143,7 +143,8 @@ export default function UsersPage() {
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                             ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
                                                 user.role === 'SUPERVISOR' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-gray-100 text-gray-800'}`}>
+                                                    user.role === 'CLIENT' ? 'bg-orange-100 text-orange-800' :
+                                                        'bg-gray-100 text-gray-800'}`}>
                                             {user.role}
                                         </span>
                                     </td>
@@ -226,6 +227,7 @@ export default function UsersPage() {
                                     <option value="OPERATOR">Operador</option>
                                     <option value="SUPERVISOR">Supervisor</option>
                                     <option value="ADMIN">Administrador</option>
+                                    <option value="CLIENT">Cliente</option>
                                 </select>
                             </div>
 
