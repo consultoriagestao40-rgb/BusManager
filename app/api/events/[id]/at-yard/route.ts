@@ -18,9 +18,9 @@ export async function POST(
         }
 
         if (user.role === 'CLIENT') {
-            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
+            return NextResponse.json({ error: 'Acesso negado: Seu perfil possui apenas permissão de visualização. Contate um administrador para maiores permissões.' }, { status: 403 });
         }
-        
+
         const { at_yard } = await request.json();
 
         if (typeof at_yard !== 'boolean') {

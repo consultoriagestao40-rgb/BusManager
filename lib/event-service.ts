@@ -42,7 +42,8 @@ export async function completeEvent(
             check_interno: data.check_interno,
             check_externo: data.check_externo,
             check_pneus: data.check_pneus,
-            observacao_operacao: data.observacao_operacao
+            observacao_operacao: data.observacao_operacao,
+            at_yard: true
         }
     });
 
@@ -100,6 +101,7 @@ export async function swapVehicle(
                 where: { id: eventId },
                 data: {
                     vehicle_id: data.replacement_vehicle_id,
+                    at_yard: true,
                     // Automated completion if pre-cleaned
                     ...(isAlreadyClean ? {
                         status: 'CONCLUIDO',

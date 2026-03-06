@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         }
 
         if (user.role === 'CLIENT') {
-            return NextResponse.json({ error: 'Acesso negado: Perfil de visualização apenas.' }, { status: 403 });
+            return NextResponse.json({ error: 'Acesso negado: Seu perfil possui apenas permissão de visualização. Contate um administrador para maiores permissões.' }, { status: 403 });
         }
 
         const { vehicle_id, empresa, motorista, observacao } = await request.json();

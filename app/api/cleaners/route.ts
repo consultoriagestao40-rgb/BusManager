@@ -36,6 +36,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Seu perfil possui apenas permissão de visualização. Contate um administrador para maiores permissões.' }, { status: 403 });
+        }
+
         const { name } = await request.json();
 
         if (!name) {
@@ -62,6 +66,10 @@ export async function PUT(request: Request) {
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Seu perfil possui apenas permissão de visualização. Contate um administrador para maiores permissões.' }, { status: 403 });
         }
 
         const { id, name, active } = await request.json();
@@ -94,6 +102,10 @@ export async function DELETE(request: Request) {
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (user.role === 'CLIENT') {
+            return NextResponse.json({ error: 'Acesso negado: Seu perfil possui apenas permissão de visualização. Contate um administrador para maiores permissões.' }, { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);

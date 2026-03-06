@@ -29,10 +29,10 @@ export default function Sidebar() {
     };
 
     const allMenuItems = [
-        { name: 'Operação', href: '/dashboard', icon: Home, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
+        { name: 'Operação', href: '/dashboard', icon: Home, roles: ['ADMIN', 'OPERATOR', 'MANAGER', 'CLIENT'] },
         { name: 'Importar', href: '/dashboard/import', icon: Upload, roles: ['ADMIN', 'MANAGER'] },
-        { name: 'KPIs', href: '/dashboard/kpi', icon: TrendingUp, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
-        { name: 'Histórico', href: '/dashboard/history', icon: History, roles: ['ADMIN', 'MANAGER'] },
+        { name: 'KPIs', href: '/dashboard/kpi', icon: TrendingUp, roles: ['ADMIN', 'OPERATOR', 'MANAGER', 'CLIENT'] },
+        { name: 'Histórico', href: '/dashboard/history', icon: History, roles: ['ADMIN', 'MANAGER', 'CLIENT'] },
         { name: 'Colaboradores', href: '/dashboard/cleaners', icon: Users, roles: ['ADMIN', 'OPERATOR', 'MANAGER'] },
         { name: 'Usuários', href: '/dashboard/users', icon: Settings, roles: ['ADMIN'] },
         { name: 'Configurações', href: '/dashboard/settings', icon: Settings, roles: ['ADMIN'] },

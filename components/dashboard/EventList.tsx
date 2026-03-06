@@ -124,7 +124,8 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
                 alert('Ação registrada com sucesso!');
                 window.location.reload();
             } else {
-                alert('Erro ao processar ação');
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.error || 'Erro ao processar ação');
             }
         } catch (e) {
             console.error(e);
@@ -144,11 +145,11 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
             });
 
             if (res.ok) {
-                alert('Carro programado com sucesso!');
+                alert('Reforço solicitado do pátio com sucesso!');
                 window.location.reload();
             } else {
-                const err = await res.json();
-                alert(err.error || 'Erro ao programar');
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.error || 'Erro ao programar');
             }
         } catch (e) {
             console.error(e);
