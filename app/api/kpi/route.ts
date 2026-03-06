@@ -141,7 +141,7 @@ export async function GET(request: Request) {
         let accCompleted = 0;
 
         const cumulativeStats = dailyStats.map(day => {
-            accTotal += day.total;
+            accTotal += (day.total - day.cancelled);
             accCompleted += day.completed;
             return {
                 date: day.date,
