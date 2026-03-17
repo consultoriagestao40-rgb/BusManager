@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
+import { startOfDay, addDays, subDays, isSameDay, format, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
@@ -157,7 +157,11 @@ export default function DashboardPage() {
     const cleanYardItemsFormatted = yardItems.filter((item: any) => {
         if (item.status !== 'LIMPO') return false;
         const cleanDate = item.last_cleaned_at || item.updated_at;
-        return cleanDate && isSameDay(new Date(cleanDate), currentDate);
+        if (!cleanDate) return false;
+        
+        // Normalize to Brazil Time (-3) to match KPI logic
+        const brazilDate = subHours(new Date(cleanDate), 3);
+        return isSameDay(brazilDate, currentDate);
     }).map((item: any) => ({
         id: item.id,
         vehicle: item.vehicle,
@@ -345,7 +349,11 @@ export default function DashboardPage() {
     const cleanYardItems = yardItems.filter((item: any) => {
         if (item.status !== 'LIMPO') return false;
         const cleanDate = item.last_cleaned_at || item.updated_at;
-        return cleanDate && isSameDay(new Date(cleanDate), currentDate);
+        if (!cleanDate) return false;
+        
+        // Normalize to Brazil Time (-3) to match KPI logic
+        const brazilDate = subHours(new Date(cleanDate), 3);
+        return isSameDay(brazilDate, currentDate);
     }).map((item: any) => ({
         id: item.id,
         vehicle_number: item.vehicle.client_vehicle_number,

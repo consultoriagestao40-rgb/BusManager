@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserFromToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
-import { parseISO, startOfDay, endOfDay, subDays, differenceInMinutes, format, subHours } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, subDays, differenceInMinutes, format, subHours, isSameDay } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -104,18 +104,20 @@ export async function GET(request: Request) {
             }
         });
  
-        // 2b. Add cleanings from Yard Inventory (that might not have events)
         yardCleanings.forEach((item: any) => {
             // Normalize to Brazil Time (-3) to match Dashboard card logic
             const cleanDate = item.last_cleaned_at || item.updated_at;
             if (!cleanDate) return;
             
-            const brazilDate = subHours(new Date(cleanDate), 3);
+            const rawCleanDate = new Date(cleanDate);
+            const brazilDate = subHours(rawCleanDate, 3);
             const dateKey = format(brazilDate, 'yyyy-MM-dd');
-            if (dateKey < format(start, 'yyyy-MM-dd') || dateKey > format(end, 'yyyy-MM-dd')) return;
+            
+            // Check if this cleaning falls within the requested period
+            if (brazilDate < start || brazilDate > end) return;
 
-            // VIRTUAL OVERRIDE: Skip if there's an active event for this vehicle today
-            // This matches the Dashboard's logic: if it's programmed, it's NOT shown as "clean" in the count
+            // VIRTUAL OVERRIDE: Skip if there's an active event for this vehicle TODAY
+            // We use dateKey to find the active events for that specific "Brazil Day"
             if (activeEventsByDay.get(dateKey)?.has(item.vehicle_id)) {
                 return;
             }
