@@ -299,10 +299,10 @@ export default function DashboardPage() {
 
         yardItems.forEach((item: any) => {
             const rowData = [
-                item.client_vehicle_number,
+                item.vehicle?.client_vehicle_number || '-',
                 item.status || 'PENDENTE',
-                item.last_cleaning ? format(new Date(item.last_cleaning), "dd/MM/yyyy HH:mm") : '-',
-                item.cleaner_name || '-'
+                item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM/yyyy HH:mm") : '-',
+                item.last_cleaner_name || '-'
             ];
             tableRows.push(rowData);
         });
@@ -1125,11 +1125,11 @@ export default function DashboardPage() {
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {yardItems.filter((item: any) => 
-                                            item.client_vehicle_number?.toString().includes(totalYardSearch)
+                                            item.vehicle?.client_vehicle_number?.toString().toLowerCase().includes(totalYardSearch.toLowerCase())
                                         ).map((item: any) => (
                                             <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-4 py-3">
-                                                    <span className="text-base font-black text-gray-800">{item.client_vehicle_number}</span>
+                                                    <span className="text-base font-black text-gray-800">{item.vehicle?.client_vehicle_number}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
@@ -1139,10 +1139,10 @@ export default function DashboardPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.last_cleaning ? format(new Date(item.last_cleaning), "dd/MM/yyyy HH:mm") : '-'}
+                                                    {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM/yyyy HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
-                                                    {item.cleaner_name || '-'}
+                                                    {item.last_cleaner_name || '-'}
                                                 </td>
                                             </tr>
                                         ))}
