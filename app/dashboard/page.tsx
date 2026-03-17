@@ -294,14 +294,15 @@ export default function DashboardPage() {
 
     const exportTotalYardToPDF = () => {
         const doc = new jsPDF() as any;
-        const tableColumn = ["Veículo", "Status", "Última Limpeza", "Colaborador"];
+        const tableColumn = ["Veículo", "Ingresso", "Status", "Última Limpeza", "Colaborador"];
         const tableRows: any[] = [];
 
         yardItems.forEach((item: any) => {
             const rowData = [
                 item.vehicle?.client_vehicle_number || '-',
+                item.created_at ? format(new Date(item.created_at), "dd/MM HH:mm") : '-',
                 item.status || 'PENDENTE',
-                item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM/yyyy HH:mm") : '-',
+                item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM HH:mm") : '-',
                 item.last_cleaner_name || '-'
             ];
             tableRows.push(rowData);
@@ -1118,6 +1119,7 @@ export default function DashboardPage() {
                                     <thead>
                                         <tr>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Última Limpeza</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
@@ -1131,6 +1133,9 @@ export default function DashboardPage() {
                                                 <td className="px-4 py-3">
                                                     <span className="text-base font-black text-gray-800">{item.vehicle?.client_vehicle_number}</span>
                                                 </td>
+                                                <td className="px-4 py-3 text-sm text-gray-500 font-bold">
+                                                    {item.created_at ? format(new Date(item.created_at), "dd/MM HH:mm") : '-'}
+                                                </td>
                                                 <td className="px-4 py-3">
                                                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                                                         item.status === 'LIMPO' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
@@ -1139,7 +1144,7 @@ export default function DashboardPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM/yyyy HH:mm") : '-'}
+                                                    {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "dd/MM HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
                                                     {item.last_cleaner_name || '-'}
