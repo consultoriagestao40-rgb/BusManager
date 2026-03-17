@@ -504,6 +504,10 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Limpos no Pátio</p>
                         <p className="text-4xl font-black text-emerald-800">{cleanYardItems.length}</p>
                     </div>
+                    <div className="bg-[#EFF6FF] p-5 rounded-2xl border-l-[6px] border-blue-500 shadow-xl shadow-blue-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setActiveTab('yard')}>
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total no Pátio</p>
+                        <p className="text-4xl font-black text-blue-800">{yardItems.length}</p>
+                    </div>
                 </div>
 
                 {/* Tab Switcher */}
