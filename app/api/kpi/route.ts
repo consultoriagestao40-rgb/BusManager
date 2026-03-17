@@ -90,28 +90,16 @@ export async function GET(request: Request) {
                         stats.delayed += 1;
                     }
                 }
-
-                // Identify Yard Cleanings from Events (Strict Manual Logic)
-                const isManualEvent = event.empresa === 'MANUAL' || 
-                                    (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('pátio')) ||
-                                    (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('sem escala'));
-                
-                if (isManualEvent) {
-                    if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
-                    yardCleaningsByDay.get(dateKey)?.add(event.vehicle_id);
-                }
             } else if (event.status === 'CANCELADO') {
                 stats.cancelled += 1;
             } else {
                 stats.not_completed += 1;
             }
-            
-            // Note: We'll count swaps separately below from allSwaps
         });
  
         // 2b. Add cleanings from Yard Inventory (that might not have events)
         yardCleanings.forEach((item: any) => {
-            const cleanDate = item.last_cleaned_at || item.updated_at || item.created_at;
+            const cleanDate = item.last_cleaned_at || item.updated_at;
             if (!cleanDate) return;
             
             const dateKey = format(new Date(cleanDate), 'yyyy-MM-dd');
