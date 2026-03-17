@@ -33,12 +33,12 @@ export async function GET(request: Request) {
                 data_viagem: {
                     gte: start,
                     lte: end
-                },
-                schedule_version: { is_active: true }
+                }
             },
             include: {
                 cleaner: true,
-                swaps: true
+                swaps: true,
+                schedule_version: true
             }
         });
 
@@ -72,32 +72,36 @@ export async function GET(request: Request) {
         events.forEach((event: any) => {
             const dateKey = format(new Date(event.data_viagem), 'yyyy-MM-dd');
 
-            if (!dailyMap.has(dateKey)) {
-                dailyMap.set(dateKey, {
-                    date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
-                    cancelled: 0, not_completed: 0, effective_total: 0, 
-                    achievement_rate: 0, yard_cleanings: 0
-                });
-            }
-
-            const stats = dailyMap.get(dateKey);
-            stats.total += 1;
-
-            if (event.status === 'CONCLUIDO') {
-                stats.completed += 1;
-
-                if (event.finished_at && event.liberar_ate_at) {
-                    if (new Date(event.finished_at) > new Date(event.liberar_ate_at)) {
-                        stats.delayed += 1;
-                    }
+            // 1. Aggregation for active schedule version (The Chart Bars)
+            if (event.schedule_version?.is_active) {
+                if (!dailyMap.has(dateKey)) {
+                    dailyMap.set(dateKey, {
+                        date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
+                        cancelled: 0, not_completed: 0, effective_total: 0, 
+                        achievement_rate: 0, yard_cleanings: 0
+                    });
                 }
-            } else if (event.status === 'CANCELADO') {
-                stats.cancelled += 1;
-            } else {
-                stats.not_completed += 1;
+
+                const stats = dailyMap.get(dateKey);
+                stats.total += 1;
+
+                if (event.status === 'CONCLUIDO') {
+                    stats.completed += 1;
+
+                    if (event.finished_at && event.liberar_ate_at) {
+                        if (new Date(event.finished_at) > new Date(event.liberar_ate_at)) {
+                            stats.delayed += 1;
+                        }
+                    }
+                } else if (event.status === 'CANCELADO') {
+                    stats.cancelled += 1;
+                } else {
+                    stats.not_completed += 1;
+                }
             }
 
-            // Track active/in-progress events to override yard status
+            // 2. Track ALL pending/in-progress events regardless of version (for Yard Override)
+            // This is what ensures parity with the Dashboard Yard count
             if (['PREVISTO', 'EM_ANDAMENTO'].includes(event.status)) {
                 if (!activeEventsByDay.has(dateKey)) activeEventsByDay.set(dateKey, new Set());
                 activeEventsByDay.get(dateKey)?.add(event.vehicle_id);
@@ -172,7 +176,8 @@ export async function GET(request: Request) {
         let countDuration = 0;
 
         events.forEach((event: any) => {
-            if (event.status === 'CONCLUIDO' && event.started_at && event.finished_at) {
+            // Performance stats only for the active version too
+            if (event.schedule_version?.is_active && event.status === 'CONCLUIDO' && event.started_at && event.finished_at) {
                 const duration = differenceInMinutes(new Date(event.finished_at), new Date(event.started_at));
 
                 if (duration > 0 && duration < 600) { // Filter outliers > 10h
@@ -206,7 +211,7 @@ export async function GET(request: Request) {
 
         const monthlyMap = new Map();
         events.forEach((event: any) => {
-            if (event.status === 'CONCLUIDO') {
+            if (event.schedule_version?.is_active && event.status === 'CONCLUIDO') {
                 const monthKey = format(new Date(event.data_viagem), 'yyyy-MM');
                 monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + 1);
             }
