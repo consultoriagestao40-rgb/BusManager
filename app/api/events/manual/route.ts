@@ -72,6 +72,7 @@ export async function POST(request: Request) {
                 motorista: motorista || '-',
                 observacao_cliente: observacao || 'Adicionado manualmente do pátio',
                 observacao_operacao: 'Sem Escala, carro do pátio',
+                at_yard: true,
                 event_business_key: `MANUAL-${vehicle_id}-${Date.now()}`
             },
             include: {

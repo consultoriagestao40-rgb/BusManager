@@ -7,8 +7,7 @@ export async function startEvent(eventId: string, userId: string) {
         data: {
             status: 'EM_ANDAMENTO',
             started_at: new Date(),
-            started_by_user_id: userId,
-            at_yard: true
+            started_by_user_id: userId
         }
     });
 }
@@ -42,8 +41,7 @@ export async function completeEvent(
             check_interno: data.check_interno,
             check_externo: data.check_externo,
             check_pneus: data.check_pneus,
-            observacao_operacao: data.observacao_operacao,
-            at_yard: true
+            observacao_operacao: data.observacao_operacao
         }
     });
 
@@ -101,7 +99,6 @@ export async function swapVehicle(
                 where: { id: eventId },
                 data: {
                     vehicle_id: data.replacement_vehicle_id,
-                    at_yard: true,
                     // Automated completion if pre-cleaned
                     ...(isAlreadyClean ? {
                         status: 'CONCLUIDO',
