@@ -58,7 +58,8 @@ export async function GET(request: Request) {
                     cancelled: 0,
                     not_completed: 0,
                     effective_total: 0,
-                    achievement_rate: 0
+                    achievement_rate: 0,
+                    yard_cleanings: 0
                 });
             }
 
@@ -72,6 +73,10 @@ export async function GET(request: Request) {
                     if (new Date(event.finished_at) > new Date(event.liberar_ate_at)) {
                         stats.delayed += 1;
                     }
+                }
+
+                if (event.at_yard) {
+                    stats.yard_cleanings += 1;
                 }
             } else if (event.status === 'CANCELADO') {
                 stats.cancelled += 1;
