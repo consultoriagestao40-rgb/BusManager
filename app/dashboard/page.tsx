@@ -154,7 +154,11 @@ export default function DashboardPage() {
         origin: e.at_yard ? 'Pátio' : 'Escala'
     }));
 
-    const cleanYardItemsFormatted = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+    const cleanYardItemsFormatted = yardItems.filter((item: any) => {
+        if (item.status !== 'LIMPO') return false;
+        const cleanDate = item.last_cleaned_at || item.updated_at;
+        return cleanDate && isSameDay(new Date(cleanDate), currentDate);
+    }).map((item: any) => ({
         id: item.id,
         vehicle: item.vehicle,
         cleaner: { name: item.last_cleaner_name },
@@ -338,7 +342,11 @@ export default function DashboardPage() {
         doc.save(`trocas_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
     };
 
-    const cleanYardItems = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+    const cleanYardItems = yardItems.filter((item: any) => {
+        if (item.status !== 'LIMPO') return false;
+        const cleanDate = item.last_cleaned_at || item.updated_at;
+        return cleanDate && isSameDay(new Date(cleanDate), currentDate);
+    }).map((item: any) => ({
         id: item.id,
         vehicle_number: item.vehicle.client_vehicle_number,
         cleaner_name: item.last_cleaner_name || '--',

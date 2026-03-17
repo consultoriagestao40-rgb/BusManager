@@ -101,7 +101,10 @@ export async function POST(request: Request) {
         if (existing) {
             const updated = await prisma.yardInventory.update({
                 where: { id: existing.id },
-                data: { status: status || 'SUJO' },
+                data: { 
+                    status: status || 'SUJO',
+                    last_cleaned_at: status === 'LIMPO' ? new Date() : existing.last_cleaned_at
+                },
                 include: { vehicle: true }
             });
             return NextResponse.json(updated);
