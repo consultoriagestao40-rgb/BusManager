@@ -52,24 +52,18 @@ export async function GET(request: Request) {
             }
         });
 
-        // 2. Aggregate Daily Stats
+        // 2. Aggregate Daily Stats (Updated with robust logic)
         const dailyMap = new Map();
+        const yardCleaningsByDay = new Map<string, Set<string>>();
 
         events.forEach((event: any) => {
             const dateKey = format(new Date(event.data_viagem), 'yyyy-MM-dd');
 
             if (!dailyMap.has(dateKey)) {
                 dailyMap.set(dateKey, {
-                    date: dateKey,
-                    total: 0,
-                    completed: 0,
-                    delayed: 0,
-                    swaps: 0,
-                    cancelled: 0,
-                    not_completed: 0,
-                    effective_total: 0,
-                    achievement_rate: 0,
-                    yard_cleanings: 0
+                    date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
+                    cancelled: 0, not_completed: 0, effective_total: 0, 
+                    achievement_rate: 0, yard_cleanings: 0
                 });
             }
 
@@ -85,38 +79,52 @@ export async function GET(request: Request) {
                     }
                 }
 
-                if (event.at_yard) {
-                    const isManual = event.empresa === 'MANUAL' || 
-                                   (event.observacao_cliente && event.observacao_cliente.includes('Sem Escala')) ||
-                                   (event.observacao_operacao && event.observacao_operacao.includes('Sem Escala'));
-                    if (isManual) {
-                        stats.yard_cleanings += 1;
-                    }
+                // Identify Yard Cleanings from Events
+                const isManual = event.empresa === 'MANUAL' || 
+                               (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('pátio')) ||
+                               (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('sem escala'));
+                
+                if (isManual || event.at_yard) {
+                    if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
+                    yardCleaningsByDay.get(dateKey)?.add(event.vehicle_id);
                 }
             } else if (event.status === 'CANCELADO') {
                 stats.cancelled += 1;
             } else {
-                // PREVISTO or EM_ANDAMENTO
                 stats.not_completed += 1;
             }
 
-             if (event.swaps && event.swaps.length > 0) {
-                 stats.swaps += event.swaps.length;
-             }
-         });
- 
-         yardCleanings.forEach((item: any) => {
-             const dateKey = format(new Date(item.last_cleaned_at), 'yyyy-MM-dd');
-             if (!dailyMap.has(dateKey)) {
-                 dailyMap.set(dateKey, {
-                     date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
-                     cancelled: 0, not_completed: 0, effective_total: 0, 
-                     achievement_rate: 0, yard_cleanings: 0
-                 });
-             }
-             const stats = dailyMap.get(dateKey);
-             stats.yard_cleanings += 1;
-         });
+            if (event.swaps && event.swaps.length > 0) {
+                stats.swaps += event.swaps.length;
+            }
+        });
+
+        // 2b. Add cleanings from Yard Inventory (that might not have events)
+        yardCleanings.forEach((item: any) => {
+            const cleanDate = item.last_cleaned_at || item.updated_at || item.created_at;
+            if (!cleanDate) return;
+            
+            const dateKey = format(new Date(cleanDate), 'yyyy-MM-dd');
+            if (dateKey < format(start, 'yyyy-MM-dd') || dateKey > format(end, 'yyyy-MM-dd')) return;
+
+            if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
+            yardCleaningsByDay.get(dateKey)?.add(item.vehicle_id);
+            
+            // Ensure day exists in dailyMap
+            if (!dailyMap.has(dateKey)) {
+                dailyMap.set(dateKey, {
+                    date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
+                    cancelled: 0, not_completed: 0, effective_total: 0, 
+                    achievement_rate: 0, yard_cleanings: 0
+                });
+            }
+        });
+
+        // 2c. Finalize yard_cleanings counts
+        yardCleaningsByDay.forEach((vehicles, dateKey) => {
+            const stats = dailyMap.get(dateKey);
+            if (stats) stats.yard_cleanings = vehicles.size;
+        });
 
         const dailyStats = Array.from(dailyMap.values()).map(day => {
             const effective = day.total - day.cancelled;

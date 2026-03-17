@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { parseISO, startOfDay, endOfDay } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, format } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -120,7 +120,37 @@ export async function GET(request: Request) {
             modelNames: Object.keys(prisma).filter(k => !k.startsWith('$') && !k.startsWith('_'))
         };
 
-        const html = `
+        const yardCleanItems = await prisma.yardInventory.findMany({
+            where: { status: 'LIMPO' },
+            include: { vehicle: true }
+        });
+
+        const yardDataHtml = `
+            <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+                <thead>
+                    <tr style="background:#f1f5f9;">
+                        <th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">Carro</th>
+                        <th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">last_cleaned_at</th>
+                        <th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">Today?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${yardCleanItems.map((item: any) => {
+                        const date = item.last_cleaned_at ? new Date(item.last_cleaned_at).toLocaleString() : 'NULL';
+                        const isToday = item.last_cleaned_at && format(new Date(item.last_cleaned_at), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+                        return `
+                            <tr>
+                                <td style="padding:8px; border:1px solid #e2e8f0;">${item.vehicle.client_vehicle_number}</td>
+                                <td style="padding:8px; border:1px solid #e2e8f0;">${date}</td>
+                                <td style="padding:8px; border:1px solid #e2e8f0;">${isToday ? '✅' : '❌'}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+
+        let html = `
             <!DOCTYPE html>
             <html>
                 <head>
@@ -185,6 +215,11 @@ export async function GET(request: Request) {
                         <p>Client recognizes <b>yardInventory</b>: <span class="status ${prismaCheck.hasYardInventory ? 'success' : 'error'}">${prismaCheck.hasYardInventory ? 'YES' : 'NO'}</span></p>
                         <p style="margin-top: 15px; font-size: 14px; color: #64748b;">Active Models:</p>
                         <pre>${prismaCheck.modelNames.join(', ')}</pre>
+                    </div>
+
+                    <div class="section">
+                        <h2>5. Yard Data Diagnostics (LIMPO total)</h2>
+                        ${yardDataHtml}
                     </div>
 
                     <div class="section" style="background: #eff6ff; border: 1px solid #bfdbfe;">
