@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import { jsPDF } from 'jspdf';
@@ -104,6 +104,19 @@ export default function DashboardPage() {
     };
 
     const isToday = isSameDay(currentDate, new Date());
+
+    const handleRefresh = async () => {
+        setLoading(true);
+        try {
+            await Promise.all([
+                fetchUser(),
+                fetchEvents(),
+                fetchYardItems()
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const [showSwapsModal, setShowSwapsModal] = useState(false);
     const [showInProgressModal, setShowInProgressModal] = useState(false);
@@ -388,6 +401,15 @@ export default function DashboardPage() {
                             <span className="font-bold text-gray-700">{format(currentDate, "dd 'De' MMMM", { locale: ptBR })}</span>
                         </div>
                         <button onClick={handleNextDay} className="p-1 hover:bg-gray-100 rounded-lg"><ChevronRight size={20} /></button>
+                        <div className="h-6 w-px bg-gray-200 mx-2"></div>
+                        <button 
+                            onClick={handleRefresh} 
+                            disabled={loading}
+                            className={`p-2 hover:bg-gray-100 rounded-lg transition-all ${loading ? 'animate-spin text-blue-500' : 'text-gray-500'}`}
+                            title="Atualizar Página"
+                        >
+                            <RefreshCw size={20} />
+                        </button>
                     </div>
                     {canEdit && (
                         <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
@@ -421,6 +443,10 @@ export default function DashboardPage() {
                     <div className="bg-[#FFFBEB] p-5 rounded-2xl border-l-[6px] border-amber-500 shadow-xl shadow-amber-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowSwapsModal(true)}>
                         <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Trocas</p>
                         <p className="text-4xl font-black text-amber-800">{swapsList.length}</p>
+                    </div>
+                    <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-emerald-500 shadow-xl shadow-emerald-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setActiveTab('yard')}>
+                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Limpos no Pátio</p>
+                        <p className="text-4xl font-black text-emerald-800">{yardItems.filter(item => item.status === 'LIMPO').length}</p>
                     </div>
                 </div>
 
@@ -624,6 +650,14 @@ export default function DashboardPage() {
                 ) : (
                     <EventDashboardList events={events} />
                 )}
+                {/* Floating Refresh Button for Mobile */}
+                <button 
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className="fixed bottom-20 right-6 p-4 bg-blue-600 text-white rounded-full shadow-lg z-40 active:scale-95 transition-all outline-none"
+                >
+                  <RefreshCw size={24} className={loading ? 'animate-spin' : ''} />
+                </button>
             </div>
 
             {showSwapsModal && (

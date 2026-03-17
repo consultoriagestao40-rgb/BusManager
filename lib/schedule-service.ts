@@ -144,7 +144,7 @@ export async function createScheduleVersion(
                 // Check if event has interactions: Status is not PREVISTO OR has Swaps
                 // Note: oldEvent.swaps comes from the include above
                 const hasSwaps = oldEvent.swaps && oldEvent.swaps.length > 0;
-                const isInteracted = oldEvent.status !== 'PREVISTO' || hasSwaps;
+                const isInteracted = oldEvent.status !== 'PREVISTO' || hasSwaps || oldEvent.at_yard;
 
                 if (isInteracted) {
                     // COPY OPERATIONAL STATE
@@ -158,6 +158,7 @@ export async function createScheduleVersion(
                     eventToCreate.check_interno = oldEvent.check_interno;
                     eventToCreate.check_externo = oldEvent.check_externo;
                     eventToCreate.check_pneus = oldEvent.check_pneus;
+                    eventToCreate.at_yard = oldEvent.at_yard;
                     eventToCreate.observacao_operacao = oldEvent.observacao_operacao;
                 }
             }
