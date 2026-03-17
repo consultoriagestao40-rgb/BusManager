@@ -80,14 +80,14 @@ export async function POST(request: Request) {
             }
         });
 
-        // 5. Remove from Yard Inventory if it exists there (baixar do estoque)
+        // 5. Update Yard Inventory status if it exists there (marcar como em andamento)
         try {
-            await prisma.yardInventory.deleteMany({
-                where: { vehicle_id }
+            await prisma.yardInventory.updateMany({
+                where: { vehicle_id },
+                data: { status: 'EM_ANDAMENTO' }
             });
         } catch (yardError) {
-            console.error('Failed to remove from yard but event was created:', yardError);
-            // We don't fail the whole request if only the yard stock update fails
+            console.error('Failed to update yard status but event was created:', yardError);
         }
 
         return NextResponse.json(event);

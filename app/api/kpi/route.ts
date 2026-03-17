@@ -86,7 +86,12 @@ export async function GET(request: Request) {
                 }
 
                 if (event.at_yard) {
-                    stats.yard_cleanings += 1;
+                    const isManual = event.empresa === 'MANUAL' || 
+                                   (event.observacao_cliente && event.observacao_cliente.includes('Sem Escala')) ||
+                                   (event.observacao_operacao && event.observacao_operacao.includes('Sem Escala'));
+                    if (isManual) {
+                        stats.yard_cleanings += 1;
+                    }
                 }
             } else if (event.status === 'CANCELADO') {
                 stats.cancelled += 1;
