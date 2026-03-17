@@ -158,7 +158,7 @@ export default function KPIDashboard() {
                                 <YAxis />
                                 <Tooltip labelFormatter={(val) => format(parseISO(val), 'dd/MM/yyyy')} />
                                 <Legend />
-                                <Bar dataKey="total" name="Previsto" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="effective_total" name="Previsto" fill="#94a3b8" radius={[4, 4, 0, 0]} />
                                 <Bar dataKey="completed" name="Realizado" fill="#16a34a" radius={[4, 4, 0, 0]} />
                                 <Bar dataKey="not_completed" name="Não Realizado" fill="#ef4444" radius={[4, 4, 0, 0]} />
                             </BarChart>
