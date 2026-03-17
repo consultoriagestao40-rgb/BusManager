@@ -354,7 +354,7 @@ export default function DashboardPage() {
         doc.text(`Data: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 14, 30);
         doc.text(`Total de Veículos: ${yardItems.length}`, 14, 37);
 
-        doc.autoTable({
+        autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
             startY: 45,
