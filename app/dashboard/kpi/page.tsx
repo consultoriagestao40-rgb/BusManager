@@ -1,21 +1,59 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format, subDays, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import { format, subDays, startOfMonth, endOfMonth, parseISO, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Loader2, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, ChevronDown, Filter } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     LineChart, Line, AreaChart, Area, ComposedChart
 } from 'recharts';
 
 export default function KPIDashboard() {
-    const [startDate, setStartDate] = useState(format(subDays(new Date(), 30), 'yyyy-MM-dd'));
-    const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+    // Current date adjusted for Brazil Timezone (-3h) for consistency
+    const getBRDate = () => subHours(new Date(), 3);
+
+    const [filterType, setFilterType] = useState('7d');
+    const [startDate, setStartDate] = useState(format(subDays(getBRDate(), 7), 'yyyy-MM-dd'));
+    const [endDate, setEndDate] = useState(format(getBRDate(), 'yyyy-MM-dd'));
     const [showAccumulated, setShowAccumulated] = useState(true);
 
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    const handleFilterChange = (type: string) => {
+        setFilterType(type);
+        const today = getBRDate();
+        
+        let start = '';
+        let end = format(today, 'yyyy-MM-dd');
+
+        switch (type) {
+            case 'today':
+                start = format(today, 'yyyy-MM-dd');
+                break;
+            case '7d':
+                start = format(subDays(today, 7), 'yyyy-MM-dd');
+                break;
+            case '14d':
+                start = format(subDays(today, 14), 'yyyy-MM-dd');
+                break;
+            case '30d':
+                start = format(subDays(today, 30), 'yyyy-MM-dd');
+                break;
+            case 'month':
+                start = format(startOfMonth(today), 'yyyy-MM-dd');
+                end = format(endOfMonth(today), 'yyyy-MM-dd');
+                break;
+            case 'custom':
+                return; // Don't fetch yet, wait for user dates
+        }
+
+        if (type !== 'custom') {
+            setStartDate(start);
+            setEndDate(end);
+        }
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -35,8 +73,10 @@ export default function KPIDashboard() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (filterType !== 'custom') {
+            fetchData();
+        }
+    }, [startDate, endDate]);
 
     if (loading) {
         return (
@@ -67,26 +107,46 @@ export default function KPIDashboard() {
                     Dashboard de Performance (KPIs)
                 </h1>
 
-                <div className="flex items-center gap-2">
-                    <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="border rounded p-2 text-sm"
-                    />
-                    <span className="text-gray-500">-</span>
-                    <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="border rounded p-2 text-sm"
-                    />
-                    <button
-                        onClick={fetchData}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-medium"
-                    >
-                        Filtrar
-                    </button>
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative">
+                        <select
+                            value={filterType}
+                            onChange={(e) => handleFilterChange(e.target.value)}
+                            className="appearance-none bg-blue-50 border border-blue-100 text-blue-700 py-2 pl-3 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        >
+                            <option value="today">Hoje</option>
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="14d">Últimos 14 dias</option>
+                            <option value="30d">Últimos 30 dias</option>
+                            <option value="month">Este Mês</option>
+                            <option value="custom">Período Personalizado</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 pointer-events-none" />
+                    </div>
+
+                    {filterType === 'custom' && (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                            <span className="text-gray-400">até</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                            <button
+                                onClick={fetchData}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold transition-all shadow-sm"
+                            >
+                                Filtrar
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
