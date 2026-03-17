@@ -149,7 +149,25 @@ export default function DashboardPage() {
     const swapsList = getAllSwaps();
     const inProgressList = events.filter((e: any) => e.status === 'EM_ANDAMENTO');
     const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
-    const completedList = events.filter((e: any) => e.status === 'CONCLUIDO');
+    const completedList = events.filter((e: any) => e.status === 'CONCLUIDO').map((e: any) => ({
+        ...e,
+        origin: 'Escala'
+    }));
+
+    const cleanYardItemsFormatted = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+        id: item.id,
+        vehicle: item.vehicle,
+        cleaner: { name: item.last_cleaner_name },
+        started_at: item.created_at, // Consider entry as "start" for yard clean
+        finished_at: item.last_cleaned_at,
+        check_interno: true,
+        check_externo: true,
+        check_pneus: true,
+        observacao_operacao: 'Limpeza de Pátio',
+        origin: 'Pátio'
+    }));
+
+    const unifiedCompletedList = [...completedList, ...cleanYardItemsFormatted];
 
     // Filtered lists
     const filteredCancelled = cancelledList.filter((e: any) => {
@@ -160,12 +178,13 @@ export default function DashboardPage() {
         );
     });
 
-    const filteredCompleted = completedList.filter((e: any) => {
+    const filteredCompleted = unifiedCompletedList.filter((e: any) => {
         const searchLower = completedSearch.toLowerCase();
         return (
             e.vehicle.client_vehicle_number?.toString().includes(searchLower) ||
             e.cleaner?.name?.toLowerCase().includes(searchLower) ||
-            e.empresa?.toLowerCase().includes(searchLower)
+            e.empresa?.toLowerCase().includes(searchLower) ||
+            e.origin.toLowerCase().includes(searchLower)
         );
     });
 
@@ -208,41 +227,41 @@ export default function DashboardPage() {
     };
 
     const exportCompletedToPDF = () => {
-        const doc = new jsPDF('l', 'mm', 'a4'); // Paisagem para caber mais colunas
+        const doc = new jsPDF('l', 'mm', 'a4');
         doc.text('Relatório de Veículos Concluídos', 14, 15);
         doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')}`, 14, 22);
 
         const tableData = filteredCompleted.map((e: any) => [
             e.vehicle.client_vehicle_number,
+            e.origin,
             e.cleaner?.name || '-',
             e.started_at ? format(new Date(e.started_at), 'HH:mm') : '-',
             e.finished_at ? format(new Date(e.finished_at), 'HH:mm') : '-',
-            '', // Interno (bolinha)
-            '', // Externo (bolinha)
-            '', // Pneus (bolinha)
+            '', // Interno
+            '', // Externo
+            '', // Pneus
             e.observacao_operacao || '-'
         ]);
 
         autoTable(doc, {
-            head: [['Carro', 'Colaborador', 'Início', 'Fim', 'Int.', 'Ext.', 'Pneus', 'Observação']],
+            head: [['Carro', 'Origem', 'Colaborador', 'Início', 'Fim', 'Int.', 'Ext.', 'Pneus', 'Observação']],
             body: tableData,
             startY: 28,
             didDrawCell: (data) => {
-                // Desenhar bolinhas nas colunas 4, 5 e 6
-                if (data.section === 'body' && [4, 5, 6].includes(data.column.index)) {
+                if (data.section === 'body' && [5, 6, 7].includes(data.column.index)) {
                    const event = filteredCompleted[data.row.index];
                    let checked = false;
-                   if (data.column.index === 4) checked = event.check_interno;
-                   if (data.column.index === 5) checked = event.check_externo;
-                   if (data.column.index === 6) checked = event.check_pneus;
+                   if (data.column.index === 5) checked = event.check_interno;
+                   if (data.column.index === 6) checked = event.check_externo;
+                   if (data.column.index === 7) checked = event.check_pneus;
 
                    const posX = data.cell.x + data.cell.width / 2;
                    const posY = data.cell.y + data.cell.height / 2;
 
                    if (checked) {
-                       doc.setFillColor(34, 197, 94); // Verde (tailwind green-500)
+                       doc.setFillColor(34, 197, 94);
                    } else {
-                       doc.setFillColor(229, 231, 235); // Cinza (tailwind gray-200)
+                       doc.setFillColor(229, 231, 235);
                    }
                    doc.circle(posX, posY, 2, 'F');
                 }
@@ -250,14 +269,34 @@ export default function DashboardPage() {
             styles: { fontSize: 9, cellPadding: 3 },
             columnStyles: {
                 0: { fontStyle: 'bold' },
-                4: { cellWidth: 15, halign: 'center' },
+                1: { fontStyle: 'bold' },
                 5: { cellWidth: 15, halign: 'center' },
                 6: { cellWidth: 15, halign: 'center' },
-                7: { cellWidth: 'auto' }
+                7: { cellWidth: 15, halign: 'center' },
+                8: { cellWidth: 'auto' }
             }
         });
 
         doc.save(`concluidos_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
+    };
+
+    const exportCompletedToExcel = () => {
+        const tableData = filteredCompleted.map((e: any) => ({
+            'Carro': e.vehicle.client_vehicle_number,
+            'Origem': e.origin,
+            'Colaborador': e.cleaner?.name || '-',
+            'Início': e.started_at ? format(new Date(e.started_at), 'HH:mm') : '-',
+            'Fim': e.finished_at ? format(new Date(e.finished_at), 'HH:mm') : '-',
+            'Interno': e.check_interno ? 'SIM' : 'NÃO',
+            'Externo': e.check_externo ? 'SIM' : 'NÃO',
+            'Pneus': e.check_pneus ? 'SIM' : 'NÃO',
+            'Observação': e.observacao_operacao || '-'
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(tableData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Concluídos');
+        XLSX.writeFile(wb, `concluidos_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
     };
 
     const exportSwapsToPDF = () => {
@@ -289,7 +328,8 @@ export default function DashboardPage() {
         cleaner_name: item.last_cleaner_name || '--',
         cleaned_at: item.last_cleaned_at,
         created_at: item.created_at,
-        status: item.status
+        status: item.status,
+        origin: 'Pátio'
     }));
 
     const exportTotalYardToPDF = () => {
@@ -526,7 +566,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCompletedModal(true)}>
                         <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos</p>
-                        <p className="text-4xl font-black text-green-800">{completedList.length}</p>
+                        <p className="text-4xl font-black text-green-800">{unifiedCompletedList.length}</p>
                     </div>
                     <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCancelledModal(true)}>
                         <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>
@@ -1011,16 +1051,23 @@ export default function DashboardPage() {
                                 >
                                     <FileText size={16} /> PDF
                                 </button>
+                                <button
+                                    onClick={exportCompletedToExcel}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2"
+                                >
+                                    <Table size={16} /> Excel
+                                </button>
                             </div>
                         </div>
 
-                        {completedList.length === 0 ? (
+                        {unifiedCompletedList.length === 0 ? (
                             <p className="text-center text-gray-500 py-8">Nenhum veículo concluído hoje.</p>
                         ) : (
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Origem</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Colaborador</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Início</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fim</th>
@@ -1035,6 +1082,13 @@ export default function DashboardPage() {
                                         <tr key={event.id}>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
                                                 {event.vehicle.client_vehicle_number}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                                    event.origin === 'Escala' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                                                }`}>
+                                                    {event.origin}
+                                                </span>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                                                 {event.cleaner?.name || '-'}
