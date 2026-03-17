@@ -281,45 +281,35 @@ export default function DashboardPage() {
         doc.save(`trocas_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
     };
 
-    const unifiedCleanItems = [
-        ...yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
-            id: item.id,
-            vehicle_number: item.vehicle.client_vehicle_number,
-            cleaner_name: item.last_cleaner_name || '--',
-            cleaned_at: item.last_cleaned_at,
-            created_at: item.created_at,
-            source: 'Estoque'
-        })),
-        ...events.filter((e: any) => e.status === 'CONCLUIDO' && e.at_yard).map((e: any) => ({
-            id: e.id,
-            vehicle_number: e.vehicle.client_vehicle_number,
-            cleaner_name: e.cleaner?.name || '--',
-            cleaned_at: e.finished_at,
-            created_at: e.started_at || e.created_at,
-            source: 'Escala'
-        }))
-    ];
+    const cleanYardItems = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+        id: item.id,
+        vehicle_number: item.vehicle.client_vehicle_number,
+        cleaner_name: item.last_cleaner_name || '--',
+        cleaned_at: item.last_cleaned_at,
+        created_at: item.created_at,
+        status: item.status
+    }));
 
     const exportCleanYardToPDF = () => {
         const doc = new jsPDF();
-        doc.text('Veículos Limpos no Pátio (Unificado)', 14, 15);
+        doc.text('Veículos Limpos no Pátio (Estoque)', 14, 15);
         doc.text(`Data: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
 
-        const tableData = unifiedCleanItems.map((item: any) => [
+        const tableData = cleanYardItems.map((item: any) => [
             item.vehicle_number,
             item.cleaner_name,
+            item.status,
             item.cleaned_at ? format(new Date(item.cleaned_at), 'dd/MM HH:mm') : '--:--',
-            format(new Date(item.created_at), 'dd/MM HH:mm'),
-            item.source
+            format(new Date(item.created_at), 'dd/MM HH:mm')
         ]);
 
         autoTable(doc, {
-            head: [['Carro', 'Faxineiro', 'Última Limpeza', 'Data Origem', 'Origem']],
+            head: [['Carro', 'Colaborador', 'Status', 'Última Limpeza', 'Ingresso']],
             body: tableData,
             startY: 28,
         });
 
-        doc.save(`carros_limpos_unificado_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+        doc.save(`carros_limpos_patio_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     };
 
 
@@ -512,7 +502,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-emerald-500 shadow-xl shadow-emerald-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCleanYardModal(true)}>
                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Limpos no Pátio</p>
-                        <p className="text-4xl font-black text-emerald-800">{unifiedCleanItems.length}</p>
+                        <p className="text-4xl font-black text-emerald-800">{cleanYardItems.length}</p>
                     </div>
                 </div>
 
@@ -1050,7 +1040,7 @@ export default function DashboardPage() {
                         <div className="flex justify-between items-center mb-6 border-b pb-4">
                             <div>
                                 <h3 className="text-xl font-bold text-gray-800">Veículos Limpos no Pátio</h3>
-                                <p className="text-xs text-gray-500 uppercase font-black tracking-widest mt-1">Total de {unifiedCleanItems.length} veículos (Estoque + Escala)</p>
+                                <p className="text-xs text-gray-500 uppercase font-black tracking-widest mt-1">Total de {cleanYardItems.length} veículos (Apenas Estoque)</p>
                             </div>
                             <div className="flex gap-2">
                                 <button 
@@ -1068,21 +1058,21 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        {unifiedCleanItems.length === 0 ? (
-                            <p className="text-center text-gray-500 py-12 font-medium">Nenhum veículo com status LIMPO disponível.</p>
+                        {cleanYardItems.length === 0 ? (
+                            <p className="text-center text-gray-500 py-12 font-medium">Nenhum veículo com status LIMPO disponível no estoque.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-100">
                                     <thead>
                                         <tr>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Faxineiro</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Última Limpeza</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Origem</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
-                                        {unifiedCleanItems.map((item: any) => (
+                                        {cleanYardItems.map((item: any) => (
                                             <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-4 py-3">
                                                     <span className="text-base font-black text-gray-800">{item.vehicle_number}</span>
@@ -1090,13 +1080,13 @@ export default function DashboardPage() {
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
                                                     {item.cleaner_name}
                                                 </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                                                        {item.status}
+                                                    </span>
+                                                </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
                                                     {item.cleaned_at ? format(new Date(item.cleaned_at), "HH:mm (dd/MM)", { locale: ptBR }) : '--:--'}
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${item.source === 'Estoque' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                        {item.source.toUpperCase()}
-                                                    </span>
                                                 </td>
                                             </tr>
                                         ))}
