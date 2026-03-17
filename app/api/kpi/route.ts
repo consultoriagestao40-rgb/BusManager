@@ -44,15 +44,10 @@ export async function GET(request: Request) {
 
 
  
-         const yardCleanings = await prisma.yardInventory.findMany({
-             where: {
-                 status: 'LIMPO',
-                 last_cleaned_at: {
-                     gte: start,
-                     lte: end
-                 }
-             }
-         });
+        const yardCleanings = await prisma.yardInventory.findMany({
+            where: { status: 'LIMPO' },
+            include: { vehicle: true }
+        });
  
          // Get ALL swaps for the period, even if the event version is now inactive
          const allSwaps = await prisma.swap.findMany({
