@@ -44,6 +44,7 @@ export default function KPIDashboard() {
             case 'month':
                 start = format(startOfMonth(today), 'yyyy-MM-dd');
                 end = format(endOfMonth(today), 'yyyy-MM-dd');
+                setShowAccumulated(false); // Default to daily view for monthly filter
                 break;
             case 'custom':
                 return; // Don't fetch yet, wait for user dates
