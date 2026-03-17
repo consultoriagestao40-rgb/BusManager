@@ -167,7 +167,7 @@ export default function KPIDashboard() {
                 </div>
 
                 <div className="bg-white p-6 rounded shadow">
-                    <h3 className="text-lg font-bold text-gray-700 mb-6">Incidências Diárias (Atrasos e Trocas)</h3>
+                    <h3 className="text-lg font-bold text-gray-700 mb-6">Atrasos Diários</h3>
                     <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={daily}>
@@ -177,6 +177,21 @@ export default function KPIDashboard() {
                                 <Tooltip labelFormatter={(val) => format(parseISO(val), 'dd/MM/yyyy')} />
                                 <Legend />
                                 <Bar dataKey="delayed" name="Atrasos" fill="#dc2626" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded shadow">
+                    <h3 className="text-lg font-bold text-gray-700 mb-6">Trocas Diárias</h3>
+                    <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={daily}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="date" tick={{ fontSize: 12 }} tickFormatter={(val) => format(parseISO(val), 'dd/MM')} />
+                                <YAxis />
+                                <Tooltip labelFormatter={(val) => format(parseISO(val), 'dd/MM/yyyy')} />
+                                <Legend />
                                 <Bar dataKey="swaps" name="Trocas" fill="#f97316" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
