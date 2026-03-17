@@ -110,7 +110,8 @@ export async function POST(request: Request) {
         const yardItem = await prisma.yardInventory.create({
             data: {
                 vehicle_id: vehicle.id,
-                status: status || 'SUJO'
+                status: status || 'SUJO',
+                last_cleaned_at: status === 'LIMPO' ? new Date() : null
             },
             include: {
                 vehicle: true

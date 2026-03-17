@@ -42,6 +42,16 @@ export async function GET(request: Request) {
             }
         });
 
+        const yardCleanings = await prisma.yardInventory.findMany({
+            where: {
+                status: 'LIMPO',
+                last_cleaned_at: {
+                    gte: start,
+                    lte: end
+                }
+            }
+        });
+
         // 2. Aggregate Daily Stats
         const dailyMap = new Map();
 
@@ -85,10 +95,23 @@ export async function GET(request: Request) {
                 stats.not_completed += 1;
             }
 
-            if (event.swaps && event.swaps.length > 0) {
-                stats.swaps += event.swaps.length;
-            }
-        });
+             if (event.swaps && event.swaps.length > 0) {
+                 stats.swaps += event.swaps.length;
+             }
+         });
+ 
+         yardCleanings.forEach((item: any) => {
+             const dateKey = format(new Date(item.last_cleaned_at), 'yyyy-MM-dd');
+             if (!dailyMap.has(dateKey)) {
+                 dailyMap.set(dateKey, {
+                     date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
+                     cancelled: 0, not_completed: 0, effective_total: 0, 
+                     achievement_rate: 0, yard_cleanings: 0
+                 });
+             }
+             const stats = dailyMap.get(dateKey);
+             stats.yard_cleanings += 1;
+         });
 
         const dailyStats = Array.from(dailyMap.values()).map(day => {
             const effective = day.total - day.cancelled;

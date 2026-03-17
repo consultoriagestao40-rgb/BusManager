@@ -85,7 +85,22 @@ export async function GET(request: Request) {
         await runSql("Add last_cleaned_at to YardInventory", `ALTER TABLE "YardInventory" ADD COLUMN IF NOT EXISTS "last_cleaned_at" TIMESTAMP(3);`);
         await runSql("Add last_cleaner_id to YardInventory", `ALTER TABLE "YardInventory" ADD COLUMN IF NOT EXISTS "last_cleaner_id" TEXT;`);
 
-        // 3. List Tables Diagnostic
+        // 3. Data Cleanup (Fix forced at_yard flag)
+        await runSql("Reset at_yard for non-manual events", `
+            UPDATE "CleaningEvent" 
+            SET "at_yard" = false 
+            WHERE ("observacao_operacao" NOT LIKE '%Sem Escala%' 
+               AND "observacao_operacao" NOT LIKE '%do pátio%')
+               OR "observacao_operacao" IS NULL;
+        `);
+        await runSql("Restore at_yard for manual events", `
+            UPDATE "CleaningEvent" 
+            SET "at_yard" = true 
+            WHERE "observacao_operacao" LIKE '%Sem Escala%'
+               OR "observacao_operacao" LIKE '%do pátio%';
+        `);
+
+        // 4. List Tables Diagnostic
         let tables: string[] = [];
         try {
             const tableRes: any[] = await prisma.$queryRaw`
