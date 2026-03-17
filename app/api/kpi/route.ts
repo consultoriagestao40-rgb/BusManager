@@ -67,6 +67,7 @@ export async function GET(request: Request) {
         // 2. Aggregate Daily Stats (Updated with robust logic)
         const dailyMap = new Map();
         const yardCleaningsByDay = new Map<string, Set<string>>();
+        const activeEventsByDay = new Map<string, Set<string>>();
 
         events.forEach((event: any) => {
             const dateKey = format(new Date(event.data_viagem), 'yyyy-MM-dd');
@@ -95,6 +96,12 @@ export async function GET(request: Request) {
             } else {
                 stats.not_completed += 1;
             }
+
+            // Track active/in-progress events to override yard status
+            if (['PREVISTO', 'EM_ANDAMENTO'].includes(event.status)) {
+                if (!activeEventsByDay.has(dateKey)) activeEventsByDay.set(dateKey, new Set());
+                activeEventsByDay.get(dateKey)?.add(event.vehicle_id);
+            }
         });
  
         // 2b. Add cleanings from Yard Inventory (that might not have events)
@@ -106,6 +113,12 @@ export async function GET(request: Request) {
             const brazilDate = subHours(new Date(cleanDate), 3);
             const dateKey = format(brazilDate, 'yyyy-MM-dd');
             if (dateKey < format(start, 'yyyy-MM-dd') || dateKey > format(end, 'yyyy-MM-dd')) return;
+
+            // VIRTUAL OVERRIDE: Skip if there's an active event for this vehicle today
+            // This matches the Dashboard's logic: if it's programmed, it's NOT shown as "clean" in the count
+            if (activeEventsByDay.get(dateKey)?.has(item.vehicle_id)) {
+                return;
+            }
  
             if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
             yardCleaningsByDay.get(dateKey)?.add(item.vehicle_id);
