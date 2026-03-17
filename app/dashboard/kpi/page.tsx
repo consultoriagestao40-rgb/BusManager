@@ -91,11 +91,13 @@ export default function KPIDashboard() {
 
     const { daily, performance, monthly } = data;
 
-    // Calculate totals for cards
-    const totalEvents = daily.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0);
-    const totalCompleted = daily.reduce((acc: number, curr: any) => acc + (curr.completed || 0), 0);
+    // Calculate totals for cards (Effective Total = Total - Cancelled)
+    const rawTotal = daily.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0);
     const totalCancelled = daily.reduce((acc: number, curr: any) => acc + (curr.cancelled || 0), 0);
-    const denominator = totalEvents - totalCancelled;
+    const totalEvents = rawTotal - totalCancelled; 
+    
+    const totalCompleted = daily.reduce((acc: number, curr: any) => acc + (curr.completed || 0), 0);
+    const denominator = totalEvents; // Already discounted
     const completionRate = denominator > 0 ? ((totalCompleted / denominator) * 100).toFixed(1) : '0';
     const totalDelays = daily.reduce((acc: number, curr: any) => acc + (curr.delayed || 0), 0);
     const totalNotCompleted = daily.reduce((acc: number, curr: any) => acc + (curr.not_completed || 0), 0);
