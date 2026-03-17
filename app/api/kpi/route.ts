@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getUserFromToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
-import { parseISO, startOfDay, endOfDay, subDays, differenceInMinutes, format } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, subDays, differenceInMinutes, format, subHours } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -99,10 +99,12 @@ export async function GET(request: Request) {
  
         // 2b. Add cleanings from Yard Inventory (that might not have events)
         yardCleanings.forEach((item: any) => {
+            // Normalize to Brazil Time (-3) to match Dashboard card logic
             const cleanDate = item.last_cleaned_at || item.updated_at;
             if (!cleanDate) return;
             
-            const dateKey = format(new Date(cleanDate), 'yyyy-MM-dd');
+            const brazilDate = subHours(new Date(cleanDate), 3);
+            const dateKey = format(brazilDate, 'yyyy-MM-dd');
             if (dateKey < format(start, 'yyyy-MM-dd') || dateKey > format(end, 'yyyy-MM-dd')) return;
  
             if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
