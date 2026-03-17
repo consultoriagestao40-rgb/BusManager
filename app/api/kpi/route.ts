@@ -42,15 +42,32 @@ export async function GET(request: Request) {
             }
         });
 
-        const yardCleanings = await prisma.yardInventory.findMany({
-            where: {
-                status: 'LIMPO',
-                last_cleaned_at: {
-                    gte: start,
-                    lte: end
-                }
-            }
-        });
+
+ 
+         const yardCleanings = await prisma.yardInventory.findMany({
+             where: {
+                 status: 'LIMPO',
+                 last_cleaned_at: {
+                     gte: start,
+                     lte: end
+                 }
+             }
+         });
+ 
+         // Get ALL swaps for the period, even if the event version is now inactive
+         const allSwaps = await prisma.swap.findMany({
+             where: {
+                 original_event: {
+                     data_viagem: {
+                         gte: start,
+                         lte: end
+                     }
+                 }
+             },
+             include: {
+                 original_event: true
+             }
+         });
 
         // 2. Aggregate Daily Stats (Updated with robust logic)
         const dailyMap = new Map();
@@ -79,12 +96,12 @@ export async function GET(request: Request) {
                     }
                 }
 
-                // Identify Yard Cleanings from Events
-                const isManual = event.empresa === 'MANUAL' || 
-                               (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('pátio')) ||
-                               (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('sem escala'));
+                // Identify Yard Cleanings from Events (Strict Manual Logic)
+                const isManualEvent = event.empresa === 'MANUAL' || 
+                                    (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('pátio')) ||
+                                    (event.observacao_operacao && event.observacao_operacao.toLowerCase().includes('sem escala'));
                 
-                if (isManual || event.at_yard) {
+                if (isManualEvent) {
                     if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
                     yardCleaningsByDay.get(dateKey)?.add(event.vehicle_id);
                 }
@@ -93,12 +110,10 @@ export async function GET(request: Request) {
             } else {
                 stats.not_completed += 1;
             }
-
-            if (event.swaps && event.swaps.length > 0) {
-                stats.swaps += event.swaps.length;
-            }
+            
+            // Note: We'll count swaps separately below from allSwaps
         });
-
+ 
         // 2b. Add cleanings from Yard Inventory (that might not have events)
         yardCleanings.forEach((item: any) => {
             const cleanDate = item.last_cleaned_at || item.updated_at || item.created_at;
@@ -106,7 +121,7 @@ export async function GET(request: Request) {
             
             const dateKey = format(new Date(cleanDate), 'yyyy-MM-dd');
             if (dateKey < format(start, 'yyyy-MM-dd') || dateKey > format(end, 'yyyy-MM-dd')) return;
-
+ 
             if (!yardCleaningsByDay.has(dateKey)) yardCleaningsByDay.set(dateKey, new Set());
             yardCleaningsByDay.get(dateKey)?.add(item.vehicle_id);
             
@@ -119,8 +134,24 @@ export async function GET(request: Request) {
                 });
             }
         });
-
-        // 2c. Finalize yard_cleanings counts
+ 
+        // 2c. Aggregate all swaps directly
+        allSwaps.forEach((swap: any) => {
+            if (!swap.original_event) return;
+            const dateKey = format(new Date(swap.original_event.data_viagem), 'yyyy-MM-dd');
+            
+            if (!dailyMap.has(dateKey)) {
+                dailyMap.set(dateKey, {
+                    date: dateKey, total: 0, completed: 0, delayed: 0, swaps: 0, 
+                    cancelled: 0, not_completed: 0, effective_total: 0, 
+                    achievement_rate: 0, yard_cleanings: 0
+                });
+            }
+            const stats = dailyMap.get(dateKey);
+            stats.swaps += 1;
+        });
+ 
+        // 2d. Finalize yard_cleanings counts
         yardCleaningsByDay.forEach((vehicles, dateKey) => {
             const stats = dailyMap.get(dateKey);
             if (stats) stats.yard_cleanings = vehicles.size;
