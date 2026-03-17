@@ -56,7 +56,9 @@ export async function GET(request: Request) {
                     delayed: 0,
                     swaps: 0,
                     cancelled: 0,
-                    not_completed: 0
+                    not_completed: 0,
+                    effective_total: 0,
+                    achievement_rate: 0
                 });
             }
 
@@ -83,7 +85,14 @@ export async function GET(request: Request) {
             }
         });
 
-        const dailyStats = Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+        const dailyStats = Array.from(dailyMap.values()).map(day => {
+            const effective = day.total - day.cancelled;
+            return {
+                ...day,
+                effective_total: effective,
+                achievement_rate: effective > 0 ? Math.round((day.completed / effective) * 100) : 0
+            };
+        }).sort((a, b) => a.date.localeCompare(b.date));
 
         // 3. Performance Metrics
         const cleanerMap = new Map();

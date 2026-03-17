@@ -188,16 +188,16 @@ export default function KPIDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded shadow">
                     <h3 className="text-lg font-bold text-gray-700 mb-6">Quantidade Média de Limpeza por Colaborador</h3>
-                    <div className="h-96">
+                    <div className="h-[500px]">
                         {/* Show top 10 */}
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart layout="vertical" data={performance.byCleaner.slice(0, 10)}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                                 <XAxis type="number" />
-                                <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }} />
+                                <YAxis dataKey="name" type="category" width={180} tick={{ fontSize: 11 }} interval={0} />
                                 <Tooltip cursor={{ fill: 'transparent' }} />
                                 <Legend />
-                                <Bar dataKey="count" name="Qtd. Limpezas" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+                                <Bar dataKey="count" name="Qtd. Limpezas" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={25} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -205,15 +205,15 @@ export default function KPIDashboard() {
 
                 <div className="bg-white p-6 rounded shadow">
                     <h3 className="text-lg font-bold text-gray-700 mb-6">Tempo Médio por Colaborador (Minutos)</h3>
-                    <div className="h-96">
+                    <div className="h-[500px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart layout="vertical" data={performance.byCleaner.slice(0, 10).sort((a: any, b: any) => a.avgTime - b.avgTime)}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                                 <XAxis type="number" />
-                                <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }} />
+                                <YAxis dataKey="name" type="category" width={180} tick={{ fontSize: 11 }} interval={0} />
                                 <Tooltip cursor={{ fill: 'transparent' }} />
                                 <Legend />
-                                <Bar dataKey="avgTime" name="Tempo Médio (min)" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
+                                <Bar dataKey="avgTime" name="Tempo Médio (min)" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={25} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -239,15 +239,17 @@ export default function KPIDashboard() {
                         </label>
                     </div>
                 </div>
-                <div className="h-80">
+                <div className="h-96">
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={showAccumulated ? data.cumulative : daily}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="date" tick={{ fontSize: 12 }} tickFormatter={(val) => format(parseISO(val), 'dd/MM')} />
-                            <YAxis />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" unit="%" domain={[0, 100]} />
                             <Tooltip labelFormatter={(val) => format(parseISO(val), 'dd/MM/yyyy')} />
                             <Legend />
                             <Bar
+                                yAxisId="left"
                                 dataKey={showAccumulated ? "accumulated_completed" : "completed"}
                                 name={showAccumulated ? "Acumulado Realizado" : "Realizado"}
                                 fill="#16a34a"
@@ -255,13 +257,26 @@ export default function KPIDashboard() {
                                 radius={[4, 4, 0, 0]}
                             />
                             <Line
+                                yAxisId="left"
                                 type="monotone"
-                                dataKey={showAccumulated ? "accumulated_total" : "total"}
-                                name={showAccumulated ? "Acumulado Previsto" : "Previsto"}
+                                dataKey={showAccumulated ? "accumulated_total" : (showAccumulated ? "accumulated_total" : "effective_total")}
+                                name={showAccumulated ? "Acumulado Previsto" : "Previsto Efetivo"}
                                 stroke="#2563eb"
                                 strokeWidth={3}
                                 dot={{ r: 4 }}
                             />
+                            {!showAccumulated && (
+                                <Line
+                                    yAxisId="right"
+                                    type="monotone"
+                                    dataKey="achievement_rate"
+                                    name="Atingimento %"
+                                    stroke="#f59e0b"
+                                    strokeWidth={2}
+                                    dot={{ r: 4 }}
+                                    label={{ position: 'top', formatter: (val: any) => `${val}%`, fontSize: 10, fill: '#d97706', fontWeight: 'bold' }}
+                                />
+                            )}
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
