@@ -281,26 +281,45 @@ export default function DashboardPage() {
         doc.save(`trocas_${format(currentDate, 'yyyy-MM-dd')}.pdf`);
     };
 
+    const unifiedCleanItems = [
+        ...yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+            id: item.id,
+            vehicle_number: item.vehicle.client_vehicle_number,
+            cleaner_name: item.last_cleaner_name || '--',
+            cleaned_at: item.last_cleaned_at,
+            created_at: item.created_at,
+            source: 'Estoque'
+        })),
+        ...events.filter((e: any) => e.status === 'CONCLUIDO' && e.at_yard).map((e: any) => ({
+            id: e.id,
+            vehicle_number: e.vehicle.client_vehicle_number,
+            cleaner_name: e.cleaner?.name || '--',
+            cleaned_at: e.finished_at,
+            created_at: e.started_at || e.created_at,
+            source: 'Escala'
+        }))
+    ];
+
     const exportCleanYardToPDF = () => {
         const doc = new jsPDF();
-        doc.text('Veículos Limpos no Pátio', 14, 15);
+        doc.text('Veículos Limpos no Pátio (Unificado)', 14, 15);
         doc.text(`Data: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
 
-        const cleanItems = yardItems.filter(item => item.status === 'LIMPO');
-        const tableData = cleanItems.map((item: any) => [
-            item.vehicle.client_vehicle_number,
-            item.last_cleaner_name || '--',
-            item.last_cleaned_at ? format(new Date(item.last_cleaned_at), 'dd/MM HH:mm') : '--:--',
-            format(new Date(item.created_at), 'dd/MM HH:mm')
+        const tableData = unifiedCleanItems.map((item: any) => [
+            item.vehicle_number,
+            item.cleaner_name,
+            item.cleaned_at ? format(new Date(item.cleaned_at), 'dd/MM HH:mm') : '--:--',
+            format(new Date(item.created_at), 'dd/MM HH:mm'),
+            item.source
         ]);
 
         autoTable(doc, {
-            head: [['Carro', 'Faxineiro', 'Última Limpeza', 'Ingresso']],
+            head: [['Carro', 'Faxineiro', 'Última Limpeza', 'Data Origem', 'Origem']],
             body: tableData,
             startY: 28,
         });
 
-        doc.save(`carros_limpos_patio.pdf`);
+        doc.save(`carros_limpos_unificado_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     };
 
 
@@ -493,7 +512,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-emerald-500 shadow-xl shadow-emerald-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCleanYardModal(true)}>
                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Limpos no Pátio</p>
-                        <p className="text-4xl font-black text-emerald-800">{yardItems.filter(item => item.status === 'LIMPO').length}</p>
+                        <p className="text-4xl font-black text-emerald-800">{unifiedCleanItems.length}</p>
                     </div>
                 </div>
 
@@ -642,15 +661,15 @@ export default function DashboardPage() {
                                                     <td className="px-6 py-4 text-right flex justify-end gap-3 items-center">
                                                         {canEdit && (
                                                             <>
-                                                                <button
+                                                                    <button
                                                                     onClick={() => handleManualProgram(item.vehicle.id)}
                                                                     disabled={item.status === 'EM_ANDAMENTO'}
                                                                     className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${item.status === 'EM_ANDAMENTO'
                                                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                        : 'bg-green-600 text-white hover:bg-green-700'
                                                                         }`}
                                                                 >
-                                                                    <Play size={10} fill="currentColor" /> Programar
+                                                                    <Play size={10} fill="currentColor" /> Iniciar Limpeza
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleRemoveYardVehicle(item.id)}
@@ -1031,7 +1050,7 @@ export default function DashboardPage() {
                         <div className="flex justify-between items-center mb-6 border-b pb-4">
                             <div>
                                 <h3 className="text-xl font-bold text-gray-800">Veículos Limpos no Pátio</h3>
-                                <p className="text-xs text-gray-500 uppercase font-black tracking-widest mt-1">Total de {yardItems.filter(item => item.status === 'LIMPO').length} veículos</p>
+                                <p className="text-xs text-gray-500 uppercase font-black tracking-widest mt-1">Total de {unifiedCleanItems.length} veículos (Estoque + Escala)</p>
                             </div>
                             <div className="flex gap-2">
                                 <button 
@@ -1049,8 +1068,8 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        {yardItems.filter(item => item.status === 'LIMPO').length === 0 ? (
-                            <p className="text-center text-gray-500 py-12 font-medium">Nenhum veículo com status LIMPO no pátio.</p>
+                        {unifiedCleanItems.length === 0 ? (
+                            <p className="text-center text-gray-500 py-12 font-medium">Nenhum veículo com status LIMPO disponível.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-100">
@@ -1059,23 +1078,25 @@ export default function DashboardPage() {
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Faxineiro</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Última Limpeza</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Desde em</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Origem</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
-                                        {yardItems.filter(item => item.status === 'LIMPO').map((item: any) => (
+                                        {unifiedCleanItems.map((item: any) => (
                                             <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-4 py-3">
-                                                    <span className="text-base font-black text-gray-800">{item.vehicle.client_vehicle_number}</span>
+                                                    <span className="text-base font-black text-gray-800">{item.vehicle_number}</span>
                                                 </td>
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
-                                                    {item.last_cleaner_name || '--'}
+                                                    {item.cleaner_name}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.last_cleaned_at ? format(new Date(item.last_cleaned_at), "HH:mm (dd/MM)", { locale: ptBR }) : '--:--'}
+                                                    {item.cleaned_at ? format(new Date(item.cleaned_at), "HH:mm (dd/MM)", { locale: ptBR }) : '--:--'}
                                                 </td>
-                                                <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {format(new Date(item.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                                                <td className="px-4 py-3 text-center">
+                                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${item.source === 'Estoque' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                                                        {item.source.toUpperCase()}
+                                                    </span>
                                                 </td>
                                             </tr>
                                         ))}

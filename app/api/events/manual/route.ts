@@ -79,14 +79,13 @@ export async function POST(request: Request) {
             }
         });
 
-        // 5. Update Yard Inventory status to EM_ANDAMENTO (Resilient update)
+        // 5. Remove from Yard Inventory if it exists there (baixar do estoque)
         try {
-            await prisma.yardInventory.updateMany({
-                where: { vehicle_id },
-                data: { status: 'EM_ANDAMENTO' as any }
+            await prisma.yardInventory.deleteMany({
+                where: { vehicle_id }
             });
         } catch (yardError) {
-            console.error('Failed to update yard status but event was created:', yardError);
+            console.error('Failed to remove from yard but event was created:', yardError);
             // We don't fail the whole request if only the yard stock update fails
         }
 

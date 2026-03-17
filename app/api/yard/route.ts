@@ -31,7 +31,7 @@ export async function GET() {
 
         // Enrich with cleaner names
         const enrichedItems = await Promise.all(yardItems.map(async (item: any) => {
-            const cleaner = item.last_cleaner_id ? await prisma.user.findUnique({
+            const cleaner = item.last_cleaner_id ? await prisma.cleaner.findUnique({
                 where: { id: item.last_cleaner_id },
                 select: { name: true }
             }) : null;

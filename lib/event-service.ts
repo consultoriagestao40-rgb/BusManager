@@ -53,7 +53,7 @@ export async function completeEvent(
         data: {
             status: 'LIMPO',
             last_cleaned_at: updatedEvent.finished_at,
-            last_cleaner_id: updatedEvent.completed_by_user_id
+            last_cleaner_id: updatedEvent.cleaner_id
         }
     });
 
