@@ -168,6 +168,8 @@ export default function DashboardPage() {
     }));
 
     const unifiedCompletedList = [...completedList, ...cleanYardItemsFormatted];
+    const escalaCount = unifiedCompletedList.filter(item => item.origin === 'Escala').length;
+    const patioCount = unifiedCompletedList.filter(item => item.origin === 'Pátio').length;
 
     // Filtered lists
     const filteredCancelled = cancelledList.filter((e: any) => {
@@ -229,7 +231,8 @@ export default function DashboardPage() {
     const exportCompletedToPDF = () => {
         const doc = new jsPDF('l', 'mm', 'a4');
         doc.text('Relatório de Veículos Concluídos', 14, 15);
-        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')}`, 14, 22);
+        doc.setFontSize(10);
+        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')} | Escala: ${escalaCount} | Pátio: ${patioCount}`, 14, 22);
 
         const tableData = filteredCompleted.map((e: any) => [
             e.vehicle.client_vehicle_number,
@@ -294,8 +297,21 @@ export default function DashboardPage() {
         }));
 
         const ws = XLSX.utils.json_to_sheet(tableData);
+        
+        // Add summary row at the top
+        XLSX.utils.sheet_add_aoa(ws, [[`Resumo: Escala: ${escalaCount} | Pátio: ${patioCount}`]], { origin: 'A1' });
+        // Shift existing data down is not easy with sheet_add_aoa, better to just prepend to tableData or use a different origin.
+        // Let's just add it to the bottom or as a separate info if needed, but the user asked for "at the top".
+        // Re-creating with summary at the top:
+        const fullData = [
+            { 'Carro': `Resumo: Escala: ${escalaCount} | Pátio: ${patioCount}`, 'Origem': '', 'Colaborador': '', 'Início': '', 'Fim': '', 'Interno': '', 'Externo': '', 'Pneus': '', 'Observação': '' },
+            {}, // Empty row
+            ...tableData
+        ];
+        const ws2 = XLSX.utils.json_to_sheet(fullData);
+
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Concluídos');
+        XLSX.utils.book_append_sheet(wb, ws2, 'Concluídos');
         XLSX.writeFile(wb, `concluidos_${format(currentDate, 'yyyy-MM-dd')}.xlsx`);
     };
 
@@ -1027,7 +1043,17 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[80vh] overflow-y-auto">
                         <div className="mb-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-gray-800">Veículos Concluídos</h3>
+                                <div className="flex items-center gap-4">
+                                    <h3 className="text-xl font-bold text-gray-800">Veículos Concluídos</h3>
+                                    <div className="flex gap-2">
+                                        <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-md border border-blue-100">
+                                            Escala: {escalaCount}
+                                        </span>
+                                        <span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md border border-emerald-100">
+                                            Pátio: {patioCount}
+                                        </span>
+                                    </div>
+                                </div>
                                 <button
                                     onClick={() => setShowCompletedModal(false)}
                                     className="text-gray-500 hover:text-gray-700 font-bold text-xl"
