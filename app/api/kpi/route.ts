@@ -155,7 +155,8 @@ export async function GET(request: Request) {
             return {
                 date: day.date,
                 accumulated_total: accTotal,
-                accumulated_completed: accCompleted
+                accumulated_completed: accCompleted,
+                accumulated_achievement_rate: accTotal > 0 ? Math.round((accCompleted / accTotal) * 100) : 0
             };
         });
 

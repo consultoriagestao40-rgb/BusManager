@@ -265,18 +265,16 @@ export default function KPIDashboard() {
                                 strokeWidth={3}
                                 dot={{ r: 4 }}
                             />
-                            {!showAccumulated && (
-                                <Line
-                                    yAxisId="right"
-                                    type="monotone"
-                                    dataKey="achievement_rate"
-                                    name="Atingimento %"
-                                    stroke="#f59e0b"
-                                    strokeWidth={2}
-                                    dot={{ r: 4 }}
-                                    label={{ position: 'top', formatter: (val: any) => `${val}%`, fontSize: 10, fill: '#d97706', fontWeight: 'bold' }}
-                                />
-                            )}
+                            <Line
+                                yAxisId="right"
+                                type="monotone"
+                                dataKey={showAccumulated ? "accumulated_achievement_rate" : "achievement_rate"}
+                                name="Atingimento %"
+                                stroke="#f59e0b"
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                                label={{ position: 'top', formatter: (val: any) => `${val}%`, fontSize: 10, fill: '#d97706', fontWeight: 'bold' }}
+                            />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
