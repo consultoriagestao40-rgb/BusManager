@@ -100,8 +100,9 @@ export async function GET(request: Request) {
                 }
             }
 
-            // 2. Track ALL pending/in-progress events regardless of version (for Yard Override)
-            // This is what ensures parity with the Dashboard Yard count
+            // 2. Track ONLY pending/in-progress events regardless of version (for Yard Override)
+            // This ensures that if it was CANCELLED or already COMPLETED via schedule, 
+            // a separate Manual Yard Cleaning can still be counted.
             if (['PREVISTO', 'EM_ANDAMENTO'].includes(event.status)) {
                 if (!activeEventsByDay.has(dateKey)) activeEventsByDay.set(dateKey, new Set());
                 activeEventsByDay.get(dateKey)?.add(event.vehicle_id);
