@@ -84,7 +84,7 @@ export default function DashboardPage() {
     useEffect(() => {
         if (user) {
             fetchEvents();
-            if (activeTab === 'yard') fetchYardItems();
+            fetchYardItems();
         }
     }, [currentDate, activeTab, user]); // Re-run when date or tab changes
 
