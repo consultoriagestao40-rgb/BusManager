@@ -142,6 +142,7 @@ export async function GET(request: Request) {
         // 2c. Aggregate all swaps directly
         allSwaps.forEach((swap: any) => {
             if (!swap.original_event) return;
+            // Use same date key as events (assuming data_viagem is the canonical date)
             const dateKey = format(new Date(swap.original_event.data_viagem), 'yyyy-MM-dd');
             
             if (!dailyMap.has(dateKey)) {

@@ -151,7 +151,7 @@ export default function DashboardPage() {
     const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
     const completedList = events.filter((e: any) => e.status === 'CONCLUIDO').map((e: any) => ({
         ...e,
-        origin: e.at_yard ? 'Pátio' : 'Escala'
+        origin: e.at_yard ? 'Escala' : 'Pátio'
     }));
 
     const cleanYardItemsFormatted = yardItems.filter((item: any) => {
