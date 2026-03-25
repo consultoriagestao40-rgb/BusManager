@@ -1521,15 +1521,15 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="flex gap-3">
-                            <button 
-                                onClick={() => setShowYardFinishModal(false)} 
+                            <button
+                                onClick={() => setShowYardFinishModal(false)}
                                 className="flex-1 py-4 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-gray-50 rounded-2xl transition-all"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleFinishYardCleaning}
-                                disabled={!selectedCleaner}
+                                disabled={processing}
                                 className="flex-2 py-4 px-8 bg-green-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform active:scale-95"
                             >
                                 Confirmar Finalização

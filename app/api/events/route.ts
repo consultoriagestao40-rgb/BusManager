@@ -36,8 +36,9 @@ export async function GET(request: Request) {
         const events = await prisma.cleaningEvent.findMany({
             where: {
                 data_viagem: { gte: start, lte: end },
-                schedule_version: { is_active: true },
-                at_yard: { not: true } // Safer than just at_yard: false if any records have NULL
+                NOT: {
+                    event_business_key: { startsWith: 'YARD-' }
+                }
             },
             include: {
                 vehicle: true,
@@ -64,25 +65,33 @@ export async function GET(request: Request) {
             }
         });
 
-        // 3. Ensure all swaps are represented in the active events
+        // 3. Get current yard inventory to sync flags
+        const currentYardIds = (await prisma.yardInventory.findMany({ select: { vehicle_id: true } })).map(y => y.vehicle_id);
+
+        // 4. Ensure all swaps are represented in the active events
         // If a swap is linked to an event that is now inactive, we find its active counterpart
         const eventsWithAllSwaps = events.map(event => {
+            // Rule: If vehicle is in yard inventory, it's considered at_yard for the scale checkbox
+            const autoAtYard = currentYardIds.includes(event.vehicle_id);
+            
+            let enrichedEvent = { 
+                ...event, 
+                at_yard: event.at_yard || autoAtYard 
+            };
+
             try {
                 const extraSwaps = allSwapsToday.filter(s =>
-                    s.original_event?.event_business_key === event.event_business_key &&
-                    !(event.swaps || []).some((existing: any) => existing.id === s.id)
+                    s.original_event?.event_business_key === enrichedEvent.event_business_key &&
+                    !(enrichedEvent.swaps || []).some((existing: any) => existing.id === s.id)
                 );
 
                 if (extraSwaps.length > 0) {
-                    return {
-                        ...event,
-                        swaps: [...(event.swaps || []), ...extraSwaps]
-                    };
+                    enrichedEvent.swaps = [...(enrichedEvent.swaps || []), ...extraSwaps];
                 }
             } catch (e) {
-                console.error('Error merging swaps for event:', event.id, e);
+                console.error('Error merging swaps for event:', enrichedEvent.id, e);
             }
-            return event;
+            return enrichedEvent;
         });
 
         return NextResponse.json({ events: eventsWithAllSwaps });
