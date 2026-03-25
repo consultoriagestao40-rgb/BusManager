@@ -176,7 +176,7 @@ export default function DashboardPage() {
     const cancelledList = events.filter((e: any) => e.status === 'CANCELADO');
     const completedList = events.filter((e: any) => e.status === 'CONCLUIDO').map((e: any) => ({
         ...e,
-        origin: e.at_yard ? 'Escala' : 'Pátio'
+        origin: 'Escala' // Eventos vindos da escala principal
     }));
 
     const cleanYardItemsFormatted = yardItems.filter((item: any) => {
@@ -201,8 +201,8 @@ export default function DashboardPage() {
     }));
 
     const unifiedCompletedList = [...completedList, ...cleanYardItemsFormatted];
-    const escalaCount = unifiedCompletedList.filter(item => item.origin === 'Escala').length;
-    const patioCount = unifiedCompletedList.filter(item => item.origin === 'Pátio').length;
+    const escalaCount = completedList.length; // Apenas escala
+    const patioCount = cleanYardItemsFormatted.length; // Apenas pátio
 
     // Filtered lists
     const filteredCancelled = cancelledList.filter((e: any) => {
@@ -686,8 +686,8 @@ export default function DashboardPage() {
                         <p className="text-4xl font-black text-blue-800">{inProgressList.length}</p>
                     </div>
                     <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCompletedModal(true)}>
-                        <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos</p>
-                        <p className="text-4xl font-black text-green-800">{unifiedCompletedList.length}</p>
+                        <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos Escala</p>
+                        <p className="text-4xl font-black text-green-800">{escalaCount}</p>
                     </div>
                     <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCancelledModal(true)}>
                         <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>
