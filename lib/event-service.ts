@@ -203,8 +203,26 @@ export async function updateYardStatus(
         });
 
         if (activeVersion) {
-            await prisma.cleaningEvent.create({
-                data: {
+            const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
+            await prisma.cleaningEvent.upsert({
+                where: {
+                    schedule_version_id_event_business_key: {
+                        schedule_version_id: activeVersion.id,
+                        event_business_key: eventBusinessKey
+                    }
+                },
+                update: {
+                    status: 'CONCLUIDO',
+                    finished_at: now,
+                    completed_by_user_id: userId,
+                    cleaner_id: checklist.cleaner_id,
+                    check_interno: checklist.check_interno,
+                    check_externo: checklist.check_externo,
+                    check_pneus: checklist.check_pneus,
+                    check_bagageiros: checklist.check_bagageiros,
+                    observacao_operacao: checklist.observacao || 'Limpeza de Pátio'
+                },
+                create: {
                     vehicle_id: vehicleId,
                     schedule_version_id: activeVersion.id,
                     data_viagem: activeVersion.data_viagem,
@@ -212,7 +230,7 @@ export async function updateYardStatus(
                     saida_programada_at: now,
                     liberar_ate_at: now,
                     status: 'CONCLUIDO',
-                    started_at: yardItem.updated_at,
+                    started_at: yardItem.updated_at, // Consider data de entrada no pátio como início
                     finished_at: now,
                     started_by_user_id: userId,
                     completed_by_user_id: userId,
@@ -222,8 +240,8 @@ export async function updateYardStatus(
                     check_pneus: checklist.check_pneus,
                     check_bagageiros: checklist.check_bagageiros,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
-                    at_yard: true, // This hides it from schedule but keeps it in history
-                    event_business_key: `YARD-${vehicleId}-${Date.now()}`
+                    at_yard: true,
+                    event_business_key: eventBusinessKey
                 }
             });
         }

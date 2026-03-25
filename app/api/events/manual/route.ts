@@ -73,7 +73,7 @@ export async function POST(request: Request) {
                 observacao_cliente: observacao || 'Adicionado manualmente do pátio',
                 observacao_operacao: 'Sem Escala, carro do pátio',
                 at_yard: true,
-                event_business_key: `MANUAL-${vehicle_id}-${Date.now()}`
+                event_business_key: `MANUAL-${vehicle_id}-${activeVersion.id}`
             },
             include: {
                 vehicle: true
