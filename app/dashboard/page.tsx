@@ -137,6 +137,7 @@ export default function DashboardPage() {
     const [showCancelledModal, setShowCancelledModal] = useState(false);
     const [showCompletedModal, setShowCompletedModal] = useState(false);
     const [showTotalYardModal, setShowTotalYardModal] = useState(false);
+    const [showTotalCleanYardModal, setShowTotalCleanYardModal] = useState(false);
 
     // Search states
     const [cancelledSearch, setCancelledSearch] = useState('');
@@ -144,6 +145,7 @@ export default function DashboardPage() {
     const [swapsSearch, setSwapsSearch] = useState('');
     const [completedSearch, setCompletedSearch] = useState('');
     const [totalYardSearch, setTotalYardSearch] = useState('');
+    const [totalCleanYardSearch, setTotalCleanYardSearch] = useState('');
 
     // Main table search and filter
     const [mainSearch, setMainSearch] = useState('');
@@ -203,6 +205,19 @@ export default function DashboardPage() {
     const unifiedCompletedList = [...completedList, ...cleanYardItemsFormatted];
     const escalaCount = completedList.length; // Apenas escala
     const patioCount = cleanYardItemsFormatted.length; // Apenas pátio
+
+    // Total Clean Inventory (No date filter)
+    const totalCleanYardItems = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
+        id: item.id,
+        vehicle: item.vehicle,
+        cleaner: { name: item.last_cleaner_name },
+        started_at: item.created_at,
+        finished_at: item.last_cleaned_at,
+        check_interno: true,
+        check_externo: true,
+        check_pneus: true,
+        origin: 'Pátio'
+    }));
 
     // Filtered lists
     const filteredCancelled = cancelledList.filter((e: any) => {
@@ -425,7 +440,7 @@ export default function DashboardPage() {
 
     const exportCleanYardToPDF = () => {
         const doc = new jsPDF();
-        doc.text('Veículos Limpos no Pátio (Estoque)', 14, 15);
+        doc.text('Veículos Limpos no Pátio (Hoje)', 14, 15);
         doc.text(`Data: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
 
         const tableData = cleanYardItems.map((item: any) => [
@@ -442,7 +457,30 @@ export default function DashboardPage() {
             startY: 28,
         });
 
-        doc.save(`carros_limpos_patio_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+        doc.save(`carros_limpos_hoje_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    };
+
+    const exportTotalCleanYardToPDF = () => {
+        const doc = new jsPDF();
+        doc.text('Estoque Total Limpo no Pátio', 14, 15);
+        doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
+
+        const tableData = totalCleanYardItems.filter((item: any) => 
+            item.vehicle?.client_vehicle_number?.toString().toLowerCase().includes(totalCleanYardSearch.toLowerCase())
+        ).map((item: any) => [
+            item.vehicle.client_vehicle_number,
+            item.cleaner?.name || '-',
+            item.finished_at ? format(new Date(item.finished_at), 'dd/MM HH:mm') : '--:--',
+            format(new Date(item.started_at), 'dd/MM HH:mm')
+        ]);
+
+        autoTable(doc, {
+            head: [['Carro', 'Colaborador', 'Data Limpeza', 'Ingresso Pátio']],
+            body: tableData,
+            startY: 28,
+        });
+
+        doc.save(`estoque_limpo_total_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     };
 
 
@@ -704,6 +742,10 @@ export default function DashboardPage() {
                     <div className="bg-[#EFF6FF] p-5 rounded-2xl border-l-[6px] border-blue-500 shadow-xl shadow-blue-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowTotalYardModal(true)}>
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total no Pátio</p>
                         <p className="text-4xl font-black text-blue-800">{yardItems.length}</p>
+                    </div>
+                    <div className="bg-[#ECFDF5] p-5 rounded-2xl border-l-[6px] border-emerald-600 shadow-xl shadow-emerald-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowTotalCleanYardModal(true)}>
+                        <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">Estoque Limpo Totál</p>
+                        <p className="text-4xl font-black text-emerald-900">{totalCleanYardItems.length}</p>
                     </div>
                 </div>
 
@@ -1436,6 +1478,91 @@ export default function DashboardPage() {
                         <div className="mt-8 flex justify-end">
                             <button
                                 onClick={() => setShowCleanYardModal(false)}
+                                className="px-6 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showTotalCleanYardModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-800">Estoque Total Limpo no Pátio</h3>
+                                <p className="text-xs text-gray-500 uppercase font-black tracking-widest mt-1">Todos os veículos prontos no estoque ({totalCleanYardItems.length})</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={exportTotalCleanYardToPDF}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2 text-sm"
+                                >
+                                    <FileText size={16} /> Relatório PDF
+                                </button>
+                                <button
+                                    onClick={() => setShowTotalCleanYardModal(false)}
+                                    className="text-gray-500 hover:text-gray-700 font-bold text-2xl px-2"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Buscar veículo limpo..." 
+                                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium"
+                                    value={totalCleanYardSearch}
+                                    onChange={(e) => setTotalCleanYardSearch(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        {totalCleanYardItems.length === 0 ? (
+                            <p className="text-center text-gray-500 py-12 font-medium">Nenhum veículo limpo no estoque.</p>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-100">
+                                    <thead>
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data Limpeza</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso Pátio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {totalCleanYardItems.filter((item: any) => 
+                                            item.vehicle?.client_vehicle_number?.toString().toLowerCase().includes(totalCleanYardSearch.toLowerCase())
+                                        ).map((item: any) => (
+                                            <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-4 py-3">
+                                                    <span className="text-base font-black text-gray-800">{item.vehicle?.client_vehicle_number}</span>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm font-bold text-gray-600">
+                                                    {item.cleaner?.name || '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-500">
+                                                    {item.finished_at ? format(new Date(item.finished_at), "dd/MM HH:mm") : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-500">
+                                                    {item.started_at ? format(new Date(item.started_at), "dd/MM HH:mm") : '-'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        <div className="mt-8 flex justify-end">
+                            <button
+                                onClick={() => setShowTotalCleanYardModal(false)}
                                 className="px-6 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all"
                             >
                                 Fechar
