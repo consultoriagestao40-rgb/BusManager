@@ -32,10 +32,23 @@ export async function GET(request: Request) {
         const start = startOfDay(targetDate);
         const end = endOfDay(targetDate);
 
-        // 1. Get active events for the day
-        const events = await prisma.cleaningEvent.findMany({
+        // 1. Get the active schedule version for this date
+        const activeVersion = await prisma.scheduleVersion.findFirst({
             where: {
                 data_viagem: { gte: start, lte: end },
+                is_active: true
+            }
+        });
+
+        if (!activeVersion) {
+            // Se não houver escala ativa, retornamos vazio (evita mostrar lixo de importações antigas ou inativas)
+            return NextResponse.json({ events: [] });
+        }
+
+        // 2. Get events ONLY for the active version
+        const events = await prisma.cleaningEvent.findMany({
+            where: {
+                schedule_version_id: activeVersion.id,
                 NOT: {
                     event_business_key: { startsWith: 'YARD-' }
                 }
@@ -53,10 +66,10 @@ export async function GET(request: Request) {
             orderBy: { hora_viagem: 'asc' }
         });
 
-        // 2. Get ALL swaps for the day (including those on inactive versions)
+        // 3. Get swaps specifically for THIS active version
         const allSwapsToday = await prisma.swap.findMany({
             where: {
-                original_event: { data_viagem: { gte: start, lte: end } }
+                original_event: { schedule_version_id: activeVersion.id }
             },
             include: {
                 replacement_vehicle: true,

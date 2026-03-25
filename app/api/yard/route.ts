@@ -36,15 +36,24 @@ export async function GET() {
                 select: { name: true }
             }) : null;
 
-            // Check if there is an active programming for TODAY
-            const activeEvent = await prisma.cleaningEvent.findFirst({
+            // 1. Get the active schedule version for TODAY (Brazil)
+            const activeVersionForToday = await prisma.scheduleVersion.findFirst({
+                where: {
+                    data_viagem: { gte: start, lte: end },
+                    is_active: true
+                },
+                select: { id: true }
+            });
+
+            // 2. Check if there is an active programming for TODAY in the ACTIVE VERSION
+            const activeEvent = activeVersionForToday ? await prisma.cleaningEvent.findFirst({
                 where: {
                     vehicle_id: item.vehicle_id,
-                    data_viagem: { gte: start, lte: end },
+                    schedule_version_id: activeVersionForToday.id,
                     status: { in: ['PREVISTO', 'EM_ANDAMENTO'] }
                 },
                 select: { id: true, status: true }
-            });
+            }) : null;
 
             return {
                 ...item,
