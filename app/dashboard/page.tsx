@@ -569,15 +569,21 @@ export default function DashboardPage() {
         }
     };
 
-    const handleStartYardCleaning = async (vehicleId: string) => {
+    const handleStartYardCleaning = async (vehicleId: string, cleanerId: string) => {
         try {
             const res = await fetch('/api/yard', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ vehicle_id: vehicleId, status: 'EM_ANDAMENTO' })
+                body: JSON.stringify({ 
+                    vehicle_id: vehicleId, 
+                    status: 'EM_ANDAMENTO',
+                    checklist: { cleaner_id: cleanerId }
+                })
             });
 
             if (res.ok) {
+                setShowYardStartModal(false);
+                fetchEvents();
                 fetchYardItems();
             } else {
                 const errorData = await res.json().catch(() => ({}));
