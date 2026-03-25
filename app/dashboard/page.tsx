@@ -441,29 +441,32 @@ export default function DashboardPage() {
     };
 
     const exportCleanYardToPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: 'landscape' });
         doc.text('Veículos Limpos no Pátio (Hoje)', 14, 15);
         doc.text(`Data: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
 
         const tableData = cleanYardItems.map((item: any) => [
             item.vehicle_number,
-            item.cleaner_name,
-            item.status,
-            item.cleaned_at ? format(new Date(item.cleaned_at), 'dd/MM HH:mm') : '--:--',
-            format(new Date(item.created_at), 'dd/MM HH:mm')
+            'Pátio',
+            item.cleaner_name || '-',
+            item.created_at ? format(new Date(item.created_at), 'HH:mm') : '--:--',
+            item.cleaned_at ? format(new Date(item.cleaned_at), 'HH:mm') : '--:--',
+            'OK', 'OK', 'OK',
+            'Limpeza de Pátio'
         ]);
 
         autoTable(doc, {
-            head: [['Carro', 'Colaborador', 'Status', 'Última Limpeza', 'Ingresso']],
+            head: [['CARRO', 'ORIGEM', 'COLABORADOR', 'INÍCIO', 'FIM', 'INTERNO', 'EXTERNO', 'PNEUS', 'OBSERVAÇÃO']],
             body: tableData,
             startY: 28,
+            styles: { fontSize: 8 }
         });
 
         doc.save(`carros_limpos_hoje_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     };
 
     const exportTotalCleanYardToPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: 'landscape' });
         doc.text('Estoque Total Limpo no Pátio', 14, 15);
         doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 22);
 
@@ -471,15 +474,19 @@ export default function DashboardPage() {
             item.vehicle?.client_vehicle_number?.toString().toLowerCase().includes(totalCleanYardSearch.toLowerCase())
         ).map((item: any) => [
             item.vehicle.client_vehicle_number,
+            'Pátio',
             item.cleaner?.name || '-',
-            item.finished_at ? format(new Date(item.finished_at), 'dd/MM HH:mm') : '--:--',
-            format(new Date(item.started_at), 'dd/MM HH:mm')
+            item.started_at ? format(new Date(item.started_at), 'HH:mm') : '--:--',
+            item.finished_at ? format(new Date(item.finished_at), 'HH:mm') : '--:--',
+            'OK', 'OK', 'OK',
+            'Estoque'
         ]);
 
         autoTable(doc, {
-            head: [['Carro', 'Colaborador', 'Data Limpeza', 'Ingresso Pátio']],
+            head: [['CARRO', 'ORIGEM', 'COLABORADOR', 'INÍCIO', 'FIM', 'INTERNO', 'EXTERNO', 'PNEUS', 'OBSERVAÇÃO']],
             body: tableData,
             startY: 28,
+            styles: { fontSize: 8 }
         });
 
         doc.save(`estoque_limpo_total_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
