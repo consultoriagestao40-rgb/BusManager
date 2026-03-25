@@ -37,6 +37,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
     const [checkInterno, setCheckInterno] = useState(false);
     const [checkExterno, setCheckExterno] = useState(false);
     const [checkPneus, setCheckPneus] = useState(false);
+    const [checkBagageiros, setCheckBagageiros] = useState(false);
     const [finishObs, setFinishObs] = useState('');
 
     useEffect(() => {
@@ -348,6 +349,10 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                 <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
                                 <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado OK</span>
                             </label>
+                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                <input type="checkbox" checked={checkBagageiros} onChange={(e) => setCheckBagageiros(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                <span className="text-sm font-semibold text-gray-700">Limpeza dos Bagajeiros OK</span>
+                            </label>
 
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
@@ -368,6 +373,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                     check_interno: checkInterno,
                                     check_externo: checkExterno,
                                     check_pneus: checkPneus,
+                                    check_bagageiros: checkBagageiros,
                                     observacao_operacao: finishObs
                                 })}
                                 disabled={processing}

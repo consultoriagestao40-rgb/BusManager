@@ -157,6 +157,7 @@ export default function DashboardPage() {
     const [yardCheckInterno, setYardCheckInterno] = useState(false);
     const [yardCheckExterno, setYardCheckExterno] = useState(false);
     const [yardCheckPneus, setYardCheckPneus] = useState(false);
+    const [yardCheckBagageiros, setYardCheckBagageiros] = useState(false);
     const [yardFinishObs, setYardFinishObs] = useState('');
 
     // Helper to extract all swaps
@@ -561,6 +562,7 @@ export default function DashboardPage() {
                         check_interno: yardCheckInterno,
                         check_externo: yardCheckExterno,
                         check_pneus: yardCheckPneus,
+                        check_bagageiros: yardCheckBagageiros,
                         cleaner_id: selectedCleaner,
                         observacao: yardFinishObs
                     }
@@ -573,6 +575,7 @@ export default function DashboardPage() {
                 setYardCheckInterno(false);
                 setYardCheckExterno(false);
                 setYardCheckPneus(false);
+                setYardCheckBagageiros(false);
                 setYardFinishObs('');
                 fetchYardItems();
                 fetchEvents();
@@ -1493,6 +1496,15 @@ export default function DashboardPage() {
                                         className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
                                     />
                                     <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Pretinho Pneus OK</span>
+                                </label>
+                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={yardCheckBagageiros} 
+                                        onChange={(e) => setYardCheckBagageiros(e.target.checked)} 
+                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                    />
+                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza dos Bagajeiros OK</span>
                                 </label>
                             </div>
 

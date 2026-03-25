@@ -37,7 +37,7 @@ export async function GET(request: Request) {
             where: {
                 data_viagem: { gte: start, lte: end },
                 schedule_version: { is_active: true },
-                at_yard: false // Hide standalone yard cleanings from schedule
+                at_yard: { not: true } // Safer than just at_yard: false if any records have NULL
             },
             include: {
                 vehicle: true,

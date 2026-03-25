@@ -32,6 +32,8 @@ export async function startEvent(eventId: string, userId: string) {
                     check_interno: true,
                     check_externo: true,
                     check_pneus: true,
+                    check_bagageiros: true,
+                    at_yard: false,
                     observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                 }
             }).then(async (res) => {
@@ -62,11 +64,12 @@ export async function completeEvent(
         check_interno: boolean;
         check_externo: boolean;
         check_pneus: boolean;
+        check_bagageiros: boolean;
         observacao_operacao?: string;
     }
 ) {
     // Business Rule: If checks are not ALL true, observation is mandatory
-    const allChecksPassed = data.check_interno && data.check_externo && data.check_pneus;
+    const allChecksPassed = data.check_interno && data.check_externo && data.check_pneus && data.check_bagageiros;
 
     if (!allChecksPassed) {
         // This check should ideally happen at API/Validation layer too, but double check here.
@@ -84,6 +87,7 @@ export async function completeEvent(
             check_interno: data.check_interno,
             check_externo: data.check_externo,
             check_pneus: data.check_pneus,
+            check_bagageiros: data.check_bagageiros,
             observacao_operacao: data.observacao_operacao
         }
     });
@@ -150,6 +154,8 @@ export async function swapVehicle(
                         check_interno: true,
                         check_externo: true,
                         check_pneus: true,
+                        check_bagageiros: true,
+                        at_yard: false,
                         revisar: true,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                     } : {
@@ -176,6 +182,7 @@ export async function updateYardStatus(
         check_interno: boolean;
         check_externo: boolean;
         check_pneus: boolean;
+        check_bagageiros: boolean;
         cleaner_id?: string;
         observacao?: string;
     }
@@ -213,6 +220,7 @@ export async function updateYardStatus(
                     check_interno: checklist.check_interno,
                     check_externo: checklist.check_externo,
                     check_pneus: checklist.check_pneus,
+                    check_bagageiros: checklist.check_bagageiros,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
                     at_yard: true, // This hides it from schedule but keeps it in history
                     event_business_key: `YARD-${vehicleId}-${Date.now()}`
