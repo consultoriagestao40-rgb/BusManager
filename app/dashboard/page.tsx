@@ -138,6 +138,8 @@ export default function DashboardPage() {
     const [showCompletedModal, setShowCompletedModal] = useState(false);
     const [showTotalYardModal, setShowTotalYardModal] = useState(false);
     const [showTotalCleanYardModal, setShowTotalCleanYardModal] = useState(false);
+    const [showYardStartModal, setShowYardStartModal] = useState(false);
+    const [selectedYardVehicleId, setSelectedYardVehicleId] = useState<string | null>(null);
 
     // Search states
     const [cancelledSearch, setCancelledSearch] = useState('');
@@ -896,7 +898,10 @@ export default function DashboardPage() {
                                                             <>
                                                                 {item.status === 'SUJO' && (
                                                                     <button
-                                                                        onClick={() => handleStartYardCleaning(item.vehicle.id)}
+                                                                        onClick={() => {
+                                                                            setSelectedYardVehicleId(item.vehicle.id);
+                                                                            setShowYardStartModal(true);
+                                                                        }}
                                                                         className="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-blue-700 flex items-center gap-1"
                                                                     >
                                                                         <Play size={10} fill="currentColor" /> Iniciar
@@ -1446,9 +1451,12 @@ export default function DashboardPage() {
                                     <thead>
                                         <tr>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Origem</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Última Limpeza</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Início</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Fim</th>
+                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Checks</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Obs</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
@@ -1457,16 +1465,27 @@ export default function DashboardPage() {
                                                 <td className="px-4 py-3">
                                                     <span className="text-base font-black text-gray-800">{item.vehicle_number}</span>
                                                 </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">Pátio</span>
+                                                </td>
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
                                                     {item.cleaner_name}
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                                                        {item.status}
-                                                    </span>
+                                                <td className="px-4 py-3 text-sm text-gray-500">
+                                                    {item.created_at ? format(new Date(item.created_at), "HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.cleaned_at ? format(new Date(item.cleaned_at), "HH:mm (dd/MM)", { locale: ptBR }) : '--:--'}
+                                                    {item.cleaned_at ? format(new Date(item.cleaned_at), "HH:mm") : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <div className="flex justify-center gap-1">
+                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Interno"></div>
+                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Externo"></div>
+                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Pneus"></div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-[10px] text-gray-400 font-medium max-w-[100px] truncate">
+                                                    Pátio
                                                 </td>
                                             </tr>
                                         ))}
@@ -1531,9 +1550,12 @@ export default function DashboardPage() {
                                     <thead>
                                         <tr>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Carro</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Origem</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data Limpeza</th>
-                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresso Pátio</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Início</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Fim</th>
+                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Checks</th>
+                                            <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Obs</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
@@ -1544,14 +1566,27 @@ export default function DashboardPage() {
                                                 <td className="px-4 py-3">
                                                     <span className="text-base font-black text-gray-800">{item.vehicle?.client_vehicle_number}</span>
                                                 </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">Pátio</span>
+                                                </td>
                                                 <td className="px-4 py-3 text-sm font-bold text-gray-600">
                                                     {item.cleaner?.name || '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.finished_at ? format(new Date(item.finished_at), "dd/MM HH:mm") : '-'}
+                                                    {item.started_at ? format(new Date(item.started_at), "HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-sm text-gray-500">
-                                                    {item.started_at ? format(new Date(item.started_at), "dd/MM HH:mm") : '-'}
+                                                    {item.finished_at ? format(new Date(item.finished_at), "HH:mm") : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <div className="flex justify-center gap-1">
+                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Interno"></div>
+                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Externo"></div>
+                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Pneus"></div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-[10px] text-gray-400 font-medium max-w-[100px] truncate">
+                                                    Estoque
                                                 </td>
                                             </tr>
                                         ))}
@@ -1664,6 +1699,36 @@ export default function DashboardPage() {
                                 className="flex-2 py-4 px-8 bg-green-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform active:scale-95"
                             >
                                 Confirmar Finalização
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showYardStartModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100]" onClick={() => setShowYardStartModal(false)}>
+                    <div className="bg-white rounded-2xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-lg font-black mb-4">Iniciar Limpeza (Pátio)</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1 block">Selecionar Colaborador</label>
+                                <select
+                                    value={selectedCleaner}
+                                    onChange={(e) => setSelectedCleaner(e.target.value)}
+                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                                >
+                                    <option value="">Selecione um colaborador</option>
+                                    {cleaners.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="flex gap-2 mt-6">
+                            <button onClick={() => setShowYardStartModal(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                            <button
+                                onClick={() => selectedYardVehicleId && handleStartYardCleaning(selectedYardVehicleId, selectedCleaner)}
+                                disabled={!selectedCleaner}
+                                className="flex-1 py-2 bg-blue-600 text-white font-black rounded-xl disabled:opacity-50 shadow-md shadow-blue-100"
+                            >
+                                Iniciar
                             </button>
                         </div>
                     </div>

@@ -195,9 +195,57 @@ export async function updateYardStatus(
 
     if (!yardItem) throw new Error('Veículo não encontrado no pátio');
 
+    if (status === 'EM_ANDAMENTO' && checklist?.cleaner_id) {
+        // Create an "In Progress" event for the yard
+        const activeVersion = await prisma.scheduleVersion.findFirst({
+            where: { is_active: true },
+            orderBy: { data_viagem: 'desc' }
+        });
+
+        if (activeVersion) {
+            const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
+            await prisma.cleaningEvent.upsert({
+                where: {
+                    schedule_version_id_event_business_key: {
+                        schedule_version_id: activeVersion.id,
+                        event_business_key: eventBusinessKey
+                    }
+                },
+                update: {
+                    status: 'EM_ANDAMENTO',
+                    started_at: new Date(),
+                    started_by_user_id: userId,
+                    cleaner_id: checklist.cleaner_id,
+                    at_yard: true
+                },
+                create: {
+                    vehicle_id: vehicleId,
+                    schedule_version_id: activeVersion.id,
+                    data_viagem: activeVersion.data_viagem,
+                    hora_viagem: new Date(),
+                    saida_programada_at: new Date(),
+                    liberar_ate_at: new Date(),
+                    status: 'EM_ANDAMENTO',
+                    started_at: new Date(),
+                    started_by_user_id: userId,
+                    cleaner_id: checklist.cleaner_id,
+                    at_yard: true,
+                    event_business_key: eventBusinessKey
+                }
+            });
+        }
+
+        return await prisma.yardInventory.update({
+            where: { id: yardItem.id },
+            data: { 
+                status: 'EM_ANDAMENTO',
+                last_cleaner_id: checklist.cleaner_id
+            }
+        });
+    }
+
     if (status === 'LIMPO' && checklist) {
         // 1. Create a record of this yard cleaning
-        // Find an active version to link it to (required by schema)
         const now = new Date();
         const activeVersion = await prisma.scheduleVersion.findFirst({
             where: { is_active: true },
@@ -222,7 +270,8 @@ export async function updateYardStatus(
                     check_externo: checklist.check_externo,
                     check_pneus: checklist.check_pneus,
                     check_bagageiros: checklist.check_bagageiros,
-                    observacao_operacao: checklist.observacao || 'Limpeza de Pátio'
+                    observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
+                    at_yard: true
                 },
                 create: {
                     vehicle_id: vehicleId,
@@ -232,7 +281,7 @@ export async function updateYardStatus(
                     saida_programada_at: now,
                     liberar_ate_at: now,
                     status: 'CONCLUIDO',
-                    started_at: yardItem.updated_at, // Consider data de entrada no pátio como início
+                    started_at: yardItem.updated_at,
                     finished_at: now,
                     started_by_user_id: userId,
                     completed_by_user_id: userId,
