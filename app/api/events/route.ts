@@ -84,12 +84,15 @@ export async function GET(request: Request) {
         // 4. Ensure all swaps are represented in the active events
         // If a swap is linked to an event that is now inactive, we find its active counterpart
         const eventsWithAllSwaps = events.map(event => {
+            // Rule: Started or Finished events are ALWAYS at_yard by business rule
+            const isStartedOrFinished = event.status === 'EM_ANDAMENTO' || event.status === 'CONCLUIDO';
+            
             // Rule: If vehicle is in yard inventory, it's considered at_yard for the scale checkbox
             const autoAtYard = currentYardIds.includes(event.vehicle_id);
             
             let enrichedEvent = { 
                 ...event, 
-                at_yard: event.at_yard || autoAtYard 
+                at_yard: event.at_yard || autoAtYard || isStartedOrFinished
             };
 
             try {
