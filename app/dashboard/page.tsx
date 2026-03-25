@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { startOfDay, addDays, subDays, isSameDay, format, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw, CheckCircle, X } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import { jsPDF } from 'jspdf';
@@ -77,8 +77,21 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchCleaners = async () => {
+        try {
+            const res = await fetch('/api/cleaners');
+            if (res.ok) {
+                const data = await res.json();
+                setCleaners(data.cleaners);
+            }
+        } catch (error) {
+            console.error('Error fetching cleaners:', error);
+        }
+    };
+
     useEffect(() => {
         fetchUser();
+        fetchCleaners();
     }, []);
 
     useEffect(() => {
@@ -135,6 +148,16 @@ export default function DashboardPage() {
     // Main table search and filter
     const [mainSearch, setMainSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('TODOS');
+
+    // Yard cleaning state
+    const [showYardFinishModal, setShowYardFinishModal] = useState(false);
+    const [selectedYardVehicle, setSelectedYardVehicle] = useState<any>(null);
+    const [cleaners, setCleaners] = useState<any[]>([]);
+    const [selectedCleaner, setSelectedCleaner] = useState('');
+    const [yardCheckInterno, setYardCheckInterno] = useState(false);
+    const [yardCheckExterno, setYardCheckExterno] = useState(false);
+    const [yardCheckPneus, setYardCheckPneus] = useState(false);
+    const [yardFinishObs, setYardFinishObs] = useState('');
 
     // Helper to extract all swaps
     const getAllSwaps = () => {
@@ -504,6 +527,65 @@ export default function DashboardPage() {
         }
     };
 
+    const handleStartYardCleaning = async (vehicleId: string) => {
+        try {
+            const res = await fetch('/api/yard', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle_id: vehicleId, status: 'EM_ANDAMENTO' })
+            });
+
+            if (res.ok) {
+                fetchYardItems();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao iniciar: ${errorData.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            console.error('Error starting yard cleaning:', error);
+            alert('Erro de conexão.');
+        }
+    };
+
+    const handleFinishYardCleaning = async () => {
+        if (!selectedYardVehicle || !selectedCleaner) return;
+
+        try {
+            const res = await fetch('/api/yard', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vehicle_id: selectedYardVehicle.vehicle.id,
+                    status: 'LIMPO',
+                    checklist: {
+                        check_interno: yardCheckInterno,
+                        check_externo: yardCheckExterno,
+                        check_pneus: yardCheckPneus,
+                        cleaner_id: selectedCleaner,
+                        observacao: yardFinishObs
+                    }
+                })
+            });
+
+            if (res.ok) {
+                setShowYardFinishModal(false);
+                setSelectedYardVehicle(null);
+                setYardCheckInterno(false);
+                setYardCheckExterno(false);
+                setYardCheckPneus(false);
+                setYardFinishObs('');
+                fetchYardItems();
+                fetchEvents();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao finalizar: ${errorData.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            console.error('Error finishing yard cleaning:', error);
+            alert('Erro de conexão.');
+        }
+    };
+
     const handleManualProgram = async (vehicleId: string) => {
         try {
             const res = await fetch('/api/events/manual', {
@@ -763,15 +845,35 @@ export default function DashboardPage() {
                                                     <td className="px-6 py-4 text-right flex justify-end gap-3 items-center">
                                                         {canEdit && (
                                                             <>
+                                                                {item.status === 'SUJO' && (
                                                                     <button
+                                                                        onClick={() => handleStartYardCleaning(item.vehicle.id)}
+                                                                        className="bg-blue-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-blue-700 flex items-center gap-1"
+                                                                    >
+                                                                        <Play size={10} fill="currentColor" /> Iniciar
+                                                                    </button>
+                                                                )}
+                                                                {item.status === 'EM_ANDAMENTO' && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setSelectedYardVehicle(item);
+                                                                            setShowYardFinishModal(true);
+                                                                        }}
+                                                                        className="bg-green-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-green-700 flex items-center gap-1"
+                                                                    >
+                                                                        <CheckCircle className="w-2.5 h-2.5" /> Finalizar
+                                                                    </button>
+                                                                )}
+                                                                <button
                                                                     onClick={() => handleManualProgram(item.vehicle.id)}
                                                                     disabled={item.status === 'EM_ANDAMENTO'}
                                                                     className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1 ${item.status === 'EM_ANDAMENTO'
                                                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                                        : 'bg-green-600 text-white hover:bg-green-700'
+                                                                        : 'bg-emerald-600 text-white hover:bg-emerald-700'
                                                                         }`}
+                                                                    title="Programar para Escala"
                                                                 >
-                                                                    <Play size={10} fill="currentColor" /> Iniciar Limpeza
+                                                                    <Plus size={10} /> Escala
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleRemoveYardVehicle(item.id)}
@@ -1330,6 +1432,95 @@ export default function DashboardPage() {
                                 className="px-6 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all"
                             >
                                 Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Yard Finish Modal */}
+            {showYardFinishModal && selectedYardVehicle && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]" onClick={() => setShowYardFinishModal(false)}>
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-black text-gray-800 tracking-tight">Finalizar Limpeza</h3>
+                            <button onClick={() => setShowYardFinishModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                <X size={24} className="text-gray-400" />
+                            </button>
+                        </div>
+
+                        <div className="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                            <p className="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Veículo selecionado</p>
+                            <p className="text-2xl font-black text-blue-900">{selectedYardVehicle.vehicle.client_vehicle_number}</p>
+                        </div>
+
+                        <div className="space-y-4 mb-8">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Colaborador</label>
+                                <select
+                                    value={selectedCleaner}
+                                    onChange={(e) => setSelectedCleaner(e.target.value)}
+                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all"
+                                >
+                                    <option value="">Selecione quem realizou a limpeza</option>
+                                    {cleaners.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-3">
+                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={yardCheckInterno} 
+                                        onChange={(e) => setYardCheckInterno(e.target.checked)} 
+                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                    />
+                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Interna OK</span>
+                                </label>
+                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={yardCheckExterno} 
+                                        onChange={(e) => setYardCheckExterno(e.target.checked)} 
+                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                    />
+                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Externa OK</span>
+                                </label>
+                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={yardCheckPneus} 
+                                        onChange={(e) => setYardCheckPneus(e.target.checked)} 
+                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                    />
+                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Pretinho Pneus OK</span>
+                                </label>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Observações</label>
+                                <textarea
+                                    value={yardFinishObs}
+                                    onChange={(e) => setYardFinishObs(e.target.value)}
+                                    placeholder="Alguma observação importante?"
+                                    rows={2}
+                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 resize-none font-medium text-gray-700 transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => setShowYardFinishModal(false)} 
+                                className="flex-1 py-4 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-gray-50 rounded-2xl transition-all"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleFinishYardCleaning}
+                                disabled={!selectedCleaner}
+                                className="flex-2 py-4 px-8 bg-green-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform active:scale-95"
+                            >
+                                Confirmar Finalização
                             </button>
                         </div>
                     </div>

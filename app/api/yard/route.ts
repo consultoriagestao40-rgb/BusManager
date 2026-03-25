@@ -159,3 +159,29 @@ export async function DELETE(request: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function PATCH(request: Request) {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth_token')?.value;
+        const user = token ? await getUserFromToken(token) : null;
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { vehicle_id, status, checklist } = await request.json();
+
+        if (!vehicle_id || !status) {
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        const { updateYardStatus } = await import('@/lib/event-service');
+        const updated = await updateYardStatus(vehicle_id, status, user.id, checklist);
+
+        return NextResponse.json(updated);
+    } catch (error: any) {
+        console.error('Yard API PATCH error:', error);
+        return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    }
+}

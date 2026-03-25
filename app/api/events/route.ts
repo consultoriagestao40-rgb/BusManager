@@ -36,7 +36,8 @@ export async function GET(request: Request) {
         const events = await prisma.cleaningEvent.findMany({
             where: {
                 data_viagem: { gte: start, lte: end },
-                schedule_version: { is_active: true }
+                schedule_version: { is_active: true },
+                at_yard: false // Hide standalone yard cleanings from schedule
             },
             include: {
                 vehicle: true,

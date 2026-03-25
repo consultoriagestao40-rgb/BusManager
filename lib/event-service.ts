@@ -2,6 +2,49 @@ import prisma from '@/lib/prisma';
 import { EventStatus, SwapReason } from '@prisma/client';
 
 export async function startEvent(eventId: string, userId: string) {
+    const event = await prisma.cleaningEvent.findUnique({
+        where: { id: eventId },
+        include: { vehicle: true }
+    });
+
+    if (!event) throw new Error('Evento não encontrado');
+
+    // Condition 02: If vehicle is in yard, remove it
+    const yardItem = await prisma.yardInventory.findFirst({
+        where: { vehicle_id: event.vehicle_id }
+    });
+
+    if (yardItem) {
+        // If it's already clean in yard, we could auto-complete, 
+        // but often 'start' in schedule means they want to re-verify or it's a new task.
+        // User said: "se sair em escala normal, o sistema tira ele do patio e baixa ele"
+        // "Baixa" might mean auto-complete if clean.
+        
+        if (yardItem.status === 'LIMPO' && event.status === 'PREVISTO') {
+            return await prisma.cleaningEvent.update({
+                where: { id: eventId },
+                data: {
+                    status: 'CONCLUIDO',
+                    started_at: yardItem.created_at, // Use yard entry as start
+                    finished_at: yardItem.last_cleaned_at || new Date(),
+                    started_by_user_id: userId,
+                    completed_by_user_id: yardItem.last_cleaner_id || userId,
+                    check_interno: true,
+                    check_externo: true,
+                    check_pneus: true,
+                    observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
+                }
+            }).then(async (res) => {
+                await prisma.yardInventory.delete({ where: { id: yardItem.id } });
+                return res;
+            });
+        }
+
+        await prisma.yardInventory.delete({
+            where: { id: yardItem.id }
+        });
+    }
+
     return await prisma.cleaningEvent.update({
         where: { id: eventId },
         data: {
@@ -122,5 +165,73 @@ export async function swapVehicle(
                 });
             }
         }
+    });
+}
+
+export async function updateYardStatus(
+    vehicleId: string,
+    status: 'SUJO' | 'EM_ANDAMENTO' | 'LIMPO',
+    userId: string,
+    checklist?: {
+        check_interno: boolean;
+        check_externo: boolean;
+        check_pneus: boolean;
+        cleaner_id?: string;
+        observacao?: string;
+    }
+) {
+    const yardItem = await prisma.yardInventory.findFirst({
+        where: { vehicle_id: vehicleId }
+    });
+
+    if (!yardItem) throw new Error('Veículo não encontrado no pátio');
+
+    if (status === 'LIMPO' && checklist) {
+        // 1. Create a record of this yard cleaning
+        // Find an active version to link it to (required by schema)
+        const now = new Date();
+        const activeVersion = await prisma.scheduleVersion.findFirst({
+            where: { is_active: true },
+            orderBy: { data_viagem: 'desc' }
+        });
+
+        if (activeVersion) {
+            await prisma.cleaningEvent.create({
+                data: {
+                    vehicle_id: vehicleId,
+                    schedule_version_id: activeVersion.id,
+                    data_viagem: activeVersion.data_viagem,
+                    hora_viagem: now,
+                    saida_programada_at: now,
+                    liberar_ate_at: now,
+                    status: 'CONCLUIDO',
+                    started_at: yardItem.updated_at,
+                    finished_at: now,
+                    started_by_user_id: userId,
+                    completed_by_user_id: userId,
+                    cleaner_id: checklist.cleaner_id,
+                    check_interno: checklist.check_interno,
+                    check_externo: checklist.check_externo,
+                    check_pneus: checklist.check_pneus,
+                    observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
+                    at_yard: true, // This hides it from schedule but keeps it in history
+                    event_business_key: `YARD-${vehicleId}-${Date.now()}`
+                }
+            });
+        }
+
+        return await prisma.yardInventory.update({
+            where: { id: yardItem.id },
+            data: {
+                status: 'LIMPO',
+                last_cleaned_at: now,
+                last_cleaner_id: checklist.cleaner_id
+            }
+        });
+    }
+
+    return await prisma.yardInventory.update({
+        where: { id: yardItem.id },
+        data: { status }
     });
 }
