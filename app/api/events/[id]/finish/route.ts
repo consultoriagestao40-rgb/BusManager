@@ -34,12 +34,13 @@ export async function POST(
         }
 
         const body = await request.json();
-        const { check_interno, check_externo, check_pneus, observacao_operacao } = body;
+        const { check_interno, check_externo, check_pneus, check_bagageiros, observacao_operacao } = body;
 
         const updatedEvent = await completeEvent(id, user.id, {
             check_interno,
             check_externo,
             check_pneus,
+            check_bagageiros,
             observacao_operacao
         });
 
