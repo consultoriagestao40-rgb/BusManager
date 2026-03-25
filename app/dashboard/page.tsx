@@ -159,6 +159,7 @@ export default function DashboardPage() {
     const [yardCheckPneus, setYardCheckPneus] = useState(false);
     const [yardCheckBagageiros, setYardCheckBagageiros] = useState(false);
     const [yardFinishObs, setYardFinishObs] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     // Helper to extract all swaps
     const getAllSwaps = () => {
@@ -549,9 +550,10 @@ export default function DashboardPage() {
     };
 
     const handleFinishYardCleaning = async () => {
-        if (!selectedYardVehicle || !selectedCleaner) return;
+        if (!selectedYardVehicle) return;
 
         try {
+            setProcessing(true);
             const res = await fetch('/api/yard', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -586,6 +588,8 @@ export default function DashboardPage() {
         } catch (error) {
             console.error('Error finishing yard cleaning:', error);
             alert('Erro de conexão.');
+        } finally {
+            setProcessing(false);
         }
     };
 
