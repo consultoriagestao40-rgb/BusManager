@@ -33,7 +33,7 @@ export async function startEvent(eventId: string, userId: string) {
                     check_externo: true,
                     check_pneus: true,
                     check_bagageiros: true,
-                    at_yard: false,
+                    at_yard: true,
                     observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                 }
             }).then(async (res) => {
@@ -52,7 +52,8 @@ export async function startEvent(eventId: string, userId: string) {
         data: {
             status: 'EM_ANDAMENTO',
             started_at: new Date(),
-            started_by_user_id: userId
+            started_by_user_id: userId,
+            at_yard: true
         }
     });
 }
@@ -88,7 +89,8 @@ export async function completeEvent(
             check_externo: data.check_externo,
             check_pneus: data.check_pneus,
             check_bagageiros: data.check_bagageiros,
-            observacao_operacao: data.observacao_operacao
+            observacao_operacao: data.observacao_operacao,
+            at_yard: true
         }
     });
 
@@ -155,7 +157,7 @@ export async function swapVehicle(
                         check_externo: true,
                         check_pneus: true,
                         check_bagageiros: true,
-                        at_yard: false,
+                        at_yard: true,
                         revisar: true,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                     } : {
