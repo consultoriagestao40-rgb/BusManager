@@ -83,6 +83,40 @@ export async function checkAndSendSLAAlerts() {
 }
 
 /**
+ * Envia alerta de início de limpeza
+ */
+export async function sendStartAlert(eventId: string) {
+    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
+
+    try {
+        const event = await prisma.cleaningEvent.findUnique({
+            where: { id: eventId },
+            include: { 
+                vehicle: true,
+                started_by: true
+            }
+        });
+
+        if (!event || !event.vehicle) return;
+
+        const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
+        const usuario = event.started_by?.name || 'Sistema';
+
+        const message = `⏳ *LIMPEZA INICIADA*\n\n` +
+            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
+            `🕒 *Saída Prevista:* ${saida}\n` +
+            `👤 *Iniciado por:* ${usuario}\n\n` +
+            `Veículo entrou em processo de limpeza! 🚌`;
+
+        sendWhatsAppMessage(message).catch(err => {
+            console.error('[WhatsApp] Falha silenciosa no envio de início:', err.message);
+        });
+    } catch (error) {
+        console.error('[WhatsApp] Erro ao preparar alerta de início:', error);
+    }
+}
+
+/**
  * Envia alerta de conclusão de limpeza
  */
 export async function sendCompletionAlert(eventId: string) {

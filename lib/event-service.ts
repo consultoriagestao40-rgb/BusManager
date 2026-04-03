@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import { EventStatus, SwapReason } from '@prisma/client';
-import { sendCompletionAlert, sendSwapAlert } from './whatsapp-service';
+import { sendCompletionAlert, sendSwapAlert, sendStartAlert } from './whatsapp-service';
 
 export async function startEvent(eventId: string, userId: string) {
     const event = await prisma.cleaningEvent.findUnique({
@@ -51,7 +51,7 @@ export async function startEvent(eventId: string, userId: string) {
         });
     }
 
-    return await prisma.cleaningEvent.update({
+    const updated = await prisma.cleaningEvent.update({
         where: { id: eventId },
         data: {
             status: 'EM_ANDAMENTO',
@@ -60,6 +60,11 @@ export async function startEvent(eventId: string, userId: string) {
             at_yard: true
         }
     });
+
+    // Envia alerta de início
+    sendStartAlert(eventId);
+
+    return updated;
 }
 
 export async function completeEvent(
@@ -274,13 +279,28 @@ export async function updateYardStatus(
             });
         }
 
-        return await prisma.yardInventory.update({
+        const res = await prisma.yardInventory.update({
             where: { id: yardItem.id },
             data: { 
                 status: 'EM_ANDAMENTO',
                 last_cleaner_id: checklist.cleaner_id
             }
         });
+
+        // Alerta de início via pátio
+        const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
+        // Procuramos o ID do evento recém criado/atualizado pelo upsert anterior
+        const event = await prisma.cleaningEvent.findUnique({
+            where: {
+                schedule_version_id_event_business_key: {
+                    schedule_version_id: activeVersion.id,
+                    event_business_key: eventBusinessKey
+                }
+            }
+        });
+        if (event) sendStartAlert(event.id);
+
+        return res;
     }
 
     if (status === 'LIMPO' && checklist) {
