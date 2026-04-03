@@ -288,17 +288,19 @@ export async function updateYardStatus(
         });
 
         // Alerta de início via pátio
-        const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
-        // Procuramos o ID do evento recém criado/atualizado pelo upsert anterior
-        const event = await prisma.cleaningEvent.findUnique({
-            where: {
-                schedule_version_id_event_business_key: {
-                    schedule_version_id: activeVersion.id,
-                    event_business_key: eventBusinessKey
+        if (activeVersion) {
+            const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
+            // Procuramos o ID do evento recém criado/atualizado pelo upsert anterior
+            const event = await prisma.cleaningEvent.findUnique({
+                where: {
+                    schedule_version_id_event_business_key: {
+                        schedule_version_id: activeVersion.id,
+                        event_business_key: eventBusinessKey
+                    }
                 }
-            }
-        });
-        if (event) sendStartAlert(event.id);
+            });
+            if (event) sendStartAlert(event.id);
+        }
 
         return res;
     }
