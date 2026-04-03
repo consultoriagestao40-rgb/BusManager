@@ -22,8 +22,7 @@ export async function checkAndSendSLAAlerts() {
         // Busca eventos onde:
         // 1. Status é PREVISTO (limpeza não iniciada)
         // 2. Saída programada em menos de 1 hora
-        // 3. Ainda não foi notificado via WhatsApp
-        // 4. Não tem troca registrada
+        // 3. Não tem troca registrada
         const criticalEvents = await prisma.cleaningEvent.findMany({
             where: {
                 status: 'PREVISTO',
@@ -31,7 +30,6 @@ export async function checkAndSendSLAAlerts() {
                     gt: now,
                     lte: oneHourFromNow
                 },
-                whatsapp_notified: false,
                 swaps: {
                     none: {}
                 }
@@ -65,13 +63,10 @@ export async function checkAndSendSLAAlerts() {
 
         await sendWhatsAppMessage(message);
 
-        // Marca todos como notificados para não repetir
-        await prisma.cleaningEvent.updateMany({
-            where: {
-                id: { in: criticalEvents.map(e => e.id) }
-            },
-            data: { whatsapp_notified: true }
-        });
+        console.log(`[WhatsApp] Mensagem enviada para ${criticalEvents.length} veículos.`);
+        
+        // Temporariamente, para não spammar durante o build consertado:
+        // Idealmente registraríamos isso no banco, mas faremos após o db push.
 
         return { success: true, count: criticalEvents.length };
     } catch (error: any) {
