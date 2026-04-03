@@ -199,7 +199,7 @@ async function sendWhatsAppMessage(text: string) {
                 'Content-Type': 'application/json',
                 'Client-Token': ZAPI_CLIENT_TOKEN || ''
             },
-            timeout: 5000 // Timeout de 5s para não prender a requisição
+            timeout: 15000 // Aumentado para 15s para lidar com lentidão da Z-API
         });
         console.log('[WhatsApp] Mensagem enviada com sucesso via Z-API.');
     } catch (error: any) {
