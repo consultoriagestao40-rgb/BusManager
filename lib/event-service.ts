@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { EventStatus, SwapReason } from '@prisma/client';
+import { sendCompletionAlert, sendSwapAlert } from './whatsapp-service';
 
 export async function startEvent(eventId: string, userId: string) {
     const event = await prisma.cleaningEvent.findUnique({
@@ -21,7 +22,7 @@ export async function startEvent(eventId: string, userId: string) {
         // "Baixa" might mean auto-complete if clean.
         
         if (yardItem.status === 'LIMPO' && event.status === 'PREVISTO') {
-            return await prisma.cleaningEvent.update({
+            const res = await prisma.cleaningEvent.update({
                 where: { id: eventId },
                 data: {
                     status: 'CONCLUIDO',
@@ -36,10 +37,13 @@ export async function startEvent(eventId: string, userId: string) {
                     at_yard: true,
                     observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                 }
-            }).then(async (res) => {
-                await prisma.yardInventory.delete({ where: { id: yardItem.id } });
-                return res;
             });
+            await prisma.yardInventory.delete({ where: { id: yardItem.id } });
+            
+            // Envia alerta de conclusão (auto-concluído via pátio)
+            sendCompletionAlert(eventId);
+            
+            return res;
         }
 
         await prisma.yardInventory.delete({
@@ -104,6 +108,9 @@ export async function completeEvent(
         }
     });
 
+    // Envia alerta de conclusão
+    sendCompletionAlert(eventId);
+
     return updatedEvent;
 }
 
@@ -116,7 +123,7 @@ export async function swapVehicle(
         observacao?: string;
     }
 ) {
-    return await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
         const event = await tx.cleaningEvent.findUnique({
             where: { id: eventId }
         });
@@ -174,6 +181,38 @@ export async function swapVehicle(
             }
         }
     });
+
+    // Envia alerta de troca após a transação
+    try {
+        const finalEvent = await prisma.cleaningEvent.findUnique({
+            where: { id: eventId },
+            include: { 
+                vehicle: true,
+                swaps: {
+                    orderBy: { created_at: 'desc' },
+                    take: 1,
+                    include: { 
+                        original_vehicle: true,
+                        replacement_vehicle: true,
+                        created_by: true
+                    }
+                }
+            }
+        });
+
+        if (finalEvent && finalEvent.swaps.length > 0) {
+            const lastSwap = finalEvent.swaps[0];
+            sendSwapAlert({
+                original_vehicle_number: lastSwap.original_vehicle.client_vehicle_number,
+                replacement_vehicle_number: lastSwap.replacement_vehicle?.client_vehicle_number || 'N/A',
+                motivo: lastSwap.motivo,
+                usuario: lastSwap.created_by.name || 'Sistema',
+                saida: finalEvent.saida_programada_at
+            });
+        }
+    } catch (e) {
+        console.error('[WhatsApp] Erro ao enviar alerta de troca:', e);
+    }
 }
 
 export async function updateYardStatus(
@@ -254,7 +293,7 @@ export async function updateYardStatus(
 
         if (activeVersion) {
             const eventBusinessKey = `YARD-${vehicleId}-${activeVersion.id}`;
-            await prisma.cleaningEvent.upsert({
+            const eventRes = await prisma.cleaningEvent.upsert({
                 where: {
                     schedule_version_id_event_business_key: {
                         schedule_version_id: activeVersion.id,
@@ -295,6 +334,11 @@ export async function updateYardStatus(
                     event_business_key: eventBusinessKey
                 }
             });
+
+            // Envia alerta de conclusão (limpeza de pátio)
+            if (eventRes) {
+                sendCompletionAlert(eventRes.id);
+            }
         }
 
         return await prisma.yardInventory.update({
