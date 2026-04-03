@@ -95,7 +95,6 @@ model CleaningEvent {
   observacao_operacao  String?
   at_yard             Boolean         @default(false)
   revisar             Boolean         @default(false)
-  whatsapp_notified   Boolean         @default(false)
   schedule_version_id  String
   event_business_key   String
   cleaner_id           String?
