@@ -26,11 +26,11 @@ export async function checkAndSendSLAAlerts() {
 
         // Busca eventos onde:
         // 1. Status é PREVISTO (limpeza não iniciada)
-        // 2. Saída programada entre 1 hora atrás e 1 hora no futuro
+        // 2. Horário de LIBERAÇÃO (Meta H-1) entre 1 hora atrás e 1 hora no futuro
         const criticalEvents = await prisma.cleaningEvent.findMany({
             where: {
                 status: 'PREVISTO',
-                saida_programada_at: {
+                liberar_ate_at: {
                     gte: oneHourAgo,
                     lte: oneHourFromNow
                 }
@@ -49,16 +49,16 @@ export async function checkAndSendSLAAlerts() {
 
         // Mensagem consolidada
         const vehicleList = criticalEvents.map(e => {
-            const saida = new Intl.DateTimeFormat('pt-BR', {
+            const limite = new Intl.DateTimeFormat('pt-BR', {
                 timeZone: 'America/Sao_Paulo',
                 hour: '2-digit',
                 minute: '2-digit',
-            }).format(new Date(e.saida_programada_at));
-            return `▪️ Carro *${(e as any).vehicle.client_vehicle_number}* — saída às *${saida}*`;
+            }).format(new Date(e.liberar_ate_at));
+            return `▪️ Carro *${(e as any).vehicle.client_vehicle_number}* — limite às *${limite}*`;
         }).join('\n');
 
         const message = `⚠️ *ALERTA DE SLA — BUSMANAGER* ⚠️\n\n` +
-            `Os veículos abaixo estão a *menos de 1 hora* da saída e a limpeza *não foi iniciada*:\n\n` +
+            `Os veículos abaixo estão a *menos de 1 hora* do limite de liberação e a limpeza *não foi iniciada*:\n\n` +
             `${vehicleList}\n\n` +
             `Favor verificar com urgência! 🚌⏱️`;
 
