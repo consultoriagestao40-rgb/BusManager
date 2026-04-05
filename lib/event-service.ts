@@ -171,7 +171,8 @@ export async function swapVehicle(
                     ...(isAlreadyClean ? {
                         status: 'CONCLUIDO',
                         finished_at: yardItem.last_cleaned_at || new Date(),
-                        completed_by_user_id: yardItem.last_cleaner_id || userId,
+                        completed_by_user_id: userId,
+                        cleaner_id: yardItem.last_cleaner_id || event.cleaner_id,
                         check_interno: true,
                         check_externo: true,
                         check_pneus: true,
