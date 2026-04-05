@@ -57,7 +57,11 @@ export async function checkAndSendSLAAlerts() {
 
         // Monta uma mensagem consolidada com todos os veículos críticos
         const vehicleList = criticalEvents.map(e => {
-            const saida = format(new Date(e.saida_programada_at), 'HH:mm', { locale: ptBR });
+            const saida = new Intl.DateTimeFormat('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(new Date(e.saida_programada_at));
             return `▪️ Carro *${e.vehicle.client_vehicle_number}* — saída às *${saida}*`;
         }).join('\n');
 
@@ -104,7 +108,11 @@ export async function sendStartAlert(eventId: string) {
 
         if (!event || !event.vehicle) return;
 
-        const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
+        const saida = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(event.saida_programada_at));
         
         // Identifica se é Pátio ou Escala para o termo correto
         const isYard = event.event_business_key?.startsWith('YARD-');
@@ -144,7 +152,11 @@ export async function sendCompletionAlert(eventId: string) {
 
         if (!event || !event.vehicle) return;
 
-        const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
+        const saida = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(event.saida_programada_at));
         const concluido = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
@@ -185,7 +197,11 @@ export async function sendSwapAlert(details: {
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
 
     try {
-        const saidaStr = format(new Date(details.saida), 'HH:mm', { locale: ptBR });
+        const saidaStr = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(details.saida));
 
         const message = `🔄 *TROCA DE VEÍCULO*\n\n` +
             `❌ *Saiu:* ${details.original_vehicle_number}\n` +
