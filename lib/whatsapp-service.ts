@@ -145,7 +145,11 @@ export async function sendCompletionAlert(eventId: string) {
         if (!event || !event.vehicle) return;
 
         const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
-        const concluido = format(new Date(), 'HH:mm', { locale: ptBR });
+        const concluido = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date());
         
         // Termo correto
         const isYard = event.event_business_key?.startsWith('YARD-');
