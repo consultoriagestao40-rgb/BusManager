@@ -1,4 +1,4 @@
-import prisma from './prisma';
+import prisma from '@/lib/prisma';
 import axios from 'axios';
 import { addHours, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -89,27 +89,34 @@ export async function sendStartAlert(eventId: string) {
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
 
     try {
+        // Busca dados completo do evento
         const event = await prisma.cleaningEvent.findUnique({
             where: { id: eventId },
             include: { 
                 vehicle: true,
-                started_by: true
+                started_by: true,
+                cleaner: true
             }
         });
 
         if (!event || !event.vehicle) return;
 
         const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
-        const usuario = event.started_by?.name || 'Sistema';
+        
+        // Identifica se é Pátio ou Escala para o termo correto
+        const isYard = event.event_business_key?.startsWith('YARD-');
+        const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
+        const responsavel = event.cleaner?.name || event.started_by?.name || 'Sistema';
 
         const message = `⏳ *LIMPEZA INICIADA*\n\n` +
             `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
-            `👤 *Iniciado por:* ${usuario}\n\n` +
+            `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Veículo entrou em processo de limpeza! 🚌`;
 
-        sendWhatsAppMessage(message).catch(err => {
-            console.error('[WhatsApp] Falha silenciosa no envio de início:', err.message);
+        // Agora com await real
+        await sendWhatsAppMessage(message).catch(err => {
+            console.error('[WhatsApp] Falha no envio de início:', err.message);
         });
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de início:', error);
@@ -127,7 +134,8 @@ export async function sendCompletionAlert(eventId: string) {
             where: { id: eventId },
             include: { 
                 vehicle: true,
-                completed_by: true
+                completed_by: true,
+                cleaner: true
             }
         });
 
@@ -135,13 +143,17 @@ export async function sendCompletionAlert(eventId: string) {
 
         const saida = format(new Date(event.saida_programada_at), 'HH:mm', { locale: ptBR });
         const concluido = format(new Date(), 'HH:mm', { locale: ptBR });
-        const usuario = event.completed_by?.name || 'Sistema';
+        
+        // Termo correto
+        const isYard = event.event_business_key?.startsWith('YARD-');
+        const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
+        const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
 
         const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
             `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
             `🏁 *Concluído às:* ${concluido}\n` +
-            `👤 *Por:* ${usuario}\n\n` +
+            `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
 
         // Aguarda o envio para garantir que a Vercel não corte a execução

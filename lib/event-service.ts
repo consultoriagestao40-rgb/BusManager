@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { EventStatus, SwapReason } from '@prisma/client';
 import { sendCompletionAlert, sendSwapAlert, sendStartAlert } from './whatsapp-service';
 
-export async function startEvent(eventId: string, userId: string) {
+export async function startEvent(eventId: string, userId: string, cleanerId?: string) {
     const event = await prisma.cleaningEvent.findUnique({
         where: { id: eventId },
         include: { vehicle: true }
@@ -17,19 +17,18 @@ export async function startEvent(eventId: string, userId: string) {
 
     if (yardItem) {
         // If it's already clean in yard, we could auto-complete, 
-        // but often 'start' in schedule means they want to re-verify or it's a new task.
-        // User said: "se sair em escala normal, o sistema tira ele do patio e baixa ele"
-        // "Baixa" might mean auto-complete if clean.
+        // mas muitas vezes 'start' na escala significa que querem re-verificar.
         
         if (yardItem.status === 'LIMPO' && event.status === 'PREVISTO') {
             const res = await prisma.cleaningEvent.update({
                 where: { id: eventId },
                 data: {
                     status: 'CONCLUIDO',
-                    started_at: yardItem.created_at, // Use yard entry as start
+                    started_at: yardItem.created_at,
                     finished_at: yardItem.last_cleaned_at || new Date(),
                     started_by_user_id: userId,
                     completed_by_user_id: yardItem.last_cleaner_id || userId,
+                    cleaner_id: cleanerId || yardItem.last_cleaner_id,
                     check_interno: true,
                     check_externo: true,
                     check_pneus: true,
@@ -57,11 +56,12 @@ export async function startEvent(eventId: string, userId: string) {
             status: 'EM_ANDAMENTO',
             started_at: new Date(),
             started_by_user_id: userId,
+            cleaner_id: cleanerId,
             at_yard: true
         }
     });
 
-    // Envia alerta de início
+    // Envia alerta de início (Agora com AWAIT para não cair na Vercel)
     await sendStartAlert(eventId);
 
     return updated;

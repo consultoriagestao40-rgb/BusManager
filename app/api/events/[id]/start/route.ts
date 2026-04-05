@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
+import { startEvent } from '@/lib/event-service';
 
 export async function POST(
     request: Request,
@@ -39,16 +40,7 @@ export async function POST(
             return NextResponse.json({ error: 'Cleaner ID is required' }, { status: 400 });
         }
 
-        const updatedEvent = await prisma.cleaningEvent.update({
-            where: { id },
-            data: {
-                status: 'EM_ANDAMENTO',
-                started_at: new Date(),
-                started_by_user_id: user.id,
-                cleaner_id: cleanerId,
-                at_yard: true
-            }
-        });
+        const updatedEvent = await startEvent(id, user.id, cleanerId);
 
         // Create log? Optional for now, but good practice.
         // await prisma.auditLog.create(...)
