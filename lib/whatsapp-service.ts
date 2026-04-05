@@ -20,21 +20,20 @@ export async function checkAndSendSLAAlerts() {
     try {
         const now = new Date();
         const oneHourFromNow = addHours(now, 1);
+        const oneHourAgo = addHours(now, -1);
 
-        console.log('[SLA] Buscando eventos críticos entre', now.toISOString(), 'e', oneHourFromNow.toISOString());
+        console.log('[SLA] Buscando eventos críticos (Janela: -1h até +1h) - NOW:', now.toISOString());
 
         // Busca eventos onde:
         // 1. Status é PREVISTO (limpeza não iniciada)
-        // 2. Saída programada em até 1 hora
-        // 3. Ainda não foi notificado via WhatsApp
+        // 2. Saída programada entre 1 hora atrás e 1 hora no futuro
         const criticalEvents = await prisma.cleaningEvent.findMany({
             where: {
                 status: 'PREVISTO',
                 saida_programada_at: {
-                    gt: now,
+                    gte: oneHourAgo,
                     lte: oneHourFromNow
-                },
-                whatsapp_notified: false
+                }
             },
             include: {
                 vehicle: true
@@ -64,18 +63,6 @@ export async function checkAndSendSLAAlerts() {
             `Favor verificar com urgência! 🚌⏱️`;
 
         await sendWhatsAppMessage(message);
-
-        // Marca como notificado com segurança
-        try {
-            await prisma.cleaningEvent.updateMany({
-                where: {
-                    id: { in: criticalEvents.map(e => e.id) }
-                },
-                data: { whatsapp_notified: true }
-            });
-        } catch (updateErr: any) {
-            console.error('[WhatsApp] Erro ao marcar whatsapp_notified, mas mensagem foi enviada:', updateErr.message);
-        }
 
         return { success: true, count: criticalEvents.length };
     } catch (error: any) {
