@@ -41,7 +41,7 @@ export async function startEvent(eventId: string, userId: string) {
             await prisma.yardInventory.delete({ where: { id: yardItem.id } });
             
             // Envia alerta de conclusão (auto-concluído via pátio)
-            sendCompletionAlert(eventId);
+            await sendCompletionAlert(eventId);
             
             return res;
         }
@@ -62,7 +62,7 @@ export async function startEvent(eventId: string, userId: string) {
     });
 
     // Envia alerta de início
-    sendStartAlert(eventId);
+    await sendStartAlert(eventId);
 
     return updated;
 }
@@ -114,7 +114,7 @@ export async function completeEvent(
     });
 
     // Envia alerta de conclusão
-    sendCompletionAlert(eventId);
+    await sendCompletionAlert(eventId);
 
     return updatedEvent;
 }
@@ -207,7 +207,7 @@ export async function swapVehicle(
 
         if (finalEvent && finalEvent.swaps.length > 0) {
             const lastSwap = finalEvent.swaps[0];
-            sendSwapAlert({
+            await sendSwapAlert({
                 original_vehicle_number: lastSwap.original_vehicle.client_vehicle_number,
                 replacement_vehicle_number: lastSwap.replacement_vehicle?.client_vehicle_number || 'N/A',
                 motivo: lastSwap.motivo,
@@ -359,7 +359,7 @@ export async function updateYardStatus(
 
             // Envia alerta de conclusão (limpeza de pátio)
             if (eventRes) {
-                sendCompletionAlert(eventRes.id);
+                await sendCompletionAlert(eventRes.id);
             }
         }
 

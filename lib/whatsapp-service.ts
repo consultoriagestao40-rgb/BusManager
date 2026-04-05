@@ -144,9 +144,9 @@ export async function sendCompletionAlert(eventId: string) {
             `👤 *Por:* ${usuario}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
 
-        // Envio assíncrono (non-blocking para o usuário)
-        sendWhatsAppMessage(message).catch(err => {
-            console.error('[WhatsApp] Falha silenciosa no envio de conclusão:', err.message);
+        // Aguarda o envio para garantir que a Vercel não corte a execução
+        await sendWhatsAppMessage(message).catch(err => {
+            console.error('[WhatsApp] Falha no envio:', err.message);
         });
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de conclusão:', error);
@@ -199,7 +199,7 @@ async function sendWhatsAppMessage(text: string) {
                 'Content-Type': 'application/json',
                 'Client-Token': ZAPI_CLIENT_TOKEN || ''
             },
-            timeout: 15000 // Aumentado para 15s para lidar com lentidão da Z-API
+            timeout: 8000 // 8s é o ideal para o limite da Vercel
         });
         console.log('[WhatsApp] Mensagem enviada com sucesso via Z-API.');
     } catch (error: any) {
