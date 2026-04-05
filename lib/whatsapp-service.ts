@@ -12,8 +12,76 @@ const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID;
  * Verifica eventos em atraso (SLA de 1h) - DESATIVADO PARA ESTABILIZAÇÃO
  */
 export async function checkAndSendSLAAlerts() {
-    console.log('[WhatsApp] Alertas de SLA desativados temporariamente.');
-    return { success: true, reason: 'Temporarily disabled' };
+    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) {
+        console.warn('[WhatsApp] Configurações de Z-API incompletas. Abortando alertas.');
+        return { success: false, reason: 'Missing configuration' };
+    }
+
+    try {
+        const now = new Date();
+        const oneHourFromNow = addHours(now, 1);
+
+        console.log('[SLA] Buscando eventos críticos entre', now.toISOString(), 'e', oneHourFromNow.toISOString());
+
+        // Busca eventos onde:
+        // 1. Status é PREVISTO (limpeza não iniciada)
+        // 2. Saída programada em até 1 hora
+        // 3. Ainda não foi notificado via WhatsApp
+        const criticalEvents = await prisma.cleaningEvent.findMany({
+            where: {
+                status: 'PREVISTO',
+                saida_programada_at: {
+                    gt: now,
+                    lte: oneHourFromNow
+                },
+                whatsapp_notified: false
+            },
+            include: {
+                vehicle: true
+            }
+        });
+
+        if (criticalEvents.length === 0) {
+            console.log('[WhatsApp] Nenhum evento crítico de SLA encontrado.');
+            return { success: true, count: 0 };
+        }
+
+        console.log(`[WhatsApp] ${criticalEvents.length} evento(s) crítico(s) de SLA encontrado(s).`);
+
+        // Mensagem consolidada
+        const vehicleList = criticalEvents.map(e => {
+            const saida = new Intl.DateTimeFormat('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(new Date(e.saida_programada_at));
+            return `▪️ Carro *${(e as any).vehicle.client_vehicle_number}* — saída às *${saida}*`;
+        }).join('\n');
+
+        const message = `⚠️ *ALERTA DE SLA — BUSMANAGER* ⚠️\n\n` +
+            `Os veículos abaixo estão a *menos de 1 hora* da saída e a limpeza *não foi iniciada*:\n\n` +
+            `${vehicleList}\n\n` +
+            `Favor verificar com urgência! 🚌⏱️`;
+
+        await sendWhatsAppMessage(message);
+
+        // Marca como notificado com segurança
+        try {
+            await prisma.cleaningEvent.updateMany({
+                where: {
+                    id: { in: criticalEvents.map(e => e.id) }
+                },
+                data: { whatsapp_notified: true }
+            });
+        } catch (updateErr: any) {
+            console.error('[WhatsApp] Erro ao marcar whatsapp_notified, mas mensagem foi enviada:', updateErr.message);
+        }
+
+        return { success: true, count: criticalEvents.length };
+    } catch (error: any) {
+        console.error('[WhatsApp] Erro ao verificar alertas de SLA:', error);
+        return { success: false, error: error.message };
+    }
 }
 
 /**
