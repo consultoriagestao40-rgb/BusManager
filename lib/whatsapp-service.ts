@@ -6,7 +6,7 @@ import { ptBR } from 'date-fns/locale';
 // Credenciais da Z-API
 // Obtenha em: https://app.z-api.io -> Sua instância -> Credenciais
 const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID;
-const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
+const ZAPI_TOKEN = 'STOP_FLOOD'; // PARADA DE EMERGÊNCIA
 const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN; // Token de segurança do client
 const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID; // Ex: "120363XXXXXXXXX@g.us"
 
