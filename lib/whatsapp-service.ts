@@ -15,78 +15,8 @@ const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID; // Ex: "120363XXXXXXXXX
  */
 export async function checkAndSendSLAAlerts() {
     // DESATIVADO TEMPORARIAMENTE PARA ESTABILIZAÇÃO
+    console.log('[WhatsApp] Alertas de SLA desativados para estabilização.');
     return { success: true, reason: 'Temporarily disabled' };
-
-    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) {
-        console.warn('[WhatsApp] Configurações de Z-API incompletas. Abortando alertas.');
-        return { success: false, reason: 'Missing configuration' };
-    }
-
-    try {
-        const now = new Date();
-        const oneHourFromNow = addHours(now, 1);
-
-        // Busca eventos onde:
-        // 1. Status é PREVISTO (limpeza não iniciada)
-        // 2. Saída programada em menos de 1 hora
-        // 3. Ainda não foi notificado via WhatsApp
-        // 4. Não tem troca registrada
-        const criticalEvents = await prisma.cleaningEvent.findMany({
-            where: {
-                status: 'PREVISTO',
-                saida_programada_at: {
-                    gt: now,
-                    lte: oneHourFromNow
-                },
-                whatsapp_notified: false,
-                swaps: {
-                    none: {}
-                }
-            },
-            include: {
-                vehicle: true
-            }
-        });
-
-        if (criticalEvents.length === 0) {
-            console.log('[WhatsApp] Nenhum evento crítico de SLA encontrado.');
-            return { success: true, count: 0 };
-        }
-
-        console.log(`[WhatsApp] ${criticalEvents.length} evento(s) crítico(s) de SLA encontrado(s).`);
-
-        // Monta uma mensagem consolidada com todos os veículos críticos
-        const vehicleList = criticalEvents.map(e => {
-            const saida = new Intl.DateTimeFormat('pt-BR', {
-                timeZone: 'America/Sao_Paulo',
-                hour: '2-digit',
-                minute: '2-digit',
-            }).format(new Date(e.saida_programada_at));
-            return `▪️ Carro *${e.vehicle.client_vehicle_number}* — saída às *${saida}*`;
-        }).join('\n');
-
-        const message = `⚠️ *ALERTA DE SLA — BUSMANAGER* ⚠️\n\n` +
-            `Os veículos abaixo estão a *menos de 1 hora* da saída e a limpeza *não foi iniciada*:\n\n` +
-            `${vehicleList}\n\n` +
-            `Favor verificar com urgência! 🚌`;
-
-        await sendWhatsAppMessage(message);
-
-        console.log(`[WhatsApp] Mensagem enviada para ${criticalEvents.length} veículos.`);
-        
-        // Marca todos como notificados para não repetir
-        await prisma.cleaningEvent.updateMany({
-            where: {
-                id: { in: criticalEvents.map(e => e.id) }
-            },
-            data: { whatsapp_notified: true }
-        });
-
-        return { success: true, count: criticalEvents.length };
-    } catch (error: any) {
-        console.error('[WhatsApp] Erro ao verificar alertas de SLA:', error);
-        return { success: false, error: error.message };
-    }
 }
 
 /**
@@ -106,7 +36,7 @@ export async function sendStartAlert(eventId: string) {
             }
         });
 
-        if (!event || !event.vehicle) return;
+        if (!event || !(event as any).vehicle) return;
 
         const saida = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
@@ -120,7 +50,7 @@ export async function sendStartAlert(eventId: string) {
         const responsavel = event.cleaner?.name || event.started_by?.name || 'Sistema';
 
         const message = `⏳ *LIMPEZA INICIADA*\n\n` +
-            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
+            `🚌 *Carro:* ${(event as any).vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Veículo entrou em processo de limpeza! 🚌`;
@@ -150,7 +80,7 @@ export async function sendCompletionAlert(eventId: string) {
             }
         });
 
-        if (!event || !event.vehicle) return;
+        if (!event || !(event as any).vehicle) return;
 
         const saida = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
@@ -169,7 +99,7 @@ export async function sendCompletionAlert(eventId: string) {
         const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
 
         const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
-            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
+            `🚌 *Carro:* ${(event as any).vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
             `🏁 *Concluído às:* ${concluido}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
