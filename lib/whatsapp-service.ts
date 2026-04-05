@@ -1,21 +1,18 @@
 import prisma from '@/lib/prisma';
 import axios from 'axios';
-import { addHours, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { addHours } from 'date-fns';
 
 // Credenciais da Z-API
-// Obtenha em: https://app.z-api.io -> Sua instância -> Credenciais
 const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID;
 const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
-const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN; // Token de segurança do client
-const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID; // Ex: "120363XXXXXXXXX@g.us"
+const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN;
+const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID;
 
 /**
- * Verifica eventos em atraso (SLA de 1h) e envia alerta consolidado
+ * Verifica eventos em atraso (SLA de 1h) - DESATIVADO PARA ESTABILIZAÇÃO
  */
 export async function checkAndSendSLAAlerts() {
-    // DESATIVADO TEMPORARIAMENTE PARA ESTABILIZAÇÃO
-    console.log('[WhatsApp] Alertas de SLA desativados para estabilização.');
+    console.log('[WhatsApp] Alertas de SLA desativados temporariamente.');
     return { success: true, reason: 'Temporarily disabled' };
 }
 
@@ -26,7 +23,6 @@ export async function sendStartAlert(eventId: string) {
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
 
     try {
-        // Busca dados completo do evento
         const event = await prisma.cleaningEvent.findUnique({
             where: { id: eventId },
             include: { 
@@ -36,7 +32,7 @@ export async function sendStartAlert(eventId: string) {
             }
         });
 
-        if (!event || !(event as any).vehicle) return;
+        if (!event || !event.vehicle) return;
 
         const saida = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
@@ -44,21 +40,17 @@ export async function sendStartAlert(eventId: string) {
             minute: '2-digit',
         }).format(new Date(event.saida_programada_at));
         
-        // Identifica se é Pátio ou Escala para o termo correto
         const isYard = event.event_business_key?.startsWith('YARD-');
         const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
         const responsavel = event.cleaner?.name || event.started_by?.name || 'Sistema';
 
         const message = `⏳ *LIMPEZA INICIADA*\n\n` +
-            `🚌 *Carro:* ${(event as any).vehicle.client_vehicle_number}\n` +
+            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Veículo entrou em processo de limpeza! 🚌`;
 
-        // Agora com await real
-        await sendWhatsAppMessage(message).catch(err => {
-            console.error('[WhatsApp] Falha no envio de início:', err.message);
-        });
+        await sendWhatsAppMessage(message);
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de início:', error);
     }
@@ -80,35 +72,32 @@ export async function sendCompletionAlert(eventId: string) {
             }
         });
 
-        if (!event || !(event as any).vehicle) return;
+        if (!event || !event.vehicle) return;
 
         const saida = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
         }).format(new Date(event.saida_programada_at));
+
         const concluido = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
         }).format(new Date());
         
-        // Termo correto
         const isYard = event.event_business_key?.startsWith('YARD-');
         const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
         const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
 
         const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
-            `🚌 *Carro:* ${(event as any).vehicle.client_vehicle_number}\n` +
+            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
             `🕒 *Saída Prevista:* ${saida}\n` +
             `🏁 *Concluído às:* ${concluido}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
 
-        // Aguarda o envio para garantir que a Vercel não corte a execução
-        await sendWhatsAppMessage(message).catch(err => {
-            console.error('[WhatsApp] Falha no envio:', err.message);
-        });
+        await sendWhatsAppMessage(message);
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de conclusão:', error);
     }
@@ -141,18 +130,18 @@ export async function sendSwapAlert(details: {
             `👤 *Por:* ${details.usuario}\n\n` +
             `Escala atualizada no BusManager! 🚌`;
 
-        sendWhatsAppMessage(message).catch(err => {
-            console.error('[WhatsApp] Falha silenciosa no envio de troca:', err.message);
-        });
+        await sendWhatsAppMessage(message);
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de troca:', error);
     }
 }
 
 /**
- * Função base para envio de mensagens via Z-API (EXPORTADA PARA RELATÓRIOS)
+ * Função base para envio de mensagens via Z-API (EXPORTADA)
  */
 export async function sendWhatsAppMessage(text: string) {
+    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
+
     const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
 
     try {
@@ -164,11 +153,11 @@ export async function sendWhatsAppMessage(text: string) {
                 'Content-Type': 'application/json',
                 'Client-Token': ZAPI_CLIENT_TOKEN || ''
             },
-            timeout: 8000 // 8s é o ideal para o limite da Vercel
+            timeout: 10000
         });
-        console.log('[WhatsApp] Mensagem enviada com sucesso via Z-API.');
+        console.log('[WhatsApp] Mensagem enviada com sucesso.');
     } catch (error: any) {
-        console.error('[WhatsApp] Falha ao enviar via Z-API:', error.response?.data || error.message);
+        console.error('[WhatsApp] Falha ao enviar:', error.response?.data || error.message);
         throw error;
     }
 }
