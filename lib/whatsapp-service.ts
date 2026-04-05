@@ -220,9 +220,9 @@ export async function sendSwapAlert(details: {
 }
 
 /**
- * Função base para envio de mensagens via Z-API
+ * Função base para envio de mensagens via Z-API (EXPORTADA PARA RELATÓRIOS)
  */
-async function sendWhatsAppMessage(text: string) {
+export async function sendWhatsAppMessage(text: string) {
     const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
 
     try {
