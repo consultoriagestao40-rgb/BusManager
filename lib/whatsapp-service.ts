@@ -6,7 +6,7 @@ import { ptBR } from 'date-fns/locale';
 // Credenciais da Z-API
 // Obtenha em: https://app.z-api.io -> Sua instância -> Credenciais
 const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID;
-const ZAPI_TOKEN = 'STOP_FLOOD'; // PARADA DE EMERGÊNCIA
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
 const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN; // Token de segurança do client
 const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID; // Ex: "120363XXXXXXXXX@g.us"
 
@@ -14,6 +14,9 @@ const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID; // Ex: "120363XXXXXXXXX
  * Verifica eventos em atraso (SLA de 1h) e envia alerta consolidado
  */
 export async function checkAndSendSLAAlerts() {
+    // DESATIVADO TEMPORARIAMENTE PARA ESTABILIZAÇÃO
+    return { success: true, reason: 'Temporarily disabled' };
+
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) {
         console.warn('[WhatsApp] Configurações de Z-API incompletas. Abortando alertas.');
         return { success: false, reason: 'Missing configuration' };

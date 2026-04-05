@@ -9,6 +9,9 @@ export async function startEvent(eventId: string, userId: string, cleanerId?: st
     });
 
     if (!event) throw new Error('Evento não encontrado');
+    
+    // Trava de duplicidade: Se já está em andamento, não faz nada (evita flood)
+    if (event.status === 'EM_ANDAMENTO') return event;
 
     // Condition 02: If vehicle is in yard, remove it
     const yardItem = await prisma.yardInventory.findFirst({
@@ -78,6 +81,10 @@ export async function completeEvent(
         observacao_operacao?: string;
     }
 ) {
+    const event = await prisma.cleaningEvent.findUnique({ where: { id: eventId } });
+    if (!event) throw new Error('Evento não encontrado');
+    if (event.status === 'CONCLUIDO') return event;
+
     // Business Rule: If checks are not ALL true, observation is mandatory
     const allChecksPassed = data.check_interno && data.check_externo && data.check_pneus && data.check_bagageiros;
 
@@ -299,7 +306,9 @@ export async function updateYardStatus(
                     }
                 }
             });
-            if (event) sendStartAlert(event.id);
+            if (event && event.status !== 'EM_ANDAMENTO') {
+                await sendStartAlert(event.id);
+            }
         }
 
         return res;
