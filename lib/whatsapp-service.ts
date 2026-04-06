@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import axios from 'axios';
-import { addHours } from 'date-fns';
+import { addHours, subHours, startOfDay, endOfDay } from 'date-fns';
 
 // Credenciais da Z-API
 const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID;
