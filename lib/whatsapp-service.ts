@@ -18,19 +18,44 @@ export async function checkAndSendSLAAlerts() {
     }
 
     try {
+        // 0. Configuração de tempo (Fuso Brasil)
         const now = new Date();
+        const brazilNow = subHours(now, 3);
+        const startOfBrazilDay = startOfDay(brazilNow);
+        const endOfBrazilDay = endOfDay(brazilNow);
+        
         const oneHourFromNow = addHours(now, 1);
-        const oneHourAgo = addHours(now, -1);
 
-        console.log('[SLA] Buscando eventos críticos (Janela: -1h até +1h) - NOW:', now.toISOString());
+        console.log('[SLA] Buscando escala ativa para HOJE (Brasil)...');
 
-        // Busca eventos críticos
+        // 1. Identificar a Escala ATIVA para hoje (para evitar carros fantasmas)
+        const activeVersion = await prisma.scheduleVersion.findFirst({
+            where: {
+                data_viagem: {
+                    gte: startOfBrazilDay,
+                    lte: endOfBrazilDay
+                },
+                is_active: true
+            }
+        });
+
+        if (!activeVersion) {
+            console.log('[WhatsApp] Nenhuma escala ativa encontrada para hoje. Pulando SLA.');
+            return { success: true, count: 0 };
+        }
+
+        // 2. Busca eventos críticos da escala ativa
+        // Regra: Apenas entre AGORA e +1 HORA (SLA preventivo)
         const criticalEvents = await prisma.cleaningEvent.findMany({
             where: {
+                schedule_version_id: activeVersion.id,
                 status: 'PREVISTO',
                 liberar_ate_at: {
-                    gte: oneHourAgo,
-                    lte: oneHourFromNow
+                    gte: now, // Começa a avisar apenas agora
+                    lte: oneHourFromNow // Para de avisar assim que o prazo estoura
+                },
+                NOT: {
+                    event_business_key: { startsWith: 'YARD-' }
                 }
             },
             include: {
@@ -39,19 +64,17 @@ export async function checkAndSendSLAAlerts() {
         });
 
         if (criticalEvents.length === 0) {
-            console.log('[WhatsApp] Nenhum evento crítico de SLA encontrado.');
+            console.log('[WhatsApp] Nenhum evento crítico de SLA encontrado na escala ativa.');
             return { success: true, count: 0 };
         }
 
-        // 1. Filtrar carros vazios (EMPTY_...)
-        // 2. Deduplicar por número de veículo (manter o horário de meta mais cedo/crítico)
+        // 3. Deduplicar por número de veículo (cada alerta deve ser único)
         const uniqueVehiclesMap = new Map();
 
         criticalEvents.forEach(e => {
             const vehicle = (e as any).vehicle;
             const vehicleNumber = vehicle?.client_vehicle_number?.toString() || '';
             
-            // Pular se for vazio ou começar com EMPTY_
             if (!vehicleNumber || vehicleNumber.startsWith('EMPTY_')) return;
 
             const currentLimit = new Date(e.liberar_ate_at);
@@ -65,20 +88,14 @@ export async function checkAndSendSLAAlerts() {
         });
 
         if (uniqueVehiclesMap.size === 0) {
-            console.log('[WhatsApp] Apenas veículos vazios ou inválidos encontrados. Pulando alerta.');
             return { success: true, count: 0 };
         }
 
-        // Ordenar por horário de limite (mais críticos primeiro)
+        // 4. Ordenar e Formatar
         const sortedVehicles = Array.from(uniqueVehiclesMap.values())
             .sort((a, b) => a.limit.getTime() - b.limit.getTime());
 
-        // Limitar a mensagem a no máximo 25 itens para não floodar/travar o WhatsApp
-        const displayList = sortedVehicles.slice(0, 25);
-        const hasMore = sortedVehicles.length > 25;
-
-        // Formatar lista
-        const vehicleList = displayList.map(v => {
+        const vehicleList = sortedVehicles.slice(0, 25).map(v => {
             const timeStr = new Intl.DateTimeFormat('pt-BR', {
                 timeZone: 'America/Sao_Paulo',
                 hour: '2-digit',
@@ -88,11 +105,11 @@ export async function checkAndSendSLAAlerts() {
         }).join('\n');
 
         let message = `⚠️ *ALERTA DE SLA — BUSMANAGER* ⚠️\n\n` +
-            `Os veículos abaixo estão a *menos de 1 hora* do limite de liberação e a limpeza *não foi iniciada*:\n\n` +
+            `Os veículos abaixo estão a *menos de 1 hora* do limite e a limpeza *não foi iniciada*:\n\n` +
             `${vehicleList}\n`;
 
-        if (hasMore) {
-            message += `\n... e mais *${sortedVehicles.length - 25}* veículos pendentes. 📉`;
+        if (sortedVehicles.length > 25) {
+            message += `\n... e mais *${sortedVehicles.length - 25}* veículos pendentes.`;
         }
 
         message += `\nFavor verificar com urgência! 🚌⏱️`;
