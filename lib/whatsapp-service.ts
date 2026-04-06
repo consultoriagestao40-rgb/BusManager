@@ -44,15 +44,14 @@ export async function checkAndSendSLAAlerts() {
             return { success: true, count: 0 };
         }
 
-        // 2. Busca eventos críticos da escala ativa
-        // Regra: Apenas entre AGORA e +1 HORA (SLA preventivo)
+        // 2. Busca eventos críticos da escala ativa (TUDO DE HOJE ATÉ +1 HORA)
         const criticalEvents = await prisma.cleaningEvent.findMany({
             where: {
                 schedule_version_id: activeVersion.id,
                 status: 'PREVISTO',
                 liberar_ate_at: {
-                    gte: now, // Começa a avisar apenas agora
-                    lte: oneHourFromNow // Para de avisar assim que o prazo estoura
+                    gte: startOfBrazilDay, // Começa do início do dia para pegar atrasos passados
+                    lte: oneHourFromNow    // Pega o que vence na próxima 1 hora
                 },
                 NOT: {
                     event_business_key: { startsWith: 'YARD-' }
@@ -64,55 +63,71 @@ export async function checkAndSendSLAAlerts() {
         });
 
         if (criticalEvents.length === 0) {
-            console.log('[WhatsApp] Nenhum evento crítico de SLA encontrado na escala ativa.');
+            console.log('[WhatsApp] Nenhum evento crítico (SLA ou Atraso) encontrado.');
             return { success: true, count: 0 };
         }
 
-        // 3. Deduplicar por número de veículo (cada alerta deve ser único)
-        const uniqueVehiclesMap = new Map();
+        // 3. Deduplicar e Classificar (Atraso vs Alerta)
+        const overdueVehicles: any[] = [];
+        const alertVehicles: any[] = [];
+        const processedVehicles = new Set();
 
-        criticalEvents.forEach(e => {
+        // Ordenar por horário de limite (mais críticos primeiro)
+        const sortedEvents = [...criticalEvents].sort((a, b) => 
+            new Date(a.liberar_ate_at).getTime() - new Date(b.liberar_ate_at).getTime()
+        );
+
+        sortedEvents.forEach(e => {
             const vehicle = (e as any).vehicle;
             const vehicleNumber = vehicle?.client_vehicle_number?.toString() || '';
             
-            if (!vehicleNumber || vehicleNumber.startsWith('EMPTY_')) return;
+            if (!vehicleNumber || vehicleNumber.startsWith('EMPTY_') || processedVehicles.has(vehicleNumber)) return;
 
-            const currentLimit = new Date(e.liberar_ate_at);
-            
-            if (!uniqueVehiclesMap.has(vehicleNumber) || currentLimit < uniqueVehiclesMap.get(vehicleNumber).limit) {
-                uniqueVehiclesMap.set(vehicleNumber, {
-                    number: vehicleNumber,
-                    limit: currentLimit
-                });
+            processedVehicles.add(vehicleNumber);
+            const limit = new Date(e.liberar_ate_at);
+            const item = { number: vehicleNumber, limit };
+
+            if (limit < now) {
+                overdueVehicles.push(item);
+            } else {
+                alertVehicles.push(item);
             }
         });
 
-        if (uniqueVehiclesMap.size === 0) {
+        if (overdueVehicles.length === 0 && alertVehicles.length === 0) {
             return { success: true, count: 0 };
         }
 
-        // 4. Ordenar e Formatar
-        const sortedVehicles = Array.from(uniqueVehiclesMap.values())
-            .sort((a, b) => a.limit.getTime() - b.limit.getTime());
+        // 4. Formatar Mensagem
+        let message = `🚨 *RELATÓRIO DE PENDÊNCIAS — BUSMANAGER* 🚨\n\n`;
 
-        const vehicleList = sortedVehicles.slice(0, 25).map(v => {
-            const timeStr = new Intl.DateTimeFormat('pt-BR', {
-                timeZone: 'America/Sao_Paulo',
-                hour: '2-digit',
-                minute: '2-digit',
-            }).format(v.limit);
-            return `▪️ Carro *${v.number}* — limite às *${timeStr}*`;
-        }).join('\n');
-
-        let message = `⚠️ *ALERTA DE SLA — BUSMANAGER* ⚠️\n\n` +
-            `Os veículos abaixo estão a *menos de 1 hora* do limite e a limpeza *não foi iniciada*:\n\n` +
-            `${vehicleList}\n`;
-
-        if (sortedVehicles.length > 25) {
-            message += `\n... e mais *${sortedVehicles.length - 25}* veículos pendentes.`;
+        if (overdueVehicles.length > 0) {
+            message += `🔥 *EM ATRASO (VENCIDO)*\n` +
+                `Estes veículos já estouraram o horário da meta. Iniciar IMEDIATAMENTE:\n` +
+                overdueVehicles.slice(0, 15).map(v => {
+                    const timeStr = new Intl.DateTimeFormat('pt-BR', {
+                        timeZone: 'America/Sao_Paulo',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    }).format(v.limit);
+                    return `▪️ Carro *${v.number}* (limite ${timeStr})`;
+                }).join('\n') + `\n\n`;
         }
 
-        message += `\nFavor verificar com urgência! 🚌⏱️`;
+        if (alertVehicles.length > 0) {
+            message += `⚠️ *ALERTA DE SLA (A VENCER)*\n` +
+                `Veículos na janela de 1 hora. Planejar limpeza para evitar atraso:\n` +
+                alertVehicles.slice(0, 15).map(v => {
+                    const timeStr = new Intl.DateTimeFormat('pt-BR', {
+                        timeZone: 'America/Sao_Paulo',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    }).format(v.limit);
+                    return `▪️ Carro *${v.number}* (limite ${timeStr})`;
+                }).join('\n') + `\n\n`;
+        }
+
+        message += `Favor resolver com urgência máxima! 🚌⏱️⚖️`;
 
         await sendWhatsAppMessage(message);
 
