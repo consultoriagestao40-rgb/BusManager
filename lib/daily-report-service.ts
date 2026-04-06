@@ -136,7 +136,12 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
             : '▪️ Nenhuma limpeza registrada.') +
         `\n\n_Relatório gerado automaticamente às 08:00_ 🚌`;
 
+    // 11. Envia para o grupo operacional padrão
     await sendWhatsAppMessage(message);
+
+    // 12. Envia também para o grupo VIP (Liderança Penha)
+    await sendWhatsAppMessage(message, '120363421745459340-group');
     
     return { success: true, date: dateStr, scheduled: effectiveScheduled, executed: totalExecuted };
 }
+
