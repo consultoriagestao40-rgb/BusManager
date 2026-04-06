@@ -129,7 +129,11 @@ export async function checkAndSendSLAAlerts() {
 
         message += `Favor resolver com urgência máxima! 🚌⏱️⚖️`;
 
+        // Envia para o grupo operacional padrão
         await sendWhatsAppMessage(message);
+
+        // Envia também para o grupo VIP da Liderança Penha (ID Oficial da Z-API)
+        await sendWhatsAppMessage(message, '120363421745459340-group');
 
         return { success: true, count: criticalEvents.length };
     } catch (error: any) {
@@ -261,14 +265,15 @@ export async function sendSwapAlert(details: {
 /**
  * Função base para envio de mensagens via Z-API (EXPORTADA)
  */
-export async function sendWhatsAppMessage(text: string) {
+export async function sendWhatsAppMessage(text: string, overridePhone?: string) {
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
 
     const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
+    const targetPhone = overridePhone || WHATSAPP_GROUP_ID;
 
     try {
         await axios.post(url, {
-            phone: WHATSAPP_GROUP_ID,
+            phone: targetPhone,
             message: text
         }, {
             headers: {
@@ -277,9 +282,9 @@ export async function sendWhatsAppMessage(text: string) {
             },
             timeout: 10000
         });
-        console.log('[WhatsApp] Mensagem enviada com sucesso.');
+        console.log(`[WhatsApp] Mensagem enviada com sucesso para ${targetPhone}.`);
     } catch (error: any) {
-        console.error('[WhatsApp] Falha ao enviar:', error.response?.data || error.message);
+        console.error(`[WhatsApp] Falha ao enviar para ${targetPhone}:`, error.response?.data || error.message);
         throw error;
     }
 }
