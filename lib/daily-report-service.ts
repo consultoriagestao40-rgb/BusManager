@@ -118,10 +118,13 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     // 9. Pátio
     const yardCleaned = executedEvents.filter(e => e.event_business_key?.startsWith('YARD-')).length;
 
+    // 10. Lógica de Programados (Total Real = Total Bruto - Cancelados)
+    const effectiveScheduled = totalScheduled - cancelledCount;
+
     // Mensagem
     const message = `📊 *FECHAMENTO DIÁRIO — BUSMANAGER* 📊\n` +
         `📅 *Referente a:* ${dateStr}\n\n` +
-        `✅ *Limpezas Realizadas:* ${totalExecuted} / ${totalScheduled} (${totalScheduled > 0 ? Math.round((totalExecuted/totalScheduled)*100) : 0}%)\n` +
+        `✅ *Limpezas Realizadas:* ${totalExecuted} / ${effectiveScheduled} (${effectiveScheduled > 0 ? Math.round((totalExecuted/effectiveScheduled)*100) : 0}%)\n` +
         `⏱️ *Tempo Médio:* ${avgTime} min por veículo\n` +
         `⚠️ *Saídas com Atraso:* ${delayedCount}\n` +
         `❌ *Cancelados:* ${cancelledCount}\n` +
@@ -135,5 +138,5 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
 
     await sendWhatsAppMessage(message);
     
-    return { success: true, date: dateStr, scheduled: totalScheduled, executed: totalExecuted };
+    return { success: true, date: dateStr, scheduled: effectiveScheduled, executed: totalExecuted };
 }
