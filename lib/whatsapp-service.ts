@@ -156,11 +156,11 @@ export async function sendStartAlert(eventId: string) {
 
         if (!event || !event.vehicle) return;
 
-        const saida = new Intl.DateTimeFormat('pt-BR', {
+        const meta = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
-        }).format(new Date(event.saida_programada_at));
+        }).format(new Date(event.liberar_ate_at));
         
         const isYard = event.event_business_key?.startsWith('YARD-');
         const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
@@ -168,7 +168,7 @@ export async function sendStartAlert(eventId: string) {
 
         const message = `⏳ *LIMPEZA INICIADA*\n\n` +
             `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
-            `🕒 *Saída Prevista:* ${saida}\n` +
+            `🕒 *Meta (H-1):* ${meta}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Veículo entrou em processo de limpeza! 🚌`;
 
@@ -196,11 +196,11 @@ export async function sendCompletionAlert(eventId: string) {
 
         if (!event || !event.vehicle) return;
 
-        const saida = new Intl.DateTimeFormat('pt-BR', {
+        const meta = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
-        }).format(new Date(event.saida_programada_at));
+        }).format(new Date(event.liberar_ate_at));
 
         const concluido = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
@@ -214,7 +214,7 @@ export async function sendCompletionAlert(eventId: string) {
 
         const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
             `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
-            `🕒 *Saída Prevista:* ${saida}\n` +
+            `🕒 *Meta (H-1):* ${meta}\n` +
             `🏁 *Concluído às:* ${concluido}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
@@ -233,21 +233,21 @@ export async function sendSwapAlert(details: {
     replacement_vehicle_number: string,
     motivo: string,
     usuario: string,
-    saida: Date
+    meta: Date // Alterado de saida para meta
 }) {
     if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
 
     try {
-        const saidaStr = new Intl.DateTimeFormat('pt-BR', {
+        const metaStr = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
-        }).format(new Date(details.saida));
+        }).format(new Date(details.meta));
 
         const message = `🔄 *TROCA DE VEÍCULO*\n\n` +
             `❌ *Saiu:* ${details.original_vehicle_number}\n` +
             `✅ *Entrou:* ${details.replacement_vehicle_number}\n` +
-            `🕒 *Saída Prevista:* ${saidaStr}\n` +
+            `🕒 *Meta (H-1):* ${metaStr}\n` +
             `📝 *Motivo:* ${details.motivo}\n` +
             `👤 *Por:* ${details.usuario}\n\n` +
             `Escala atualizada no BusManager! 🚌`;

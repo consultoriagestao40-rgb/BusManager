@@ -220,7 +220,7 @@ export async function swapVehicle(
                 replacement_vehicle_number: lastSwap.replacement_vehicle?.client_vehicle_number || 'N/A',
                 motivo: lastSwap.motivo,
                 usuario: lastSwap.created_by.name || 'Sistema',
-                saida: finalEvent.saida_programada_at
+                meta: finalEvent.liberar_ate_at
             });
         }
     } catch (e) {
