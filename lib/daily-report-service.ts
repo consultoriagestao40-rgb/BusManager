@@ -11,9 +11,33 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     const start = startOfDay(targetDate);
     const end = endOfDay(targetDate);
 
-    // 1. Total Programado (Criados na escala para esse dia)
+    const dateStr = new Intl.DateTimeFormat('pt-BR', { 
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).format(targetDate);
+
+    // 1. Identificar a Escala ATIVA para o dia do relatório
+    const activeVersion = await prisma.scheduleVersion.findFirst({
+        where: {
+            data_viagem: {
+                gte: start,
+                lte: end
+            },
+            is_active: true
+        }
+    });
+
+    if (!activeVersion) {
+        console.log(`[WhatsApp] Nenhuma escala ativa encontrada para ${dateStr}. Relatório abortado.`);
+        return { success: false, reason: 'No active schedule found' };
+    }
+
+    // 2. Total Programado (Apenas da escala ATIVA)
     const totalScheduled = await prisma.cleaningEvent.count({
         where: {
+            schedule_version_id: activeVersion.id,
             data_viagem: {
                 gte: start,
                 lte: end
@@ -21,9 +45,10 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
-    // 2. Total Executado (Finalizados dentro do dia alvo)
+    // 3. Total Executado (Finalizados dentro do dia alvo E que pertencem à escala ativa)
     const executedEvents = await prisma.cleaningEvent.findMany({
         where: {
+            schedule_version_id: activeVersion.id,
             status: 'CONCLUIDO',
             finished_at: {
                 gte: start,
@@ -37,13 +62,13 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
 
     const totalExecuted = executedEvents.length;
 
-    // 3. Atrasos (Término > Saída Programada)
+    // 4. Atrasos (Término > Saída Programada)
     const delayedCount = executedEvents.filter(e => {
         if (!e.finished_at || !e.saida_programada_at) return false;
         return e.finished_at > e.saida_programada_at;
     }).length;
 
-    // 4. Tempo Médio
+    // 5. Tempo Médio
     let totalMinutes = 0;
     let eventsWithTime = 0;
     executedEvents.forEach(e => {
@@ -54,7 +79,7 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     });
     const avgTime = eventsWithTime > 0 ? Math.round(totalMinutes / eventsWithTime) : 0;
 
-    // 5. Ranking
+    // 6. Ranking
     const ranking: Record<string, number> = {};
     executedEvents.forEach(e => {
         const name = e.cleaner?.name || 'Sistema';
@@ -65,9 +90,12 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5); // Top 5
 
-    // 6. Trocas
+    // 7. Trocas (Apenas da escala ativa)
     const totalSwaps = await prisma.swap.count({
         where: {
+            original_event: {
+                schedule_version_id: activeVersion.id
+            },
             created_at: {
                 gte: start,
                 lte: end
@@ -75,9 +103,10 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
-    // 6.1 Cancelados
+    // 8. Cancelados (Apenas da escala ativa)
     const cancelledCount = await prisma.cleaningEvent.count({
         where: {
+            schedule_version_id: activeVersion.id,
             status: 'CANCELADO',
             data_viagem: {
                 gte: start,
@@ -86,15 +115,8 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
-    // 7. Pátio
+    // 9. Pátio
     const yardCleaned = executedEvents.filter(e => e.event_business_key?.startsWith('YARD-')).length;
-
-    const dateStr = new Intl.DateTimeFormat('pt-BR', { 
-        timeZone: 'America/Sao_Paulo',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(targetDate);
 
     // Mensagem
     const message = `📊 *FECHAMENTO DIÁRIO — BUSMANAGER* 📊\n` +
