@@ -1,5 +1,5 @@
 import prisma from './prisma';
-import { startOfDay, endOfDay, subDays, differenceInMinutes } from 'date-fns';
+import { startOfDay, endOfDay, subDays, differenceInMinutes, subHours, format } from 'date-fns';
 import { sendWhatsAppMessage } from './whatsapp-service';
 
 /**
@@ -45,44 +45,91 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
-    // 3. Total Executado (Finalizados dentro do dia alvo E que pertencem à escala ativa)
+    // 3. Total Executado na Escala (Finalizados e que pertencem à escala ativa)
     const executedEvents = await prisma.cleaningEvent.findMany({
         where: {
             schedule_version_id: activeVersion.id,
-            status: 'CONCLUIDO',
-            finished_at: {
-                gte: start,
-                lte: end
-            }
+            status: 'CONCLUIDO'
         },
         include: {
             cleaner: true
         }
     });
 
-    const totalExecuted = executedEvents.length;
+    // 4. Limpezas de Pátio (Lógica de "Virtual Override" igual ao Dashboard KPI)
+    const yardItems = await prisma.yardInventory.findMany({
+        where: { status: 'LIMPO' }
+    });
 
-    // 4. Atrasos (Término > Saída Programada)
+    const activeVehicleIds = new Set(executedEvents.map(e => e.vehicle_id));
+    const cleaners = await prisma.cleaner.findMany();
+    const cleanerMapById = new Map(cleaners.map(c => [c.id, c.name]));
+    
+    const validYardCleanings = yardItems.filter(item => {
+        const cleanDate = item.last_cleaned_at || item.updated_at;
+        if (!cleanDate) return false;
+        
+        // Normalize to Brazil Time (-3) to match Dashboard card logic
+        const brazilDate = subHours(new Date(cleanDate), 3);
+        
+        // Check if falls within the report day
+        if (brazilDate < start || brazilDate > end) return false;
+
+        // Skip if there's an active scale event for this vehicle (Avoid double counting)
+        if (activeVehicleIds.has(item.vehicle_id)) return false;
+
+        return true;
+    });
+
+    // 5. Consolidação de Dados
+    const totalExecuted = executedEvents.length + validYardCleanings.length;
+
+    // 6. Atrasos (Usa 'liberar_ate_at' que é a Meta H-1, igual ao Dashboard)
     const delayedCount = executedEvents.filter(e => {
-        if (!e.finished_at || !e.saida_programada_at) return false;
-        return e.finished_at > e.saida_programada_at;
+        if (!e.finished_at || !e.liberar_ate_at) return false;
+        return new Date(e.finished_at) > new Date(e.liberar_ate_at);
     }).length;
 
-    // 5. Tempo Médio
+    // 7. Tempo Médio (Escala + Pátio)
     let totalMinutes = 0;
-    let eventsWithTime = 0;
+    let countDuration = 0;
+
+    // Tempos da Escala
     executedEvents.forEach(e => {
         if (e.started_at && e.finished_at) {
-            totalMinutes += differenceInMinutes(e.finished_at, e.started_at);
-            eventsWithTime++;
+            const duration = differenceInMinutes(new Date(e.finished_at), new Date(e.started_at));
+            if (duration > 0 && duration < 600) { // Filtro de outliers
+                totalMinutes += duration;
+                countDuration++;
+            }
         }
     });
-    const avgTime = eventsWithTime > 0 ? Math.round(totalMinutes / eventsWithTime) : 0;
 
-    // 6. Ranking
+    // Tempos do Pátio
+    validYardCleanings.forEach(item => {
+        if (item.updated_at && item.last_cleaned_at) {
+            const duration = differenceInMinutes(new Date(item.last_cleaned_at), new Date(item.updated_at));
+            if (duration > 0 && duration < 600) {
+                totalMinutes += duration;
+                countDuration++;
+            }
+        }
+    });
+
+    const avgTime = countDuration > 0 ? Math.round(totalMinutes / countDuration) : 0;
+
+    // 8. Ranking de Produtividade Unificado
     const ranking: Record<string, number> = {};
+    
+    // Produtividade Escala
     executedEvents.forEach(e => {
         const name = e.cleaner?.name || 'Sistema';
+        ranking[name] = (ranking[name] || 0) + 1;
+    });
+
+    // Produtividade Pátio
+    validYardCleanings.forEach(item => {
+        const name = item.last_cleaner_id ? (cleanerMapById.get(item.last_cleaner_id) || 'Não Identificado') : 'Sistema';
         ranking[name] = (ranking[name] || 0) + 1;
     });
 
@@ -95,10 +142,6 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         where: {
             original_event: {
                 schedule_version_id: activeVersion.id
-            },
-            created_at: {
-                gte: start,
-                lte: end
             }
         }
     });
@@ -115,8 +158,8 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
-    // 9. Pátio
-    const yardCleaned = executedEvents.filter(e => e.event_business_key?.startsWith('YARD-')).length;
+    // 10. Pátio (Quantidade oficial calculada no passo 4)
+    const yardCleanedCount = validYardCleanings.length;
 
     // 10. Lógica de Programados (Total Real = Total Bruto - Cancelados)
     const effectiveScheduled = totalScheduled - cancelledCount;
@@ -129,7 +172,7 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         `⚠️ *Saídas com Atraso:* ${delayedCount}\n` +
         `❌ *Cancelados:* ${cancelledCount}\n` +
         `🔄 *Trocas na Escala:* ${totalSwaps}\n` +
-        `🛢️ *Limpezas de Pátio:* ${yardCleaned}\n\n` +
+        `🛢️ *Limpezas de Pátio:* ${yardCleanedCount}\n\n` +
         `👤 *Produtividade por Equipe (Top 5):*\n` +
         (sortedRanking.length > 0 
             ? sortedRanking.map(([name, count]) => `▪️ ${name}: ${count} carro(s)`).join('\n')
