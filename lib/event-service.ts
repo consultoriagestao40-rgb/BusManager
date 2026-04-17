@@ -167,7 +167,7 @@ export async function swapVehicle(
                 where: { id: eventId },
                 data: {
                     vehicle_id: data.replacement_vehicle_id,
-                    // Automated completion if pre-cleaned
+                    // Automated completion if pre-cleaned in yard
                     ...(isAlreadyClean ? {
                         status: 'CONCLUIDO',
                         finished_at: yardItem.last_cleaned_at || new Date(),
@@ -181,7 +181,18 @@ export async function swapVehicle(
                         revisar: true,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                     } : {
-                        revisar: false
+                        status: 'PREVISTO',
+                        revisar: false,
+                        started_at: null,
+                        finished_at: null,
+                        started_by_user_id: null,
+                        completed_by_user_id: null,
+                        cleaner_id: null,
+                        check_interno: false,
+                        check_externo: false,
+                        check_pneus: false,
+                        check_bagageiros: false,
+                        observacao_operacao: (event.observacao_operacao || '') + ' (Troca - Novo Carro Sujo)'.trim()
                     })
                 }
             });

@@ -539,7 +539,7 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
                                     <RefreshCw className="w-4 h-4 animate-spin" /> Conferência Necessária
                                 </p>
                                 <p className="text-xs text-orange-700 mt-1.5 font-bold italic leading-relaxed">
-                                    {selectedEvent.observacao_operacao || 'Este veículo foi recuperado do pátio já limpo.'}
+                                    Carro do pátio, precisa revisar
                                 </p>
                             </div>
                         )}

@@ -331,7 +331,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                     <RefreshCw className="w-3 h-3 animate-spin" /> Conferência Necessária
                                 </p>
                                 <p className="text-[11px] text-orange-700 mt-1 font-medium">
-                                    {selectedEvent.observacao_operacao || 'Este veículo foi recuperado do pátio já limpo.'}
+                                    Carro do pátio, precisa revisar
                                 </p>
                             </div>
                         )}
