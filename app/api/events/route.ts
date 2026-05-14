@@ -41,17 +41,42 @@ export async function GET(request: Request) {
         });
 
         if (!activeVersion) {
-            // Se não houver escala ativa, retornamos vazio (evita mostrar lixo de importações antigas ou inativas)
-            return NextResponse.json({ events: [] });
+            // Sem escala ativa (ex: feriado) — busca apenas eventos manuais do dia
+            const manualEvents = await prisma.cleaningEvent.findMany({
+                where: {
+                    event_business_key: { startsWith: 'MANUAL-SCHEDULE-' },
+                    data_viagem: { gte: start, lte: end },
+                    status: { not: 'CANCELADO' }
+                },
+                include: {
+                    vehicle: true,
+                    cleaner: true,
+                    swaps: {
+                        include: { replacement_vehicle: true, original_vehicle: true }
+                    }
+                },
+                orderBy: { hora_viagem: 'asc' }
+            });
+            return NextResponse.json({ events: manualEvents });
         }
 
-        // 2. Get events ONLY for the active version
+        // 2. Get events for the active version PLUS any manual events of the day
+        //    (manual events may belong to an older version if a new import happened after insertion)
         const events = await prisma.cleaningEvent.findMany({
             where: {
-                schedule_version_id: activeVersion.id,
-                NOT: {
-                    event_business_key: { startsWith: 'YARD-' }
-                }
+                OR: [
+                    // Events from the current active version (normal schedule)
+                    {
+                        schedule_version_id: activeVersion.id,
+                        NOT: { event_business_key: { startsWith: 'YARD-' } }
+                    },
+                    // Manual events inserted for today — always show regardless of version
+                    {
+                        event_business_key: { startsWith: 'MANUAL-SCHEDULE-' },
+                        data_viagem: { gte: start, lte: end },
+                        status: { not: 'CANCELADO' }
+                    }
+                ]
             },
             include: {
                 vehicle: true,
@@ -111,6 +136,7 @@ export async function GET(request: Request) {
         });
 
         return NextResponse.json({ events: eventsWithAllSwaps });
+
 
     } catch (error: any) {
         console.error('Events API error:', error);
