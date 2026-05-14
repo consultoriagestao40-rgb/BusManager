@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Clock, CheckCircle, Play, RefreshCw, Trash2, Pencil } from 'lucide-react';
+import { Clock, CheckCircle, Play, RefreshCw, Trash2, Pencil, Timer } from 'lucide-react';
 
 interface Event {
     id: string;
@@ -15,6 +15,7 @@ interface Event {
     revisar?: boolean;
     observacao_operacao?: string;
     event_business_key?: string;
+    started_at?: string;
 }
 
 export default function WebEventList({ events, autoOpenEventId, userRole }: { events: Event[], autoOpenEventId?: string | null, userRole?: string }) {
@@ -214,6 +215,15 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                             }`}>
                                             {event.status}
                                         </span>
+                                        {event.status === 'EM_ANDAMENTO' && event.started_at && (
+                                            <div className="flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-blue-600 animate-pulse">
+                                                <Timer className="w-3 h-3" />
+                                                {(() => {
+                                                    const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
+                                                    return diff > 0 ? `${diff} min` : 'Atrasado';
+                                                })()}
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="py-4 px-4 text-right">
                                         <div className="flex justify-end gap-2">
@@ -352,6 +362,17 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setFinishModalOpen(false)}>
                     <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
+                        
+                        {selectedEvent.started_at && (
+                            <div className="mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold">
+                                <Timer className="w-4 h-4" />
+                                Tempo de Limpeza: {(() => {
+                                    const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
+                                    return diff > 0 ? `Restam ${diff} minutos` : 'Tempo excedido (60 min)';
+                                })()}
+                            </div>
+                        )}
+
 
                         {selectedEvent.revisar && (
                             <div className="mb-4 p-3 bg-orange-100 border border-orange-200 rounded-lg">
@@ -419,6 +440,17 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setEditModalOpen(false)}>
                     <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Editar Limpeza</h3>
+                        
+                        {selectedEvent.started_at && (
+                            <div className="mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold">
+                                <Timer className="w-4 h-4" />
+                                Tempo de Limpeza: {(() => {
+                                    const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
+                                    return diff > 0 ? `Restam ${diff} minutos` : 'Tempo excedido';
+                                })()}
+                            </div>
+                        )}
+
                         <p className="text-sm text-gray-600 mb-4">Veículo: {selectedEvent.vehicle.client_vehicle_number}</p>
                         
                         <div className="mb-6">
