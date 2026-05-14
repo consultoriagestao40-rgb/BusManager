@@ -146,17 +146,29 @@ export default function DashboardPage() {
         setPrevEventsCount(events.length);
     }, [events.length]);
 
-    // Detect critical time to play alert
+    // Detect critical time to play alert (Cleaning Timer or SLA Meta)
     useEffect(() => {
-        const hasCritical = events.some(e => {
+        // Check 1: Cleaning in progress timer (60 min rule)
+        const hasCriticalCleaning = events.some(e => {
             if (e.status !== 'EM_ANDAMENTO' || !e.started_at) return false;
             const diff = differenceInMinutes(new Date(new Date(e.started_at).getTime() + 60 * 60 * 1000), now);
             return diff === 10 || diff === 5 || diff === 0;
         });
-        if (hasCritical) {
+
+        // Check 2: SLA Meta (H-1) for scheduled cars
+        const hasCriticalSLA = events.some(e => {
+            if (e.status !== 'PREVISTO') return false;
+            const metaTime = new Date(e.liberar_ate_at);
+            const diffSLA = differenceInMinutes(metaTime, now);
+            // Alert at exactly the meta time, 5 min before, or 10 min before
+            return diffSLA === 10 || diffSLA === 5 || diffSLA === 0;
+        });
+
+        if (hasCriticalCleaning || hasCriticalSLA) {
             playNotificationSound('alert');
         }
     }, [now, events]);
+
 
 
     // Prevent screen sleep (Wake Lock)
