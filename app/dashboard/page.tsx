@@ -102,7 +102,30 @@ export default function DashboardPage() {
             fetchYardItems();
         }
         return () => clearInterval(timer);
-    }, [currentDate, activeTab, user]); // Re-run when date or tab changes
+    }, [currentDate, activeTab, user]);
+
+    // Prevent screen sleep (Wake Lock)
+    useEffect(() => {
+        let wakeLock: any = null;
+        const requestWakeLock = async () => {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await (navigator as any).wakeLock.request('screen');
+                }
+            } catch (err) {}
+        };
+        requestWakeLock();
+        const handleVisibilityChange = async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            if (wakeLock !== null) wakeLock.release();
+        };
+    }, []);
 
     const handlePrevDay = () => setCurrentDate(prev => subDays(prev, 1));
     const handleNextDay = () => setCurrentDate(prev => addDays(prev, 1));
@@ -1207,7 +1230,12 @@ export default function DashboardPage() {
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm">
                                                 {event.started_at ? (
-                                                    <div className="flex items-center gap-1.5 font-bold text-blue-600">
+                                                    <div className={(() => {
+                                                        const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
+                                                        if (diff <= 10) return "flex items-center gap-1.5 font-black text-red-600 animate-pulse";
+                                                        if (diff <= 20) return "flex items-center gap-1.5 font-black text-orange-600";
+                                                        return "flex items-center gap-1.5 font-bold text-blue-600";
+                                                    })()}>
                                                         <Timer className="w-4 h-4" />
                                                         {(() => {
                                                             const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);

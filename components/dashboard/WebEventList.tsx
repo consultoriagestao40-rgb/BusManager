@@ -216,7 +216,13 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                             {event.status}
                                         </span>
                                         {event.status === 'EM_ANDAMENTO' && event.started_at && (
-                                            <div className="flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-blue-600 animate-pulse">
+                                            <div className={(() => {
+                                                const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
+                                                if (diff <= 0) return "flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-red-600 animate-pulse";
+                                                if (diff <= 10) return "flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-red-600 animate-pulse";
+                                                if (diff <= 20) return "flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-orange-600";
+                                                return "flex items-center justify-center gap-1 mt-1 text-[10px] font-black text-blue-600 animate-pulse";
+                                            })()}>
                                                 <Timer className="w-3 h-3" />
                                                 {(() => {
                                                     const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
@@ -364,7 +370,12 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                         <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
                         
                         {selectedEvent.started_at && (
-                            <div className="mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold">
+                            <div className={(() => {
+                                const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
+                                if (diff <= 10) return "mb-4 flex items-center gap-2 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-xs font-bold animate-pulse border border-red-100";
+                                if (diff <= 20) return "mb-4 flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-2 rounded-lg text-xs font-bold border border-orange-100";
+                                return "mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold";
+                            })()}>
                                 <Timer className="w-4 h-4" />
                                 Tempo de Limpeza: {(() => {
                                     const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
@@ -442,7 +453,12 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                         <h3 className="text-lg font-bold mb-4">Editar Limpeza</h3>
                         
                         {selectedEvent.started_at && (
-                            <div className="mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold">
+                            <div className={(() => {
+                                const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
+                                if (diff <= 10) return "mb-4 flex items-center gap-2 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-xs font-bold animate-pulse border border-red-100";
+                                if (diff <= 20) return "mb-4 flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-2 rounded-lg text-xs font-bold border border-orange-100";
+                                return "mb-4 flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-xs font-bold";
+                            })()}>
                                 <Timer className="w-4 h-4" />
                                 Tempo de Limpeza: {(() => {
                                     const diff = differenceInMinutes(new Date(new Date(selectedEvent.started_at).getTime() + 60 * 60 * 1000), now);
