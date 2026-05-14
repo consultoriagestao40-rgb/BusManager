@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { startOfDay, addDays, subDays, isSameDay, format, subHours } from 'date-fns';
+import { startOfDay, addDays, subDays, isSameDay, format, subHours, differenceInMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw, CheckCircle, X } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, Calendar, Search, FileText, Table, Play, Plus, Trash2, LogOut, RefreshCw, CheckCircle, X, Timer } from 'lucide-react';
 import WebEventList from '@/components/dashboard/WebEventList';
 import EventDashboardList from '@/components/dashboard/EventList';
 import { jsPDF } from 'jspdf';
@@ -18,6 +18,7 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'schedule' | 'yard'>('schedule');
     const [yardItems, setYardItems] = useState<any[]>([]);
+    const [now, setNow] = useState(new Date());
     const [yardLoading, setYardLoading] = useState(false);
     const [newVehicleNumber, setNewVehicleNumber] = useState('');
     const [newVehicleStatus, setNewVehicleStatus] = useState<'SUJO' | 'LIMPO'>('SUJO');
@@ -95,10 +96,12 @@ export default function DashboardPage() {
     }, []);
 
     useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 60000);
         if (user) {
             fetchEvents();
             fetchYardItems();
         }
+        return () => clearInterval(timer);
     }, [currentDate, activeTab, user]); // Re-run when date or tab changes
 
     const handlePrevDay = () => setCurrentDate(prev => subDays(prev, 1));
@@ -1158,6 +1161,7 @@ export default function DashboardPage() {
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Carro</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Colaborador</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Início</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tempo Limpeza</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Meta (H-1)</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                     </tr>
@@ -1173,6 +1177,17 @@ export default function DashboardPage() {
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 {event.started_at ? format(new Date(event.started_at), 'HH:mm') : '-'}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                {event.started_at ? (
+                                                    <div className="flex items-center gap-1.5 font-bold text-blue-600">
+                                                        <Timer className="w-4 h-4" />
+                                                        {(() => {
+                                                            const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
+                                                            return diff > 0 ? `${diff} min` : <span className="text-red-500">Atrasado</span>;
+                                                        })()}
+                                                    </div>
+                                                ) : '-'}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 {format(new Date(event.liberar_ate_at), 'HH:mm')}
