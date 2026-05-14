@@ -505,7 +505,7 @@ export default function DashboardPage() {
 
 
 
-    // Main table filtering
+    // Main table filtering and sorting
     const filteredEvents = events.filter((e: any) => {
         const searchLower = mainSearch.toLowerCase();
         const matchesSearch = (
@@ -514,11 +514,38 @@ export default function DashboardPage() {
             e.motorista?.toLowerCase().includes(searchLower)
         );
 
-        // Hide CANCELADO from main list unless explicitly selected (but we are removing the option)
-        const isCancelled = e.status === 'CANCELADO';
-        const matchesStatus = statusFilter === 'TODOS' ? !isCancelled : e.status === statusFilter;
+        // DEFAULT FILTER: Show only EM_ANDAMENTO and PREVISTO unless a specific status is chosen
+        const matchesStatus = statusFilter === 'TODOS' 
+            ? (e.status === 'EM_ANDAMENTO' || e.status === 'PREVISTO') 
+            : e.status === statusFilter;
 
         return matchesSearch && matchesStatus;
+    }).sort((a: any, b: any) => {
+        // Priority 1: EM_ANDAMENTO
+        // Priority 2: PREVISTO
+        // Priority 3: Others (CONCLUIDO/CANCELADO)
+        const getPriority = (status: string) => {
+            if (status === 'EM_ANDAMENTO') return 1;
+            if (status === 'PREVISTO') return 2;
+            return 3;
+        };
+        
+        const priorityA = getPriority(a.status);
+        const priorityB = getPriority(b.status);
+        
+        if (priorityA !== priorityB) {
+            return priorityA - priorityB;
+        }
+        
+        // If both are EM_ANDAMENTO, sort by started_at (oldest first - who started first stays at top)
+        if (a.status === 'EM_ANDAMENTO' && b.status === 'EM_ANDAMENTO') {
+            const timeA = a.started_at ? new Date(a.started_at).getTime() : 0;
+            const timeB = b.started_at ? new Date(b.started_at).getTime() : 0;
+            return timeA - timeB;
+        }
+        
+        // Otherwise use original trip time
+        return new Date(a.hora_viagem).getTime() - new Date(b.hora_viagem).getTime();
     });
 
     // Main table export functions
