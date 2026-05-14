@@ -141,6 +141,14 @@ export default function DashboardPage() {
     const [showYardStartModal, setShowYardStartModal] = useState(false);
     const [selectedYardVehicleId, setSelectedYardVehicleId] = useState<string | null>(null);
 
+    // Manual schedule modal state
+    const [showManualScheduleModal, setShowManualScheduleModal] = useState(false);
+    const [manualVehicleNumber, setManualVehicleNumber] = useState('');
+    const [manualSaidaTime, setManualSaidaTime] = useState('');
+    const [manualLoading, setManualLoading] = useState(false);
+    const [manualError, setManualError] = useState<string | null>(null);
+    const [manualSuccess, setManualSuccess] = useState<string | null>(null);
+
     // Search states
     const [cancelledSearch, setCancelledSearch] = useState('');
     const [inProgressSearch, setInProgressSearch] = useState('');
@@ -646,6 +654,47 @@ export default function DashboardPage() {
         }
     };
 
+    const handleManualSchedule = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!manualVehicleNumber || !manualSaidaTime) return;
+
+        setManualLoading(true);
+        setManualError(null);
+        setManualSuccess(null);
+
+        try {
+            const res = await fetch('/api/events/manual-schedule', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vehicle_number: manualVehicleNumber.trim(),
+                    saida_time: manualSaidaTime
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setManualSuccess(`Carro ${manualVehicleNumber} adicionado com sucesso à escala!`);
+                setManualVehicleNumber('');
+                setManualSaidaTime('');
+                fetchEvents();
+                // Auto-close modal after 2 seconds
+                setTimeout(() => {
+                    setShowManualScheduleModal(false);
+                    setManualSuccess(null);
+                }, 2000);
+            } else {
+                setManualError(data.error || 'Erro ao adicionar carro.');
+            }
+        } catch (error) {
+            console.error('Error adding manual schedule event:', error);
+            setManualError('Erro de conexão. Tente novamente.');
+        } finally {
+            setManualLoading(false);
+        }
+    };
+
     const handleManualProgram = async (vehicleId: string) => {
         try {
             const res = await fetch('/api/events/manual', {
@@ -717,11 +766,27 @@ export default function DashboardPage() {
                             <RefreshCw size={20} />
                         </button>
                     </div>
-                    {canEdit && (
-                        <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
-                            Nova Importação
-                        </a>
-                    )}
+                    <div className="flex flex-col items-end gap-2">
+                        {canEdit && (
+                            <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
+                                Nova Importação
+                            </a>
+                        )}
+                        <button
+                            id="btn-adicionar-carro-manual"
+                            onClick={() => {
+                                setManualError(null);
+                                setManualSuccess(null);
+                                setManualVehicleNumber('');
+                                setManualSaidaTime('');
+                                setShowManualScheduleModal(true);
+                            }}
+                            className="px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md shadow-amber-100 transition-all flex items-center gap-2"
+                        >
+                            <Plus size={16} />
+                            Adicionar Carro Manual
+                        </button>
+                    </div>
                 </div>
 
                 {/* Original Colored Metric Cards (Vibrant like Foto 02) */}
@@ -1744,6 +1809,133 @@ export default function DashboardPage() {
                                 Iniciar
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* Manual Schedule Modal */}
+            {showManualScheduleModal && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]"
+                    onClick={() => setShowManualScheduleModal(false)}
+                >
+                    <div
+                        className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 className="text-2xl font-black text-gray-800 tracking-tight">Adicionar Carro Manual</h3>
+                                <p className="text-xs text-gray-400 font-medium mt-0.5">Para uso em feriados sem escala do cliente</p>
+                            </div>
+                            <button
+                                onClick={() => setShowManualScheduleModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <X size={24} className="text-gray-400" />
+                            </button>
+                        </div>
+
+                        {/* Success message */}
+                        {manualSuccess && (
+                            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center gap-3">
+                                <CheckCircle size={20} className="text-green-600 shrink-0" />
+                                <p className="text-sm font-bold text-green-700">{manualSuccess}</p>
+                            </div>
+                        )}
+
+                        {/* Error message */}
+                        {manualError && (
+                            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3">
+                                <X size={20} className="text-red-500 shrink-0" />
+                                <p className="text-sm font-bold text-red-600">{manualError}</p>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleManualSchedule} className="space-y-5">
+                            {/* Vehicle Number */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                                    Número do Carro <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    id="manual-vehicle-number"
+                                    type="text"
+                                    value={manualVehicleNumber}
+                                    onChange={(e) => setManualVehicleNumber(e.target.value)}
+                                    placeholder="Ex: 65305"
+                                    required
+                                    autoFocus
+                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 font-bold text-gray-800 text-lg transition-all placeholder:font-normal placeholder:text-gray-300"
+                                />
+                            </div>
+
+                            {/* Departure Time */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                                    Horário de Saída do Cliente <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    id="manual-saida-time"
+                                    type="time"
+                                    value={manualSaidaTime}
+                                    onChange={(e) => setManualSaidaTime(e.target.value)}
+                                    required
+                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 font-bold text-gray-800 text-lg transition-all"
+                                />
+                            </div>
+
+                            {/* Info box */}
+                            <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                                <p className="text-xs font-bold text-amber-700 leading-relaxed">
+                                    ℹ️ O <strong>H-1 (meta)</strong> será calculado automaticamente como <strong>1 hora antes</strong> da saída informada.
+                                    Os demais campos serão preenchidos com valores padrão do sistema.
+                                </p>
+                            </div>
+
+                            {/* Default values summary */}
+                            <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-1.5">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Valores padrão que serão aplicados</p>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-500 font-medium">Status</span>
+                                    <span className="font-black text-gray-700">PREVISTO</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-500 font-medium">Pátio</span>
+                                    <span className="font-black text-green-600">✓ Marcado</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-500 font-medium">Colaborador</span>
+                                    <span className="font-black text-gray-400">— (em branco)</span>
+                                </div>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-gray-500 font-medium">Empresa</span>
+                                    <span className="font-black text-gray-700">MANUAL</span>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowManualScheduleModal(false)}
+                                    className="flex-1 py-4 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-gray-50 rounded-2xl transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    id="btn-confirmar-manual"
+                                    disabled={manualLoading || !manualVehicleNumber || !manualSaidaTime}
+                                    className="flex-1 py-4 bg-amber-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-amber-600 shadow-xl shadow-amber-100 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    {manualLoading ? (
+                                        <><Loader2 size={16} className="animate-spin" /> Salvando...</>
+                                    ) : (
+                                        <><Plus size={16} /> Confirmar</>                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
