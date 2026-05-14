@@ -11,6 +11,39 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 
+// Sound utility for notifications
+const playNotificationSound = (type: 'new' | 'alert') => {
+    try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'new') {
+            // Soft notification for new items
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+            oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        } else {
+            // Beep for critical time
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(660, audioCtx.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        }
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+        console.warn('Audio feedback not supported or blocked');
+    }
+};
+
 export default function DashboardPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<any[]>([]);
@@ -19,6 +52,7 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<'schedule' | 'yard'>('schedule');
     const [yardItems, setYardItems] = useState<any[]>([]);
     const [now, setNow] = useState(new Date());
+    const [prevEventsCount, setPrevEventsCount] = useState(0);
     const [yardLoading, setYardLoading] = useState(false);
     const [newVehicleNumber, setNewVehicleNumber] = useState('');
     const [newVehicleStatus, setNewVehicleStatus] = useState<'SUJO' | 'LIMPO'>('SUJO');
@@ -103,6 +137,27 @@ export default function DashboardPage() {
         }
         return () => clearInterval(timer);
     }, [currentDate, activeTab, user]);
+
+    // Detect new events to play sound
+    useEffect(() => {
+        if (events.length > prevEventsCount && prevEventsCount !== 0) {
+            playNotificationSound('new');
+        }
+        setPrevEventsCount(events.length);
+    }, [events.length]);
+
+    // Detect critical time to play alert
+    useEffect(() => {
+        const hasCritical = events.some(e => {
+            if (e.status !== 'EM_ANDAMENTO' || !e.started_at) return false;
+            const diff = differenceInMinutes(new Date(new Date(e.started_at).getTime() + 60 * 60 * 1000), now);
+            return diff === 10 || diff === 5 || diff === 0;
+        });
+        if (hasCritical) {
+            playNotificationSound('alert');
+        }
+    }, [now, events]);
+
 
     // Prevent screen sleep (Wake Lock)
     useEffect(() => {
