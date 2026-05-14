@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { startOfDay, endOfDay, subHours, subMinutes, parse, format } from 'date-fns';
+import { startOfDay, endOfDay, subHours, subMinutes, format } from 'date-fns';
 
 export async function POST(request: Request) {
     try {
@@ -45,19 +45,42 @@ export async function POST(request: Request) {
         const start = startOfDay(brazilNow);
         const end = endOfDay(brazilNow);
 
-        // 2. Build the departure datetime from the provided time string
-        //    User types Brazil local time (e.g. "14:30" = 14:30 BRT = 17:30 UTC)
-        //    We store as UTC in DB, browser reads as local (BRT), so we must add 3h
+        // 2. Build the departure datetime — TIMEZONE-SAFE
+        //
+        // The user is in Brazil (UTC-3). They type "14:24" meaning 14h24 local time.
+        // The browser's date-fns `format(new Date(stored), 'HH:mm')` reads UTC and
+        // converts to the browser's local timezone (BRT = UTC-3).
+        //
+        // So: to display "14:24" in BRT, we need to store "14:24 UTC" in the DB.
+        // The trick is to use Date.UTC with the BRAZIL date components (from brazilNow)
+        // and the EXACT hours/minutes the user typed — no offset adjustment needed.
+        // This works because: stored 14:24 UTC → browser (UTC-3) shows 11:24 BRT... 
+        //
+        // Wait — actually the display formula is: stored UTC → local BRT = UTC - 3h.
+        // So to show "14:24 BRT" we store "17:24 UTC".
+        // BUT we can bypass this entirely by using the fact that date-fns `format`
+        // in Next.js client components runs in the BROWSER (BRT = UTC-3).
+        // Therefore: store (user_hours + 3) as UTC hours → browser shows user_hours in BRT.
+        //
+        // Previous attempts failed because `startOfDay` depends on server local timezone.
+        // Fix: use Date.UTC() exclusively — it is ALWAYS UTC regardless of server TZ.
         const [hours, minutes] = saida_time.split(':').map(Number);
-        // Start from UTC midnight of Brazil's today, then set UTC hours = BRT hours + 3
-        const saida_date = new Date(start);
-        saida_date.setUTCHours(hours + 3, minutes, 0, 0);
 
-        // saida_programada_at and hora_viagem = client's departure time (stored as UTC)
-        // liberar_ate_at = saida - 1h  (H-1, calculated automatically, NOT set by user)
-        const saida_programada_at = saida_date;
-        const hora_viagem = saida_date;
-        const liberar_ate_at = subMinutes(saida_date, 60);
+        // Extract Brazil's today date components using UTC methods on brazilNow
+        // (brazilNow was computed as now - 3h, so its UTC values = Brazil local values)
+        const brazilYear = brazilNow.getUTCFullYear();
+        const brazilMonth = brazilNow.getUTCMonth();   // 0-indexed
+        const brazilDay = brazilNow.getUTCDate();
+
+        // Build UTC timestamp: Brazil local HH:MM + 3h = UTC
+        // Date.UTC handles hour overflow (e.g. 23 + 3 = 26 → rolls to next day correctly)
+        const saidaMs = Date.UTC(brazilYear, brazilMonth, brazilDay, hours + 3, minutes, 0, 0);
+        const saida_programada_at = new Date(saidaMs);
+        const hora_viagem = new Date(saidaMs);
+        const liberar_ate_at = subMinutes(saida_programada_at, 60); // H-1 automatic
+
+        // data_viagem = UTC midnight of Brazil's today
+        const data_viagem = new Date(Date.UTC(brazilYear, brazilMonth, brazilDay, 0, 0, 0, 0));
 
         // 3. Find or create Vehicle
         let vehicle = await prisma.vehicle.findUnique({
@@ -97,7 +120,7 @@ export async function POST(request: Request) {
 
             activeVersion = await prisma.scheduleVersion.create({
                 data: {
-                    data_viagem: start,
+                    data_viagem: data_viagem,
                     version_number: 1,
                     schedule_import_id: manualImport.id,
                     is_active: true
@@ -131,7 +154,7 @@ export async function POST(request: Request) {
             data: {
                 vehicle_id: vehicle.id,
                 schedule_version_id: activeVersion.id,
-                data_viagem: start,
+                data_viagem: data_viagem,
                 hora_viagem: hora_viagem,
                 saida_programada_at: saida_programada_at,
                 liberar_ate_at: liberar_ate_at,
@@ -162,6 +185,59 @@ export async function POST(request: Request) {
                 details: error.message,
                 code: error.code
             },
+            { status: 500 }
+        );
+    }
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth_token')?.value;
+        const user = token ? await getUserFromToken(token) : null;
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (user.role === 'CLIENT') {
+            return NextResponse.json(
+                { error: 'Acesso negado.' },
+                { status: 403 }
+            );
+        }
+
+        const { searchParams } = new URL(request.url);
+        const eventId = searchParams.get('id');
+
+        if (!eventId) {
+            return NextResponse.json({ error: 'ID do evento é obrigatório.' }, { status: 400 });
+        }
+
+        // Only allow deleting manually-inserted events
+        const event = await prisma.cleaningEvent.findUnique({
+            where: { id: eventId }
+        });
+
+        if (!event) {
+            return NextResponse.json({ error: 'Evento não encontrado.' }, { status: 404 });
+        }
+
+        if (!event.event_business_key?.startsWith('MANUAL-SCHEDULE-')) {
+            return NextResponse.json(
+                { error: 'Apenas eventos inseridos manualmente podem ser excluídos por aqui.' },
+                { status: 403 }
+            );
+        }
+
+        await prisma.cleaningEvent.delete({ where: { id: eventId } });
+
+        return NextResponse.json({ success: true });
+
+    } catch (error: any) {
+        console.error('Manual Schedule DELETE error:', error);
+        return NextResponse.json(
+            { error: 'Erro interno no servidor', details: error.message },
             { status: 500 }
         );
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Clock, CheckCircle, Play, RefreshCw } from 'lucide-react';
+import { Clock, CheckCircle, Play, RefreshCw, Trash2 } from 'lucide-react';
 
 interface Event {
     id: string;
@@ -101,6 +101,21 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
             alert('Erro de conexão');
         } finally {
             setProcessing(false);
+        }
+    };
+
+    const deleteManualEvent = async (eventId: string, vehicleNumber: string) => {
+        if (!confirm(`Tem certeza que deseja excluir o carro ${vehicleNumber} inserido manualmente?`)) return;
+        try {
+            const res = await fetch(`/api/events/manual-schedule?id=${eventId}`, { method: 'DELETE' });
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'Erro ao excluir evento.');
+            }
+        } catch (e) {
+            alert('Erro de conexão.');
         }
     };
 
@@ -210,6 +225,15 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                                         <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
                                                     )}
                                                     <button onClick={() => { setSelectedEvent(event); setSwapModalOpen(true); }} className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg"><RefreshCw className="w-5 h-5" /></button>
+                                                    {event.event_business_key?.startsWith('MANUAL-SCHEDULE-') && event.status === 'PREVISTO' && (
+                                                        <button
+                                                            onClick={() => deleteManualEvent(event.id, event.vehicle.client_vehicle_number)}
+                                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
+                                                            title="Excluir carro manual"
+                                                        >
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </button>
+                                                    )}
                                                 </>
                                             )}
                                         </div>
