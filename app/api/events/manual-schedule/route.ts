@@ -46,12 +46,14 @@ export async function POST(request: Request) {
         const end = endOfDay(brazilNow);
 
         // 2. Build the departure datetime from the provided time string
-        //    We combine Brazil-today's date with the given HH:MM
+        //    User types Brazil local time (e.g. "14:30" = 14:30 BRT = 17:30 UTC)
+        //    We store as UTC in DB, browser reads as local (BRT), so we must add 3h
         const [hours, minutes] = saida_time.split(':').map(Number);
+        // Start from UTC midnight of Brazil's today, then set UTC hours = BRT hours + 3
         const saida_date = new Date(start);
-        saida_date.setHours(hours, minutes, 0, 0);
+        saida_date.setUTCHours(hours + 3, minutes, 0, 0);
 
-        // saida_programada_at and hora_viagem = client's departure time
+        // saida_programada_at and hora_viagem = client's departure time (stored as UTC)
         // liberar_ate_at = saida - 1h  (H-1, calculated automatically, NOT set by user)
         const saida_programada_at = saida_date;
         const hora_viagem = saida_date;

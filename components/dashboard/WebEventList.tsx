@@ -152,7 +152,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                 <tr key={event.id} className={rowClass}>
                                     <td className="py-4 px-4 hidden lg:table-cell">
                                         <div className="flex flex-col">
-                                            {!event.event_business_key?.startsWith('MANUAL-') && (
+                                            {!event.event_business_key?.startsWith('YARD-') && (
                                                 <span className="text-sm font-bold text-gray-900">{format(new Date(event.hora_viagem), 'HH:mm')}</span>
                                             )}
                                         </div>
@@ -174,7 +174,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                         </div>
                                     </td>
                                     <td className="py-4 px-4 text-sm text-gray-700 hidden xl:table-cell">
-                                        {!event.event_business_key?.startsWith('MANUAL-') && format(new Date(event.saida_programada_at), 'HH:mm')}
+                                        {!event.event_business_key?.startsWith('YARD-') && format(new Date(event.saida_programada_at), 'HH:mm')}
                                     </td>
                                     <td className="py-4 px-4 text-sm text-gray-700 hidden lg:table-cell">
                                         {format(new Date(event.liberar_ate_at), 'HH:mm')}
