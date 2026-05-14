@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Clock, CheckCircle, Play, RefreshCw, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle, Play, RefreshCw, Trash2, Pencil } from 'lucide-react';
 
 interface Event {
     id: string;
@@ -26,6 +26,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
     const [startModalOpen, setStartModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
     const [swapModalOpen, setSwapModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
     const [cleaners, setCleaners] = useState<any[]>([]);
     const [yardItems, setYardItems] = useState<any[]>([]);
     const [selectedCleaner, setSelectedCleaner] = useState('');
@@ -81,7 +82,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
         }
     };
 
-    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'at-yard', data?: any) => {
+    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'at-yard' | 'edit', data?: any) => {
         if (processing) return;
         setProcessing(true);
         try {
@@ -222,7 +223,10 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                                         <button onClick={() => { setSelectedEvent(event); setStartModalOpen(true); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><Play className="w-5 h-5" /></button>
                                                     )}
                                                     {event.status === 'EM_ANDAMENTO' && (
-                                                        <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
+                                                        <>
+                                                            <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
+                                                            <button onClick={() => { setSelectedEvent(event); setSelectedCleaner((event as any).cleaner_id || ''); setEditModalOpen(true); }} className="p-1.5 text-gray-500 hover:bg-gray-50 rounded-lg" title="Editar início"><Pencil className="w-5 h-5" /></button>
+                                                        </>
                                                     )}
                                                     <button onClick={() => { setSelectedEvent(event); setSwapModalOpen(true); }} className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg"><RefreshCw className="w-5 h-5" /></button>
                                                     {event.event_business_key?.startsWith('MANUAL-SCHEDULE-') && event.status === 'PREVISTO' && (
@@ -404,6 +408,52 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                 className="flex-1 py-2 bg-green-600 text-white font-bold rounded-lg disabled:opacity-50"
                             >
                                 {processing ? 'Finalizando...' : 'Finalizar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editModalOpen && selectedEvent && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setEditModalOpen(false)}>
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-lg font-bold mb-4">Editar Limpeza</h3>
+                        <p className="text-sm text-gray-600 mb-4">Veículo: {selectedEvent.vehicle.client_vehicle_number}</p>
+                        
+                        <div className="mb-6">
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Alterar Colaborador</label>
+                            <select
+                                value={selectedCleaner}
+                                onChange={(e) => setSelectedCleaner(e.target.value)}
+                                className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Selecione um colaborador</option>
+                                {cleaners.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+
+                        <div className="border-t border-gray-100 pt-4 mb-6">
+                            <button 
+                                onClick={() => {
+                                    if(confirm("Deseja realmente RETORNAR este veículo para 'Previsto'? Isso apagará o registro de quem iniciou e o horário de início.")) {
+                                        handleAction(selectedEvent.id, 'edit', { resetStatus: true });
+                                    }
+                                }}
+                                className="w-full py-2 text-red-600 text-xs font-black uppercase hover:bg-red-50 rounded-lg border border-red-100 transition-colors"
+                            >
+                                Retornar para "Previsto" (Reiniciar)
+                            </button>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button onClick={() => setEditModalOpen(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                            <button
+                                onClick={() => handleAction(selectedEvent.id, 'edit', { cleanerId: selectedCleaner })}
+                                disabled={processing}
+                                className="flex-1 py-2 bg-blue-600 text-white font-bold rounded-lg disabled:opacity-50"
+                            >
+                                {processing ? 'Salvando...' : 'Salvar'}
                             </button>
                         </div>
                     </div>

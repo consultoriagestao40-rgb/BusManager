@@ -399,3 +399,35 @@ export async function updateYardStatus(
         data: { status }
     });
 }
+
+export async function editEvent(
+    eventId: string,
+    userId: string,
+    data: {
+        cleanerId?: string;
+        resetStatus?: boolean;
+    }
+) {
+    const event = await prisma.cleaningEvent.findUnique({ where: { id: eventId } });
+    if (!event) throw new Error('Evento não encontrado');
+    if (event.status === 'CONCLUIDO') throw new Error('Eventos finalizados não podem ser editados.');
+
+    if (data.resetStatus) {
+        return await prisma.cleaningEvent.update({
+            where: { id: eventId },
+            data: {
+                status: 'PREVISTO',
+                started_at: null,
+                started_by_user_id: null,
+                cleaner_id: null,
+            }
+        });
+    }
+
+    return await prisma.cleaningEvent.update({
+        where: { id: eventId },
+        data: {
+            cleaner_id: data.cleanerId || event.cleaner_id,
+        }
+    });
+}
