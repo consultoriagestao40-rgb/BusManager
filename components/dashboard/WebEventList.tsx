@@ -18,7 +18,19 @@ interface Event {
     started_at?: string;
 }
 
-export default function WebEventList({ events, autoOpenEventId, userRole }: { events: Event[], autoOpenEventId?: string | null, userRole?: string }) {
+export default function WebEventList({ 
+    events, 
+    autoOpenEventId, 
+    userRole,
+    hasYardLock = false,
+    criticalYardEventId = null
+}: { 
+    events: Event[], 
+    autoOpenEventId?: string | null, 
+    userRole?: string,
+    hasYardLock?: boolean,
+    criticalYardEventId?: string | null
+}) {
     const [now, setNow] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -133,6 +145,7 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
 
     const getRowClass = (event: Event, sla: string) => {
         const baseClass = "transition-colors border-b border-gray-100 last:border-0";
+        if (event.id === criticalYardEventId) return `${baseClass} border-l-8 border-red-600 bg-red-500/25 text-red-900 animate-pulse font-extrabold`;
         if (event.status === 'CONCLUIDO') return `${baseClass} bg-green-50 hover:bg-green-100`;
         if (event.status === 'EM_ANDAMENTO') return `${baseClass} bg-blue-50/50 hover:bg-blue-100/50`;
         if (sla === 'expired') return `${baseClass} bg-red-50 hover:bg-red-100`;
@@ -164,9 +177,14 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                             const diff = differenceInMinutes(new Date(event.liberar_ate_at), now);
                             const diffText = diff > 0 ? `${Math.floor(diff / 60)}h ${diff % 60}m` : 'Estourado';
                             const rowClass = getRowClass(event, sla);
+                            const isPlayDisabled = hasYardLock;
+                            const isSwapDisabled = hasYardLock && event.id !== criticalYardEventId;
+                            const isEditOrFinishDisabled = hasYardLock;
+                            const isDeleteDisabled = hasYardLock;
+                            const isYardCheckboxDisabled = userRole === 'CLIENT' || (hasYardLock && event.id !== criticalYardEventId);
 
                             return (
-                                <tr key={event.id} className={rowClass}>
+                                <tr key={event.id} id={`event-row-${event.id}`} className={rowClass}>
                                     <td className="py-4 px-4 hidden lg:table-cell">
                                         <div className="flex flex-col">
                                             {!event.event_business_key?.startsWith('YARD-') && (
@@ -204,9 +222,10 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                         <input
                                             type="checkbox"
                                             checked={event.at_yard}
-                                            onChange={() => userRole !== 'CLIENT' && handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
-                                            className={`w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${userRole === 'CLIENT' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                                            disabled={userRole === 'CLIENT'}
+                                            onChange={() => !isYardCheckboxDisabled && handleAction(event.id, 'at-yard', { at_yard: !event.at_yard })}
+                                            className={`w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${isYardCheckboxDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
+                                            disabled={isYardCheckboxDisabled}
+                                            title={isYardCheckboxDisabled && hasYardLock ? "Bloqueado: pátio crítico pendente" : "Confirmar presença no pátio"}
                                         />
                                     </td>
                                     <td className="py-4 px-4 text-center">
@@ -236,20 +255,49 @@ export default function WebEventList({ events, autoOpenEventId, userRole }: { ev
                                             {userRole !== 'CLIENT' && (
                                                 <>
                                                     {event.status === 'PREVISTO' && (
-                                                        <button onClick={() => { setSelectedEvent(event); setStartModalOpen(true); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"><Play className="w-5 h-5" /></button>
+                                                        <button 
+                                                            onClick={() => { if (!isPlayDisabled) { setSelectedEvent(event); setStartModalOpen(true); } }} 
+                                                            disabled={isPlayDisabled}
+                                                            className={`p-1.5 rounded-lg transition-all ${isPlayDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-blue-600 hover:bg-blue-50'}`}
+                                                            title={isPlayDisabled ? "Bloqueado: pátio crítico pendente" : "Iniciar limpeza"}
+                                                        >
+                                                            <Play className="w-5 h-5" />
+                                                        </button>
                                                     )}
                                                     {event.status === 'EM_ANDAMENTO' && (
                                                         <>
-                                                            <button onClick={() => { setSelectedEvent(event); setFinishModalOpen(true); }} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-5 h-5" /></button>
-                                                            <button onClick={() => { setSelectedEvent(event); setSelectedCleaner((event as any).cleaner_id || ''); setEditModalOpen(true); }} className="p-1.5 text-gray-500 hover:bg-gray-50 rounded-lg" title="Editar início"><Pencil className="w-5 h-5" /></button>
+                                                            <button 
+                                                                onClick={() => { if (!isEditOrFinishDisabled) { setSelectedEvent(event); setFinishModalOpen(true); } }} 
+                                                                disabled={isEditOrFinishDisabled}
+                                                                className={`p-1.5 rounded-lg transition-all ${isEditOrFinishDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-green-600 hover:bg-green-50'}`}
+                                                                title={isEditOrFinishDisabled ? "Bloqueado: pátio crítico pendente" : "Finalizar limpeza"}
+                                                            >
+                                                                <CheckCircle className="w-5 h-5" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => { if (!isEditOrFinishDisabled) { setSelectedEvent(event); setSelectedCleaner((event as any).cleaner_id || ''); setEditModalOpen(true); } }} 
+                                                                disabled={isEditOrFinishDisabled}
+                                                                className={`p-1.5 rounded-lg transition-all ${isEditOrFinishDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-gray-500 hover:bg-gray-50'}`}
+                                                                title={isEditOrFinishDisabled ? "Bloqueado: pátio crítico pendente" : "Editar início"}
+                                                            >
+                                                                <Pencil className="w-5 h-5" />
+                                                            </button>
                                                         </>
                                                     )}
-                                                    <button onClick={() => { setSelectedEvent(event); setSwapModalOpen(true); }} className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg"><RefreshCw className="w-5 h-5" /></button>
+                                                    <button 
+                                                        onClick={() => { if (!isSwapDisabled) { setSelectedEvent(event); setSwapModalOpen(true); } }} 
+                                                        disabled={isSwapDisabled}
+                                                        className={`p-1.5 rounded-lg transition-all ${isSwapDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-orange-600 hover:bg-orange-50'}`}
+                                                        title={isSwapDisabled ? "Bloqueado: pátio crítico pendente" : "Trocar veículo"}
+                                                    >
+                                                        <RefreshCw className="w-5 h-5" />
+                                                    </button>
                                                     {event.event_business_key?.startsWith('MANUAL-SCHEDULE-') && event.status === 'PREVISTO' && (
                                                         <button
-                                                            onClick={() => deleteManualEvent(event.id, event.vehicle.client_vehicle_number)}
-                                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
-                                                            title="Excluir carro manual"
+                                                            onClick={() => { if (!isDeleteDisabled) { deleteManualEvent(event.id, event.vehicle.client_vehicle_number); } }}
+                                                            disabled={isDeleteDisabled}
+                                                            className={`p-1.5 rounded-lg transition-all ${isDeleteDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-red-500 hover:bg-red-50'}`}
+                                                            title={isDeleteDisabled ? "Bloqueado: pátio crítico pendente" : "Excluir carro manual"}
                                                         >
                                                             <Trash2 className="w-5 h-5" />
                                                         </button>

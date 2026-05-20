@@ -21,9 +21,16 @@ interface Event {
 interface EventListProps {
     events: Event[];
     userRole?: string;
+    hasYardLock?: boolean;
+    criticalYardEventId?: string | null;
 }
 
-export default function EventDashboardList({ events, userRole }: EventListProps) {
+export default function EventDashboardList({ 
+    events, 
+    userRole,
+    hasYardLock = false,
+    criticalYardEventId = null
+}: EventListProps) {
     const router = useRouter();
     const [now, setNow] = useState(new Date());
     const [searchTerm, setSearchTerm] = useState('');
@@ -227,11 +234,13 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
 
                     {/* NEW: Add from Yard Button */}
                     <button
-                        onClick={() => setShowYardModal(true)}
-                        className="w-full bg-blue-600 p-3 rounded-xl flex items-center justify-center gap-2 font-black text-sm shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                        onClick={() => { if (!hasYardLock) setShowYardModal(true); }}
+                        disabled={hasYardLock}
+                        className={`w-full p-3 rounded-xl flex items-center justify-center gap-2 font-black text-sm transition-all ${hasYardLock ? 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-40' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95'}`}
+                        title={hasYardLock ? "Bloqueado: pátio crítico pendente" : "PROGRAMAR DO PÁTIO"}
                     >
                         <RefreshCw className="w-4 h-4 animate-spin-slow" />
-                        PROGRAMAR DO PÁTIO
+                        PROGRAMAR DO PÁTIO {hasYardLock && <span className="text-xs font-black text-red-400">(BLOQUEADO)</span>}
                     </button>
 
                     {/* Search & Filter Container (Floating Look) */}
@@ -287,15 +296,21 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
                             const isCompleted = event.status === 'CONCLUIDO';
                             const isInProgress = event.status === 'EM_ANDAMENTO';
 
-                            // Determine Row Background Color
+                             // Determine Row Background Color
                             let rowBgClass = 'bg-white hover:bg-gray-50'; // Default
-                            if (isCompleted) rowBgClass = 'bg-green-50/80 border-green-100';
+                            if (event.id === criticalYardEventId) rowBgClass = 'border-l-8 border-red-600 bg-red-500/25 text-red-900 animate-pulse font-extrabold';
+                            else if (isCompleted) rowBgClass = 'bg-green-50/80 border-green-100';
                             else if (sla === 'expired' && !isCancelled) rowBgClass = 'bg-red-50/80 border-red-100';
                             else if (sla === 'critical' && !isCancelled) rowBgClass = 'bg-orange-50/80 border-orange-100';
                             else if (sla === 'warning' && !isCancelled) rowBgClass = 'bg-yellow-50/80 border-yellow-100';
 
+                            const isPlayDisabled = hasYardLock;
+                            const isSwapDisabled = hasYardLock && event.id !== criticalYardEventId;
+                            const isEditOrFinishDisabled = hasYardLock;
+                            const isYardCheckboxDisabled = userRole === 'CLIENT' || (hasYardLock && event.id !== criticalYardEventId);
+
                             return (
-                                <div key={event.id} className={`grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 p-4 items-center transition-colors border-b border-gray-100 last:border-0 ${rowBgClass} ${isCancelled ? 'opacity-60 grayscale bg-gray-50' : ''}`}>
+                                <div key={event.id} id={`event-row-${event.id}`} className={`grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 p-4 items-center transition-colors border-b border-gray-100 last:border-0 ${rowBgClass} ${isCancelled ? 'opacity-60 grayscale bg-gray-50' : ''}`}>
                                     {/* Carro */}
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-gray-900">
@@ -326,12 +341,13 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
                                             type="checkbox"
                                             checked={event.at_yard}
                                             onChange={(e) => {
-                                                if (userRole === 'CLIENT') return;
+                                                if (isYardCheckboxDisabled) return;
                                                 e.stopPropagation();
                                                 handleActionTrigger(event, 'at-yard');
                                             }}
-                                            className={`w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 ${userRole === 'CLIENT' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                                            disabled={userRole === 'CLIENT'}
+                                            className={`w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 ${isYardCheckboxDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
+                                            disabled={isYardCheckboxDisabled}
+                                            title={isYardCheckboxDisabled && hasYardLock ? "Bloqueado: pátio crítico pendente" : "Confirmar presença no pátio"}
                                         />
                                     </div>
 
@@ -357,37 +373,45 @@ export default function EventDashboardList({ events, userRole }: EventListProps)
                                                             <div className="p-3 space-y-2">
                                                                 {event.status === 'PREVISTO' && (
                                                                     <button
-                                                                        onClick={() => handleActionTrigger(event, 'start')}
-                                                                        className="w-full text-left px-4 py-3.5 hover:bg-blue-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                        onClick={() => { if (!isPlayDisabled) handleActionTrigger(event, 'start'); }}
+                                                                        disabled={isPlayDisabled}
+                                                                        className={`w-full text-left px-4 py-3.5 flex items-center gap-4 rounded-xl text-sm font-bold transition-colors ${isPlayDisabled ? 'opacity-40 cursor-not-allowed text-gray-400 bg-gray-50' : 'hover:bg-blue-50 text-gray-700'}`}
+                                                                        title={isPlayDisabled ? "Bloqueado: pátio crítico pendente" : "Iniciar Limpeza"}
                                                                     >
-                                                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><Play className="w-5 h-5" /></div>
-                                                                        Iniciar Limpeza
+                                                                        <div className={`p-2 rounded-lg ${isPlayDisabled ? 'bg-gray-200 text-gray-400' : 'bg-blue-100 text-blue-600'}`}><Play className="w-5 h-5" /></div>
+                                                                        Iniciar Limpeza {isPlayDisabled && <span className="text-[10px] text-red-500 font-bold ml-auto">(Bloqueado)</span>}
                                                                     </button>
                                                                 )}
                                                                 {isInProgress && (
                                                                     <button
-                                                                        onClick={() => handleActionTrigger(event, 'finish')}
-                                                                        className="w-full text-left px-4 py-3.5 hover:bg-green-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                        onClick={() => { if (!isEditOrFinishDisabled) handleActionTrigger(event, 'finish'); }}
+                                                                        disabled={isEditOrFinishDisabled}
+                                                                        className={`w-full text-left px-4 py-3.5 flex items-center gap-4 rounded-xl text-sm font-bold transition-colors ${isEditOrFinishDisabled ? 'opacity-40 cursor-not-allowed text-gray-400 bg-gray-50' : 'hover:bg-green-50 text-gray-700'}`}
+                                                                        title={isEditOrFinishDisabled ? "Bloqueado: pátio crítico pendente" : "Finalizar Limpeza"}
                                                                     >
-                                                                        <div className="p-2 bg-green-100 text-green-600 rounded-lg"><Check className="w-5 h-5" /></div>
-                                                                        Finalizar Limpeza
+                                                                        <div className={`p-2 rounded-lg ${isEditOrFinishDisabled ? 'bg-gray-200 text-gray-400' : 'bg-green-100 text-green-600'}`}><Check className="w-5 h-5" /></div>
+                                                                        Finalizar Limpeza {isEditOrFinishDisabled && <span className="text-[10px] text-red-500 font-bold ml-auto">(Bloqueado)</span>}
                                                                     </button>
                                                                 )}
                                                                 {!isCompleted && (
                                                                     <>
                                                                         <button
-                                                                            onClick={() => handleActionTrigger(event, 'swap')}
-                                                                            className="w-full text-left px-4 py-3.5 hover:bg-orange-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                            onClick={() => { if (!isSwapDisabled) handleActionTrigger(event, 'swap'); }}
+                                                                            disabled={isSwapDisabled}
+                                                                            className={`w-full text-left px-4 py-3.5 flex items-center gap-4 rounded-xl text-sm font-bold transition-colors ${isSwapDisabled ? 'opacity-40 cursor-not-allowed text-gray-400 bg-gray-50' : 'hover:bg-orange-50 text-gray-700'}`}
+                                                                            title={isSwapDisabled ? "Bloqueado: pátio crítico pendente" : "Fazer Troca"}
                                                                         >
-                                                                            <div className="p-2 bg-orange-100 text-orange-600 rounded-lg"><RefreshCw className="w-5 h-5" /></div>
-                                                                            Fazer Troca
+                                                                            <div className={`p-2 rounded-lg ${isSwapDisabled ? 'bg-gray-200 text-gray-400' : 'bg-orange-100 text-orange-600'}`}><RefreshCw className="w-5 h-5" /></div>
+                                                                            Fazer Troca {isSwapDisabled && <span className="text-[10px] text-red-500 font-bold ml-auto">(Bloqueado)</span>}
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleActionTrigger(event, 'addColaborador')}
-                                                                            className="w-full text-left px-4 py-3.5 hover:bg-purple-50 flex items-center gap-4 rounded-xl text-sm font-bold text-gray-700 transition-colors"
+                                                                            onClick={() => { if (!isEditOrFinishDisabled) handleActionTrigger(event, 'addColaborador'); }}
+                                                                            disabled={isEditOrFinishDisabled}
+                                                                            className={`w-full text-left px-4 py-3.5 flex items-center gap-4 rounded-xl text-sm font-bold transition-colors ${isEditOrFinishDisabled ? 'opacity-40 cursor-not-allowed text-gray-400 bg-gray-50' : 'hover:bg-purple-50 text-gray-700'}`}
+                                                                            title={isEditOrFinishDisabled ? "Bloqueado: pátio crítico pendente" : "Colaboradores"}
                                                                         >
-                                                                            <div className="p-2 bg-purple-100 text-purple-600 rounded-lg"><UserPlus className="w-5 h-5" /></div>
-                                                                            Colaboradores
+                                                                            <div className={`p-2 rounded-lg ${isEditOrFinishDisabled ? 'bg-gray-200 text-gray-400' : 'bg-purple-100 text-purple-600'}`}><UserPlus className="w-5 h-5" /></div>
+                                                                            Colaboradores {isEditOrFinishDisabled && <span className="text-[10px] text-red-500 font-bold ml-auto">(Bloqueado)</span>}
                                                                         </button>
                                                                     </>
                                                                 )}

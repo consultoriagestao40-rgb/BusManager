@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { getUserFromToken } from '@/lib/auth';
-import { parseISO, startOfDay, endOfDay, subHours, addHours } from 'date-fns';
+import { parseISO, startOfDay, endOfDay, subHours, addHours, differenceInMinutes } from 'date-fns';
 
 export async function GET(request: Request) {
     try {
@@ -134,6 +134,62 @@ export async function GET(request: Request) {
             }
             return enrichedEvent;
         });
+
+        // 5. Check and trigger WhatsApp alerts for Critical Yard (no at_yard and <= 90 minutes remaining)
+        try {
+            const nowTime = new Date();
+            const criticalYardEvents = eventsWithAllSwaps.filter((event: any) => {
+                // Rule: status is 'PREVISTO', not at_yard
+                if (event.status !== 'PREVISTO' || event.at_yard) return false;
+                
+                // Calculate time difference in minutes
+                const limitDate = new Date(event.liberar_ate_at);
+                const diff = differenceInMinutes(limitDate, nowTime);
+                
+                // Active alerts: when difference is <= 90 minutes (1h30m)
+                // And whatsapp_yard_alert_sent is false (to prevent duplicates)
+                return diff <= 90 && !event.whatsapp_yard_alert_sent;
+            });
+
+            if (criticalYardEvents.length > 0) {
+                const { sendWhatsAppMessage } = await import('@/lib/whatsapp-service');
+                for (const criticalEvent of criticalYardEvents) {
+                    const vehicleNumber = criticalEvent.vehicle?.client_vehicle_number || '';
+                    
+                    const text = `🚨 *ALERTA URGENTE: CARRO AUSENTE NO PÁTIO* 🚨\n\n` +
+                        `🚌 *Carro:* ${vehicleNumber}\n` +
+                        `🕒 *Meta de Liberação (H-1):* ${new Intl.DateTimeFormat('pt-BR', {
+                            timeZone: 'America/Sao_Paulo',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }).format(new Date(criticalEvent.liberar_ate_at))}\n\n` +
+                        `⚠️ *Atenção:* Falta menos de *30 minutos* para iniciar a limpeza planejada deste veículo e ele ainda *NÃO foi confirmado no pátio*!\n\n` +
+                        `Por favor, confirme a presença do veículo no pátio ou realize a substituição (Troca) no BusManager para liberar a operação.`;
+
+                    try {
+                        // Envia para o grupo operacional padrão
+                        await sendWhatsAppMessage(text);
+                        // Envia também para o grupo VIP da Liderança Penha
+                        await sendWhatsAppMessage(text, '120363421745459340-group');
+
+                        // Atualiza no banco de dados para marcar como enviado
+                        await prisma.cleaningEvent.update({
+                            where: { id: criticalEvent.id },
+                            data: { whatsapp_yard_alert_sent: true }
+                        });
+                        
+                        // Atualiza na resposta em memória também
+                        criticalEvent.whatsapp_yard_alert_sent = true;
+                        
+                        console.log(`[Yard Alert] WhatsApp enviado com sucesso para o carro ${vehicleNumber}.`);
+                    } catch (err) {
+                        console.error(`[Yard Alert] Erro ao enviar WhatsApp para ${vehicleNumber}:`, err);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('[Yard Alert] Erro no fluxo de monitoramento de pátio crítico:', err);
+        }
 
         return NextResponse.json({ events: eventsWithAllSwaps });
 

@@ -12,7 +12,7 @@ import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 
 // Sound utility for notifications
-const playNotificationSound = (type: 'new' | 'alert') => {
+const playNotificationSound = (type: 'new' | 'alert' | 'yard-alert') => {
     try {
         const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const oscillator = audioCtx.createOscillator();
@@ -27,6 +27,14 @@ const playNotificationSound = (type: 'new' | 'alert') => {
             oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
             oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5);
             gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        } else if (type === 'yard-alert') {
+            // Siren sound for critical yard alert (sawtooth linear sliding pitch)
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(450, audioCtx.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(750, audioCtx.currentTime + 0.25);
+            oscillator.frequency.linearRampToValueAtTime(450, audioCtx.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
         } else {
             // Beep for critical time
@@ -146,7 +154,7 @@ export default function DashboardPage() {
         setPrevEventsCount(events.length);
     }, [events.length]);
 
-    // Detect critical time to play alert (Cleaning Timer or SLA Meta)
+    // Detect critical time to play alert (Cleaning Timer or SLA Meta or Yard Alert)
     useEffect(() => {
         // Check 1: Cleaning in progress timer (60 min rule)
         const hasCriticalCleaning = events.some(e => {
@@ -164,7 +172,17 @@ export default function DashboardPage() {
             return diffSLA === 10 || diffSLA === 5 || diffSLA === 0;
         });
 
-        if (hasCriticalCleaning || hasCriticalSLA) {
+        // Check 3: Yard Lock siren alarm
+        const hasYardAlert = events.some(e => {
+            if (e.status !== 'PREVISTO' || e.at_yard) return false;
+            if ((e.event_business_key || '').startsWith('YARD-')) return false;
+            const diffSLA = differenceInMinutes(new Date(e.liberar_ate_at), now);
+            return diffSLA <= 90;
+        });
+
+        if (hasYardAlert) {
+            playNotificationSound('yard-alert');
+        } else if (hasCriticalCleaning || hasCriticalSLA) {
             playNotificationSound('alert');
         }
     }, [now, events]);
@@ -308,6 +326,15 @@ export default function DashboardPage() {
     const unifiedCompletedList = [...completedList, ...cleanYardItemsFormatted];
     const escalaCount = completedList.length; // Apenas escala
     const patioCount = cleanYardItemsFormatted.length; // Apenas pátio
+
+    // Critical Yard Alert Lock and sound notification rules
+    const criticalYardEvent = events.find((e: any) => 
+        e.status === 'PREVISTO' && 
+        !e.at_yard && 
+        differenceInMinutes(new Date(e.liberar_ate_at), now) <= 90 &&
+        !(e.event_business_key || '').startsWith('YARD-')
+    );
+    const hasYardLock = !!criticalYardEvent;
 
     // Total Clean Inventory (No date filter)
     const totalCleanYardItems = yardItems.filter((item: any) => item.status === 'LIMPO').map((item: any) => ({
@@ -865,6 +892,35 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
+            {hasYardLock && (
+                <div className="bg-red-600 text-white p-4 rounded-2xl shadow-lg shadow-red-200 border border-red-700 animate-pulse flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-white/10 p-2 rounded-xl">
+                            <Timer size={24} className="text-white animate-spin" />
+                        </div>
+                        <div>
+                            <h4 className="font-extrabold text-base tracking-wide uppercase">🚨 PENDÊNCIA OPERACIONAL CRÍTICA 🚨</h4>
+                            <p className="text-sm font-semibold text-red-100">
+                                O carro <span className="font-black underline decoration-2">{criticalYardEvent.vehicle.client_vehicle_number}</span> está previsto mas NÃO foi confirmado no pátio! Faltam menos de 30 minutos para iniciar a limpeza planejada. Todas as outras operações do sistema foram bloqueadas!
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            const el = document.getElementById(`event-row-${criticalYardEvent.id}`);
+                            if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                // Add a temporary border flash or effect
+                                el.classList.add('ring-4', 'ring-red-500');
+                                setTimeout(() => el.classList.remove('ring-4', 'ring-red-500'), 3000);
+                            }
+                        }}
+                        className="px-5 py-2.5 bg-white text-red-600 font-black rounded-xl text-sm hover:bg-red-50 active:scale-95 transition-all shadow-md shrink-0 uppercase tracking-wider"
+                    >
+                        Localizar Carro
+                    </button>
+                </div>
+            )}
             {/* --- DESKTOP VERSION (Original Designer) --- */}
             <div className="hidden md:block space-y-6">
                 {/* Date Navigation & Import */}
@@ -999,7 +1055,12 @@ export default function DashboardPage() {
                         </div>
 
                         <h2 className="text-xl font-black text-gray-800 tracking-tight">Escala de Limpeza</h2>
-                        <WebEventList events={filteredEvents} autoOpenEventId={autoOpenEventId} />
+                        <WebEventList 
+                            events={filteredEvents} 
+                            autoOpenEventId={autoOpenEventId} 
+                            hasYardLock={hasYardLock}
+                            criticalYardEventId={criticalYardEvent?.id}
+                        />
                     </div>
                 ) : (
                     /* Yard Inventory Content */
@@ -1170,7 +1231,11 @@ export default function DashboardPage() {
                         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
                     </div>
                 ) : (
-                    <EventDashboardList events={events} />
+                    <EventDashboardList 
+                        events={events} 
+                        hasYardLock={hasYardLock}
+                        criticalYardEventId={criticalYardEvent?.id}
+                    />
                 )}
                 {/* Floating Refresh Button for Mobile */}
                 <button 

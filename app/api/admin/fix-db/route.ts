@@ -46,6 +46,7 @@ export async function GET(request: Request) {
         await runSql("Add CLIENT role", `ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'CLIENT';`);
         await runSql("Add at_yard column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "at_yard" BOOLEAN DEFAULT false;`);
         await runSql("Add revisar column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "revisar" BOOLEAN DEFAULT false;`);
+        await runSql("Add whatsapp_yard_alert_sent column", `ALTER TABLE "CleaningEvent" ADD COLUMN IF NOT EXISTS "whatsapp_yard_alert_sent" BOOLEAN DEFAULT false;`);
 
         // Check and update Enum
         try {
