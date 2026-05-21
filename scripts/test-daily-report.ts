@@ -12,82 +12,188 @@ async function generateDailyReport(targetDate: Date = subDays(new Date(), 1)) {
 
     console.log(`📊 Iniciando relatório para o dia: ${dateStr}`);
 
-    // 1. Total Programado (Todos os eventos com data_viagem no dia alvo)
-    const totalScheduled = await prisma.cleaningEvent.count({
+    // 1. Identificar a Escala ATIVA para o dia do relatório
+    const activeVersion = await prisma.scheduleVersion.findFirst({
         where: {
             data_viagem: {
                 gte: start,
                 lte: end
+            },
+            is_active: true
+        }
+    });
+
+    if (!activeVersion) {
+        console.log(`📊 Nenhuma escala ativa encontrada para o dia: ${dateStr}`);
+        return;
+    }
+
+    // 2. Total Programado (Apenas da escala ATIVA, ignorando eventos extras de pátio)
+    const totalScheduled = await prisma.cleaningEvent.count({
+        where: {
+            schedule_version_id: activeVersion.id,
+            data_viagem: {
+                gte: start,
+                lte: end
+            },
+            NOT: {
+                event_business_key: { startsWith: 'YARD-' }
             }
         }
     });
 
-    // 2. Total Executado (Concluídos no dia alvo)
+    // 3. Total Executado na Escala (Finalizados e que pertencem à escala ativa)
     const executedEvents = await prisma.cleaningEvent.findMany({
         where: {
-            status: 'CONCLUIDO',
-            finished_at: {
-                gte: start,
-                lte: end
-            }
+            schedule_version_id: activeVersion.id,
+            status: 'CONCLUIDO'
         },
         include: {
             cleaner: true
         }
     });
 
-    const totalExecuted = executedEvents.length;
+    // Separar escala principal vs pátio
+    const escalaExecutedEvents = executedEvents.filter(e => !(e.event_business_key || '').startsWith('YARD-'));
+    const yardExecutedEvents = executedEvents.filter(e => (e.event_business_key || '').startsWith('YARD-'));
 
-    // 3. Atrasos (Término > Saída Programada)
-    const delayedEvents = executedEvents.filter(e => {
-        if (!e.finished_at || !e.saida_programada_at) return false;
-        return e.finished_at > e.saida_programada_at;
+    // 4. Limpezas de Pátio (Lógica de "Virtual Override" igual ao Dashboard KPI)
+    const yardItems = await prisma.yardInventory.findMany({
+        where: { status: 'LIMPO' }
     });
 
-    // 4. Tempo Médio de Execução (em minutos)
-    let totalMinutes = 0;
-    let eventsWithTime = 0;
-    executedEvents.forEach(e => {
-        if (e.started_at && e.finished_at) {
-            totalMinutes += differenceInMinutes(e.finished_at, e.started_at);
-            eventsWithTime++;
+    const activeVehicleIds = new Set(escalaExecutedEvents.map(e => e.vehicle_id));
+    const cleaners = await prisma.cleaner.findMany();
+    const cleanerMapById = new Map(cleaners.map(c => [c.id, c.name]));
+    
+    const validYardCleanings = yardItems.filter(item => {
+        const cleanDate = item.last_cleaned_at || item.updated_at;
+        if (!cleanDate) return false;
+        
+        // Normalize to Brazil Time (-3)
+        const brazilDate = new Date(new Date(cleanDate).getTime() - 3 * 60 * 60 * 1000);
+        
+        if (brazilDate < start || brazilDate > end) return false;
+        if (activeVehicleIds.has(item.vehicle_id)) return false;
+        return true;
+    });
+
+    // Unificar eventos de pátio históricos e itens do pátio atualmente limpos
+    const uniqueYardCleanings = new Map<string, { vehicle_id: string; cleanerName: string; duration: number }>();
+
+    yardExecutedEvents.forEach(e => {
+        uniqueYardCleanings.set(e.vehicle_id, {
+            vehicle_id: e.vehicle_id,
+            cleanerName: e.cleaner?.name || 'Sistema',
+            duration: e.started_at && e.finished_at ? differenceInMinutes(new Date(e.finished_at), new Date(e.started_at)) : 0
+        });
+    });
+
+    validYardCleanings.forEach(item => {
+        if (!uniqueYardCleanings.has(item.vehicle_id)) {
+            const name = item.last_cleaner_id ? (cleanerMapById.get(item.last_cleaner_id) || 'Não Identificado') : 'Sistema';
+            const duration = item.updated_at && item.last_cleaned_at ? differenceInMinutes(new Date(item.last_cleaned_at), new Date(item.updated_at)) : 0;
+            uniqueYardCleanings.set(item.vehicle_id, {
+                vehicle_id: item.vehicle_id,
+                cleanerName: name,
+                duration: duration
+            });
         }
     });
-    const avgTime = eventsWithTime > 0 ? Math.round(totalMinutes / eventsWithTime) : 0;
 
-    // 5. Ranking por Colaborador
-    const ranking: Record<string, number> = {};
-    executedEvents.forEach(e => {
-        const name = e.cleaner?.name || 'Não Informado';
-        ranking[name] = (ranking[name] || 0) + 1;
-    });
+    const finalYardCleanings = Array.from(uniqueYardCleanings.values());
+    const yardCleanedCount = finalYardCleanings.length;
 
-    const sortedRanking = Object.entries(ranking)
-        .sort((a, b) => b[1] - a[1]);
+    // 5. Consolidação de Dados
+    const totalExecuted = escalaExecutedEvents.length + yardCleanedCount;
 
-    // 6. Trocas (Swaps realizados no dia)
-    const totalSwaps = await prisma.swap.count({
-        where: {
-            created_at: {
-                gte: start,
-                lte: end
+    // 6. Atrasos (Usa 'liberar_ate_at' que é a Meta H-1)
+    const delayedCount = escalaExecutedEvents.filter(e => {
+        if (!e.finished_at || !e.liberar_ate_at) return false;
+        return new Date(e.finished_at) > new Date(e.liberar_ate_at);
+    }).length;
+
+    // 7. Tempo Médio (Escala + Pátio)
+    let totalMinutes = 0;
+    let countDuration = 0;
+
+    escalaExecutedEvents.forEach(e => {
+        if (e.started_at && e.finished_at) {
+            const duration = differenceInMinutes(new Date(e.finished_at), new Date(e.started_at));
+            if (duration > 0 && duration < 600) {
+                totalMinutes += duration;
+                countDuration++;
             }
         }
     });
 
-    // 7. Limpezas de Pátio (YARD-)
-    const yardCleaned = executedEvents.filter(e => e.event_business_key?.startsWith('YARD-')).length;
+    finalYardCleanings.forEach(item => {
+        if (item.duration > 0 && item.duration < 600) {
+            totalMinutes += item.duration;
+            countDuration++;
+        }
+    });
+
+    const avgTime = countDuration > 0 ? Math.round(totalMinutes / countDuration) : 0;
+
+    // 8. Ranking de Produtividade Unificado
+    const ranking: Record<string, number> = {};
+    
+    escalaExecutedEvents.forEach(e => {
+        const name = e.cleaner?.name || 'Sistema';
+        ranking[name] = (ranking[name] || 0) + 1;
+    });
+
+    finalYardCleanings.forEach(item => {
+        const name = item.cleanerName;
+        ranking[name] = (ranking[name] || 0) + 1;
+    });
+
+    const sortedRanking = Object.entries(ranking)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    // 9. Trocas
+    const totalSwaps = await prisma.swap.count({
+        where: {
+            original_event: {
+                schedule_version_id: activeVersion.id
+            }
+        }
+    });
+
+    // 10. Cancelados
+    const cancelledCount = await prisma.cleaningEvent.count({
+        where: {
+            schedule_version_id: activeVersion.id,
+            status: 'CANCELADO',
+            data_viagem: {
+                gte: start,
+                lte: end
+            },
+            NOT: {
+                event_business_key: { startsWith: 'YARD-' }
+            }
+        }
+    });
+
+    const effectiveScheduled = totalScheduled - cancelledCount;
 
     // Montagem da Mensagem
     const message = `📊 *FECHAMENTO DIÁRIO — BUSMANAGER* 📊\n` +
         `📅 *Referente a:* ${dateStr}\n\n` +
-        `✅ *Limpezas Realizadas:* ${totalExecuted} / ${totalScheduled} (${totalScheduled > 0 ? Math.round((totalExecuted/totalScheduled)*100) : 0}%)\n` +
+        `✅ *Limpezas Realizadas:* ${totalExecuted} / ${effectiveScheduled} (${effectiveScheduled > 0 ? Math.round((totalExecuted/effectiveScheduled)*100) : 0}%)\n` +
+        `   ▪️ Escala: ${escalaExecutedEvents.length} carro(s)\n` +
+        `   ▪️ Pátio: ${yardCleanedCount} carro(s)\n\n` +
         `⏱️ *Tempo Médio:* ${avgTime} min por veículo\n` +
-        `⚠️ *Saídas com Atraso:* ${delayedEvents.length}\n` +
+        `⚠️ *Saídas com Atraso:* ${delayedCount}\n` +
+        `❌ *Cancelados:* ${cancelledCount}\n` +
         `🔄 *Trocas na Escala:* ${totalSwaps}\n` +
-        `🛢️ *Limpezas de Pátio:* ${yardCleaned}\n\n` +
-        `👤 *Produtividade por Equipe:*\n` +
-        sortedRanking.map(([name, count]) => `▪️ ${name}: ${count} carro(s)`).join('\n') +
+        `🛢️ *Limpezas de Pátio:* ${yardCleanedCount}\n\n` +
+        `👤 *Produtividade por Equipe (Top 5):*\n` +
+        (sortedRanking.length > 0 
+            ? sortedRanking.map(([name, count]) => `▪️ ${name}: ${count} carro(s)`).join('\n')
+            : '▪️ Nenhuma limpeza registrada.') +
         `\n\n_Relatório gerado automaticamente pelo BusManager_ 🚌`;
 
     console.log('\n--- MENSAGEM FINAL ---');

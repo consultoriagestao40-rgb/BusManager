@@ -34,13 +34,16 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         return { success: false, reason: 'No active schedule found' };
     }
 
-    // 2. Total Programado (Apenas da escala ATIVA)
+    // 2. Total Programado (Apenas da escala ATIVA, ignorando eventos extras de pátio)
     const totalScheduled = await prisma.cleaningEvent.count({
         where: {
             schedule_version_id: activeVersion.id,
             data_viagem: {
                 gte: start,
                 lte: end
+            },
+            NOT: {
+                event_business_key: { startsWith: 'YARD-' }
             }
         }
     });
@@ -56,12 +59,16 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         }
     });
 
+    // Separar eventos concluídos da escala principal vs pátio
+    const escalaExecutedEvents = executedEvents.filter(e => !(e.event_business_key || '').startsWith('YARD-'));
+    const yardExecutedEvents = executedEvents.filter(e => (e.event_business_key || '').startsWith('YARD-'));
+
     // 4. Limpezas de Pátio (Lógica de "Virtual Override" igual ao Dashboard KPI)
     const yardItems = await prisma.yardInventory.findMany({
         where: { status: 'LIMPO' }
     });
 
-    const activeVehicleIds = new Set(executedEvents.map(e => e.vehicle_id));
+    const activeVehicleIds = new Set(escalaExecutedEvents.map(e => e.vehicle_id));
     const cleaners = await prisma.cleaner.findMany();
     const cleanerMapById = new Map(cleaners.map(c => [c.id, c.name]));
     
@@ -81,11 +88,39 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         return true;
     });
 
-    // 5. Consolidação de Dados
-    const totalExecuted = executedEvents.length + validYardCleanings.length;
+    // Unificar eventos de pátio históricos e itens do pátio atualmente limpos no dia
+    const uniqueYardCleanings = new Map<string, { vehicle_id: string; cleanerName: string; duration: number }>();
 
-    // 6. Atrasos (Usa 'liberar_ate_at' que é a Meta H-1, igual ao Dashboard)
-    const delayedCount = executedEvents.filter(e => {
+    // 1. Inserir dados vindos dos eventos concluídos do pátio
+    yardExecutedEvents.forEach(e => {
+        uniqueYardCleanings.set(e.vehicle_id, {
+            vehicle_id: e.vehicle_id,
+            cleanerName: e.cleaner?.name || 'Sistema',
+            duration: e.started_at && e.finished_at ? differenceInMinutes(new Date(e.finished_at), new Date(e.started_at)) : 0
+        });
+    });
+
+    // 2. Inserir dados vindos do pátio ativo no dia para assegurar cobertura completa
+    validYardCleanings.forEach(item => {
+        if (!uniqueYardCleanings.has(item.vehicle_id)) {
+            const name = item.last_cleaner_id ? (cleanerMapById.get(item.last_cleaner_id) || 'Não Identificado') : 'Sistema';
+            const duration = item.updated_at && item.last_cleaned_at ? differenceInMinutes(new Date(item.last_cleaned_at), new Date(item.updated_at)) : 0;
+            uniqueYardCleanings.set(item.vehicle_id, {
+                vehicle_id: item.vehicle_id,
+                cleanerName: name,
+                duration: duration
+            });
+        }
+    });
+
+    const finalYardCleanings = Array.from(uniqueYardCleanings.values());
+    const yardCleanedCount = finalYardCleanings.length;
+
+    // 5. Consolidação de Dados: escala + pátio
+    const totalExecuted = escalaExecutedEvents.length + yardCleanedCount;
+
+    // 6. Atrasos da Escala (Usa 'liberar_ate_at' que é a Meta H-1, igual ao Dashboard)
+    const delayedCount = escalaExecutedEvents.filter(e => {
         if (!e.finished_at || !e.liberar_ate_at) return false;
         return new Date(e.finished_at) > new Date(e.liberar_ate_at);
     }).length;
@@ -95,7 +130,7 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     let countDuration = 0;
 
     // Tempos da Escala
-    executedEvents.forEach(e => {
+    escalaExecutedEvents.forEach(e => {
         if (e.started_at && e.finished_at) {
             const duration = differenceInMinutes(new Date(e.finished_at), new Date(e.started_at));
             if (duration > 0 && duration < 600) { // Filtro de outliers
@@ -106,13 +141,10 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     });
 
     // Tempos do Pátio
-    validYardCleanings.forEach(item => {
-        if (item.updated_at && item.last_cleaned_at) {
-            const duration = differenceInMinutes(new Date(item.last_cleaned_at), new Date(item.updated_at));
-            if (duration > 0 && duration < 600) {
-                totalMinutes += duration;
-                countDuration++;
-            }
+    finalYardCleanings.forEach(item => {
+        if (item.duration > 0 && item.duration < 600) {
+            totalMinutes += item.duration;
+            countDuration++;
         }
     });
 
@@ -122,14 +154,14 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     const ranking: Record<string, number> = {};
     
     // Produtividade Escala
-    executedEvents.forEach(e => {
+    escalaExecutedEvents.forEach(e => {
         const name = e.cleaner?.name || 'Sistema';
         ranking[name] = (ranking[name] || 0) + 1;
     });
 
     // Produtividade Pátio
-    validYardCleanings.forEach(item => {
-        const name = item.last_cleaner_id ? (cleanerMapById.get(item.last_cleaner_id) || 'Não Identificado') : 'Sistema';
+    finalYardCleanings.forEach(item => {
+        const name = item.cleanerName;
         ranking[name] = (ranking[name] || 0) + 1;
     });
 
@@ -154,12 +186,12 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
             data_viagem: {
                 gte: start,
                 lte: end
+            },
+            NOT: {
+                event_business_key: { startsWith: 'YARD-' }
             }
         }
     });
-
-    // 10. Pátio (Quantidade oficial calculada no passo 4)
-    const yardCleanedCount = validYardCleanings.length;
 
     // 10. Lógica de Programados (Total Real = Total Bruto - Cancelados)
     const effectiveScheduled = totalScheduled - cancelledCount;
@@ -168,6 +200,8 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
     const message = `📊 *FECHAMENTO DIÁRIO — BUSMANAGER* 📊\n` +
         `📅 *Referente a:* ${dateStr}\n\n` +
         `✅ *Limpezas Realizadas:* ${totalExecuted} / ${effectiveScheduled} (${effectiveScheduled > 0 ? Math.round((totalExecuted/effectiveScheduled)*100) : 0}%)\n` +
+        `   ▪️ Escala: ${escalaExecutedEvents.length} carro(s)\n` +
+        `   ▪️ Pátio: ${yardCleanedCount} carro(s)\n\n` +
         `⏱️ *Tempo Médio:* ${avgTime} min por veículo\n` +
         `⚠️ *Saídas com Atraso:* ${delayedCount}\n` +
         `❌ *Cancelados:* ${cancelledCount}\n` +
