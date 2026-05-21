@@ -411,7 +411,7 @@ export default function DashboardPage() {
         const doc = new jsPDF('l', 'mm', 'a4');
         doc.text('Relatório de Veículos Concluídos', 14, 15);
         doc.setFontSize(10);
-        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')} | Escala: ${escalaCount} | Pátio: ${patioCount}`, 14, 22);
+        doc.text(`Data: ${format(currentDate, 'dd/MM/yyyy')} | Total Concluídos: ${escalaCount + patioCount} (Escala: ${escalaCount} | Pátio: ${patioCount})`, 14, 22);
 
         const tableData = filteredCompleted.map((e: any) => [
             e.vehicle.client_vehicle_number,
@@ -478,12 +478,12 @@ export default function DashboardPage() {
         const ws = XLSX.utils.json_to_sheet(tableData);
         
         // Add summary row at the top
-        XLSX.utils.sheet_add_aoa(ws, [[`Resumo: Escala: ${escalaCount} | Pátio: ${patioCount}`]], { origin: 'A1' });
+        XLSX.utils.sheet_add_aoa(ws, [[`Resumo: Total Concluídos: ${escalaCount + patioCount} (Escala: ${escalaCount} | Pátio: ${patioCount})`]], { origin: 'A1' });
         // Shift existing data down is not easy with sheet_add_aoa, better to just prepend to tableData or use a different origin.
         // Let's just add it to the bottom or as a separate info if needed, but the user asked for "at the top".
         // Re-creating with summary at the top:
         const fullData = [
-            { 'Carro': `Resumo: Escala: ${escalaCount} | Pátio: ${patioCount}`, 'Origem': '', 'Colaborador': '', 'Início': '', 'Fim': '', 'Interno': '', 'Externo': '', 'Pneus': '', 'Observação': '' },
+            { 'Carro': `Resumo: Total Concluídos: ${escalaCount + patioCount} (Escala: ${escalaCount} | Pátio: ${patioCount})`, 'Origem': '', 'Colaborador': '', 'Início': '', 'Fim': '', 'Interno': '', 'Externo': '', 'Pneus': '', 'Observação': '' },
             {}, // Empty row
             ...tableData
         ];
@@ -1011,8 +1011,9 @@ export default function DashboardPage() {
                         <p className="text-4xl font-black text-blue-800">{inProgressList.length}</p>
                     </div>
                     <div className="bg-[#F0FDF4] p-5 rounded-2xl border-l-[6px] border-green-500 shadow-xl shadow-green-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCompletedModal(true)}>
-                        <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Concluídos Escala</p>
-                        <p className="text-4xl font-black text-green-800">{escalaCount}</p>
+                        <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Total Concluídos</p>
+                        <p className="text-4xl font-black text-green-800">{escalaCount + patioCount}</p>
+                        <p className="text-[10px] text-green-600 mt-1 font-bold">{escalaCount} escala + {patioCount} pátio</p>
                     </div>
                     <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCancelledModal(true)}>
                         <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>

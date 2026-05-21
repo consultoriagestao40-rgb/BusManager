@@ -165,10 +165,13 @@ export async function GET(request: Request) {
 
         const dailyStats = Array.from(dailyMap.values()).map(day => {
             const effective = day.total - day.cancelled;
+            const totalCompleted = day.completed + day.yard_cleanings;
             return {
                 ...day,
+                completed: totalCompleted,
+                escala_completed: day.completed,
                 effective_total: effective,
-                achievement_rate: effective > 0 ? Math.round((day.completed / effective) * 100) : 0
+                achievement_rate: effective > 0 ? Math.round((totalCompleted / effective) * 100) : 0
             };
         }).sort((a, b) => a.date.localeCompare(b.date));
 
