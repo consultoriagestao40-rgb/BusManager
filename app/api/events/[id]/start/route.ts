@@ -56,6 +56,7 @@ export async function POST(
                     schedule_version_id: activeVersion.id,
                     status: 'PREVISTO',
                     at_yard: false,
+                    yard_bypass: false,
                     liberar_ate_at: {
                         lte: ninetyMinutesFromNow
                     },

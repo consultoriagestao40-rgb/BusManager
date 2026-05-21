@@ -331,6 +331,7 @@ export default function DashboardPage() {
     const criticalYardEvent = events.find((e: any) => 
         e.status === 'PREVISTO' && 
         !e.at_yard && 
+        !e.yard_bypass && 
         differenceInMinutes(new Date(e.liberar_ate_at), now) <= 90 &&
         !(e.event_business_key || '').startsWith('YARD-')
     );
@@ -890,6 +891,26 @@ export default function DashboardPage() {
         }
     };
 
+    const handleAdminBypass = async (eventId: string) => {
+        if (!confirm('Deseja realmente liberar o bloqueio operacional deste veículo como Administrador?')) return;
+        try {
+            const res = await fetch(`/api/events/${eventId}/bypass`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ yard_bypass: true })
+            });
+            if (res.ok) {
+                fetchEvents();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao liberar bloqueio: ${errorData.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            console.error('Error performing bypass:', error);
+            alert('Erro de conexão ao liberar bloqueio.');
+        }
+    };
+
     return (
         <div className="space-y-6">
             {hasYardLock && (
@@ -905,20 +926,30 @@ export default function DashboardPage() {
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => {
-                            const el = document.getElementById(`event-row-${criticalYardEvent.id}`);
-                            if (el) {
-                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                // Add a temporary border flash or effect
-                                el.classList.add('ring-4', 'ring-red-500');
-                                setTimeout(() => el.classList.remove('ring-4', 'ring-red-500'), 3000);
-                            }
-                        }}
-                        className="px-5 py-2.5 bg-white text-red-600 font-black rounded-xl text-sm hover:bg-red-50 active:scale-95 transition-all shadow-md shrink-0 uppercase tracking-wider"
-                    >
-                        Localizar Carro
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={() => {
+                                const el = document.getElementById(`event-row-${criticalYardEvent.id}`);
+                                if (el) {
+                                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    // Add a temporary border flash or effect
+                                    el.classList.add('ring-4', 'ring-red-500');
+                                    setTimeout(() => el.classList.remove('ring-4', 'ring-red-500'), 3000);
+                                }
+                            }}
+                            className="px-5 py-2.5 bg-white text-red-600 font-black rounded-xl text-sm hover:bg-red-50 active:scale-95 transition-all shadow-md uppercase tracking-wider"
+                        >
+                            Localizar Carro
+                        </button>
+                        {user?.role === 'ADMIN' && (
+                            <button
+                                onClick={() => handleAdminBypass(criticalYardEvent.id)}
+                                className="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-black rounded-xl text-sm active:scale-95 transition-all shadow-md uppercase tracking-wider"
+                            >
+                                Liberar Bloqueio (Admin)
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
             {/* --- DESKTOP VERSION (Original Designer) --- */}
@@ -1060,6 +1091,7 @@ export default function DashboardPage() {
                             autoOpenEventId={autoOpenEventId} 
                             hasYardLock={hasYardLock}
                             criticalYardEventId={criticalYardEvent?.id}
+                            userRole={user?.role}
                         />
                     </div>
                 ) : (
@@ -1235,6 +1267,7 @@ export default function DashboardPage() {
                         events={events} 
                         hasYardLock={hasYardLock}
                         criticalYardEventId={criticalYardEvent?.id}
+                        userRole={user?.role}
                     />
                 )}
                 {/* Floating Refresh Button for Mobile */}

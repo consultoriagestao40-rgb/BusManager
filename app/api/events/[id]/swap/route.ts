@@ -65,26 +65,37 @@ export async function POST(
         });
 
         if (activeVersion) {
-            const criticalYardEvent = await prisma.cleaningEvent.findFirst({
-                where: {
-                    schedule_version_id: activeVersion.id,
-                    status: 'PREVISTO',
-                    at_yard: false,
-                    liberar_ate_at: {
-                        lte: ninetyMinutesFromNow
-                    },
-                    NOT: {
-                        event_business_key: { startsWith: 'YARD-' }
-                    }
-                },
-                include: { vehicle: true }
-            });
+            // Determine if the target event is itself critical
+            const isTargetCritical = event.status === 'PREVISTO' &&
+                !event.at_yard &&
+                !event.yard_bypass &&
+                new Date(event.liberar_ate_at).getTime() <= ninetyMinutesFromNow.getTime() &&
+                !event.event_business_key?.startsWith('YARD-');
 
-            // If a critical yard event exists and it is NOT this event, block the action
-            if (criticalYardEvent && criticalYardEvent.id !== id) {
-                return NextResponse.json({
-                    error: `Ação bloqueada! Existe uma pendência operacional crítica: o carro ${criticalYardEvent.vehicle.client_vehicle_number} está escalado mas NÃO foi confirmado no pátio (faltando menos de 30 min para iniciar a limpeza). Por favor, confirme-o no pátio ou realize a troca para restabelecer as operações do sistema.`
-                }, { status: 400 });
+            // If the target event is NOT critical, check if there is any other critical event blocking it
+            if (!isTargetCritical) {
+                const criticalYardEvent = await prisma.cleaningEvent.findFirst({
+                    where: {
+                        schedule_version_id: activeVersion.id,
+                        status: 'PREVISTO',
+                        at_yard: false,
+                        yard_bypass: false,
+                        liberar_ate_at: {
+                            lte: ninetyMinutesFromNow
+                        },
+                        NOT: {
+                            event_business_key: { startsWith: 'YARD-' }
+                        }
+                    },
+                    include: { vehicle: true }
+                });
+
+                // If a critical yard event exists and it is NOT this event, block the action
+                if (criticalYardEvent && criticalYardEvent.id !== id) {
+                    return NextResponse.json({
+                        error: `Ação bloqueada! Existe uma pendência operacional crítica: o carro ${criticalYardEvent.vehicle.client_vehicle_number} está escalado mas NÃO foi confirmado no pátio (faltando menos de 30 min para iniciar a limpeza). Por favor, confirme-o no pátio ou realize a troca para restabelecer as operações do sistema.`
+                    }, { status: 400 });
+                }
             }
         }
 

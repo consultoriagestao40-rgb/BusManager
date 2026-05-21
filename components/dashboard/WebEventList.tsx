@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Clock, CheckCircle, Play, RefreshCw, Trash2, Pencil, Timer } from 'lucide-react';
+import { Clock, CheckCircle, Play, RefreshCw, Trash2, Pencil, Timer, ShieldAlert } from 'lucide-react';
 
 interface Event {
     id: string;
@@ -12,6 +12,7 @@ interface Event {
     swaps: any[];
     cleaner?: { name: string };
     at_yard: boolean;
+    yard_bypass?: boolean;
     revisar?: boolean;
     observacao_operacao?: string;
     event_business_key?: string;
@@ -95,7 +96,7 @@ export default function WebEventList({
         }
     };
 
-    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'at-yard' | 'edit', data?: any) => {
+    const handleAction = async (eventId: string, action: 'start' | 'finish' | 'swap' | 'at-yard' | 'edit' | 'bypass', data?: any) => {
         if (processing) return;
         setProcessing(true);
         try {
@@ -199,6 +200,11 @@ export default function WebEventList({
                                                 {(event as any).revisar && (
                                                     <span className="text-[9px] bg-orange-500 text-white px-1.5 py-0.5 rounded-full font-black animate-pulse">REVISAR</span>
                                                 )}
+                                                {event.yard_bypass && (
+                                                    <span className="text-[9px] bg-yellow-500 text-gray-950 px-1.5 py-0.5 rounded-full font-black flex items-center gap-0.5" title="Bloqueio operacional liberado por Administrador">
+                                                        <ShieldAlert className="w-2.5 h-2.5" /> LIBERADO (ADMIN)
+                                                    </span>
+                                                )}
                                             </div>
                                             {event.vehicle.prefix && <span className="text-[10px] bg-blue-100 text-blue-800 px-1 py-0.5 rounded w-fit">{event.vehicle.prefix}</span>}
                                             {event.observacao_operacao && (
@@ -300,6 +306,22 @@ export default function WebEventList({
                                                             title={isDeleteDisabled ? "Bloqueado: pátio crítico pendente" : "Excluir carro manual"}
                                                         >
                                                             <Trash2 className="w-5 h-5" />
+                                                        </button>
+                                                    )}
+                                                    {userRole === 'ADMIN' && (
+                                                        <button
+                                                            onClick={() => {
+                                                                const actionMsg = event.yard_bypass 
+                                                                    ? "Deseja remover o bypass/liberação deste carro?" 
+                                                                    : "Deseja liberar o bloqueio operacional deste carro como Administrador?";
+                                                                if (confirm(actionMsg)) {
+                                                                    handleAction(event.id, 'bypass', { yard_bypass: !event.yard_bypass });
+                                                                }
+                                                            }}
+                                                            className={`p-1.5 rounded-lg transition-all ${event.yard_bypass ? 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+                                                            title={event.yard_bypass ? "Remover liberação do bloqueio (Admin)" : "Liberar bloqueio operacional (Admin)"}
+                                                        >
+                                                            <ShieldAlert className="w-5 h-5" />
                                                         </button>
                                                     )}
                                                 </>

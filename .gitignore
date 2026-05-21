@@ -47,3 +47,4 @@ next-env.d.ts
 *.sqlite
 prisma/*.db
 prisma/*.sqlite
+.env*.local

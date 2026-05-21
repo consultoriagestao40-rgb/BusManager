@@ -27,6 +27,16 @@ export async function POST(
             return NextResponse.json({ error: 'Invalid at_yard value' }, { status: 400 });
         }
 
+        // Load target event to check if it is itself critical (if so, we allow it!)
+        const targetEvent = await prisma.cleaningEvent.findUnique({
+            where: { id },
+            include: { vehicle: true }
+        });
+
+        if (!targetEvent) {
+            return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+        }
+
         // Lock validation: prevent toggling other cars if there is a pending critical yard event
         const nowTime = new Date();
         const ninetyMinutesFromNow = new Date(nowTime.getTime() + 90 * 60 * 1000);
@@ -44,26 +54,37 @@ export async function POST(
         });
 
         if (activeVersion) {
-            const criticalYardEvent = await prisma.cleaningEvent.findFirst({
-                where: {
-                    schedule_version_id: activeVersion.id,
-                    status: 'PREVISTO',
-                    at_yard: false,
-                    liberar_ate_at: {
-                        lte: ninetyMinutesFromNow
-                    },
-                    NOT: {
-                        event_business_key: { startsWith: 'YARD-' }
-                    }
-                },
-                include: { vehicle: true }
-            });
+            // Determine if the target event is itself critical
+            const isTargetCritical = targetEvent.status === 'PREVISTO' &&
+                !targetEvent.at_yard &&
+                !targetEvent.yard_bypass &&
+                new Date(targetEvent.liberar_ate_at).getTime() <= ninetyMinutesFromNow.getTime() &&
+                !targetEvent.event_business_key?.startsWith('YARD-');
 
-            // If a critical yard event exists and it is NOT this event, block the action
-            if (criticalYardEvent && criticalYardEvent.id !== id) {
-                return NextResponse.json({
-                    error: `Ação bloqueada! Existe uma pendência operacional crítica: o carro ${criticalYardEvent.vehicle.client_vehicle_number} está escalado mas NÃO foi confirmado no pátio (faltando menos de 30 min para iniciar a limpeza). Por favor, confirme-o no pátio ou realize a troca para restabelecer as operações do sistema.`
-                }, { status: 400 });
+            // If the target event is NOT critical, check if there is any other critical event blocking it
+            if (!isTargetCritical) {
+                const criticalYardEvent = await prisma.cleaningEvent.findFirst({
+                    where: {
+                        schedule_version_id: activeVersion.id,
+                        status: 'PREVISTO',
+                        at_yard: false,
+                        yard_bypass: false,
+                        liberar_ate_at: {
+                            lte: ninetyMinutesFromNow
+                        },
+                        NOT: {
+                            event_business_key: { startsWith: 'YARD-' }
+                        }
+                    },
+                    include: { vehicle: true }
+                });
+
+                // If a critical yard event exists and it is NOT this event, block the action
+                if (criticalYardEvent && criticalYardEvent.id !== id) {
+                    return NextResponse.json({
+                        error: `Ação bloqueada! Existe uma pendência operacional crítica: o carro ${criticalYardEvent.vehicle.client_vehicle_number} está escalado mas NÃO foi confirmado no pátio (faltando menos de 30 min para iniciar a limpeza). Por favor, confirme-o no pátio ou realize a troca para restabelecer as operações do sistema.`
+                    }, { status: 400 });
+                }
             }
         }
 

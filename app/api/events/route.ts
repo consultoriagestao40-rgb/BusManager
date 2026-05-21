@@ -139,8 +139,8 @@ export async function GET(request: Request) {
         try {
             const nowTime = new Date();
             const criticalYardEvents = eventsWithAllSwaps.filter((event: any) => {
-                // Rule: status is 'PREVISTO', not at_yard
-                if (event.status !== 'PREVISTO' || event.at_yard) return false;
+                // Rule: status is 'PREVISTO', not at_yard, not yard_bypass
+                if (event.status !== 'PREVISTO' || event.at_yard || event.yard_bypass) return false;
                 
                 // Calculate time difference in minutes
                 const limitDate = new Date(event.liberar_ate_at);

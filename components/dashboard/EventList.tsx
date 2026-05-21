@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, differenceInMinutes } from 'date-fns';
-import { Bus, Search, Play, Check, RefreshCw, UserPlus, LogOut } from 'lucide-react';
+import { Bus, Search, Play, Check, RefreshCw, UserPlus, LogOut, ShieldAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Event {
@@ -13,6 +13,7 @@ interface Event {
     swaps: any[];
     cleaner?: { name: string };
     at_yard: boolean;
+    yard_bypass?: boolean;
     revisar?: boolean;
     observacao_operacao?: string;
     event_business_key?: string;
@@ -129,6 +130,56 @@ export default function EventDashboardList({
 
             if (res.ok) {
                 alert('Ação registrada com sucesso!');
+                window.location.reload();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.error || 'Erro ao processar ação');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleAtYardToggle = async (event: Event) => {
+        if (processing) return;
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/events/${event.id}/at-yard`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ at_yard: !event.at_yard })
+            });
+
+            if (res.ok) {
+                alert('Ação registrada com sucesso!');
+                window.location.reload();
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.error || 'Erro ao processar ação');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleMobileBypass = async (eventId: string, bypass: boolean) => {
+        if (processing) return;
+        setProcessing(true);
+        try {
+            const res = await fetch(`/api/events/${eventId}/bypass`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ yard_bypass: bypass })
+            });
+
+            if (res.ok) {
+                alert('Ação de bypass registrada com sucesso!');
                 window.location.reload();
             } else {
                 const errorData = await res.json().catch(() => ({}));
@@ -316,6 +367,11 @@ export default function EventDashboardList({
                                         <span className="text-sm font-bold text-gray-900">
                                             {event.vehicle.client_vehicle_number || '-'}
                                         </span>
+                                        {event.yard_bypass && (
+                                            <span className="text-[8px] bg-yellow-500 text-gray-950 px-1 py-0.5 rounded font-black w-fit mt-1 flex items-center gap-0.5" title="Bloqueio operacional liberado por Administrador">
+                                                <ShieldAlert className="w-2 h-2" /> LIBERADO
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* Hora Saída */}
@@ -343,7 +399,7 @@ export default function EventDashboardList({
                                             onChange={(e) => {
                                                 if (isYardCheckboxDisabled) return;
                                                 e.stopPropagation();
-                                                handleActionTrigger(event, 'at-yard');
+                                                handleAtYardToggle(event);
                                             }}
                                             className={`w-6 h-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 ${isYardCheckboxDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
                                             disabled={isYardCheckboxDisabled}
@@ -414,6 +470,25 @@ export default function EventDashboardList({
                                                                             Colaboradores {isEditOrFinishDisabled && <span className="text-[10px] text-red-500 font-bold ml-auto">(Bloqueado)</span>}
                                                                         </button>
                                                                     </>
+                                                                )}
+                                                                {userRole === 'ADMIN' && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setShowMenu(null);
+                                                                            const actionMsg = event.yard_bypass 
+                                                                                ? "Deseja remover o bypass/liberação deste carro?" 
+                                                                                : "Deseja liberar o bloqueio operacional deste carro como Administrador?";
+                                                                            if (confirm(actionMsg)) {
+                                                                                handleMobileBypass(event.id, !event.yard_bypass);
+                                                                            }
+                                                                        }}
+                                                                        className="w-full text-left px-4 py-3.5 flex items-center gap-4 rounded-xl text-sm font-bold transition-colors hover:bg-yellow-50 text-gray-700 animate-pulse bg-yellow-500/10"
+                                                                    >
+                                                                        <div className="p-2 rounded-lg bg-yellow-100 text-yellow-600">
+                                                                            <ShieldAlert className="w-5 h-5" />
+                                                                        </div>
+                                                                        {event.yard_bypass ? "Remover Liberação (Admin)" : "Liberar Bloqueio (Admin)"}
+                                                                    </button>
                                                                 )}
                                                             </div>
                                                             <div className="p-4 bg-gray-50 border-t border-gray-100 sm:hidden">
