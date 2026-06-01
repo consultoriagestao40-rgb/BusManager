@@ -1026,7 +1026,7 @@ export default function DashboardPage() {
                             className="px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md shadow-amber-100 transition-all flex items-center gap-2"
                         >
                             <Plus size={16} />
-                            Adicionar Carro Manual
+                            Extra - Escala
                         </button>
                     </div>
                 </div>
@@ -2188,7 +2188,7 @@ export default function DashboardPage() {
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h3 className="text-2xl font-black text-gray-800 tracking-tight">Adicionar Carro Manual</h3>
+                                <h3 className="text-2xl font-black text-gray-800 tracking-tight">Extra - Escala</h3>
                                 <p className="text-xs text-gray-400 font-medium mt-0.5">Para uso em feriados sem escala do cliente</p>
                             </div>
                             <button
