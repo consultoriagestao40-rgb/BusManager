@@ -113,7 +113,7 @@ export async function createScheduleVersion(
                 // Try to find cleaner name if available
                 let cleanerName = 'Faxineiro não identificado';
                 if (yardStock.last_cleaner_id) {
-                    const cleanerUser = await tx.user.findUnique({
+                    const cleanerUser = await tx.cleaner.findUnique({
                         where: { id: yardStock.last_cleaner_id },
                         select: { name: true }
                     });
@@ -124,7 +124,7 @@ export async function createScheduleVersion(
                     ? new Date(yardStock.last_cleaned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                     : '--:--';
 
-                finalObservation = `⚠️ Veículo já estava LIMPO no pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${baseObservation}`.trim();
+                finalObservation = `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${baseObservation}`.trim();
             }
 
             let eventToCreate: any = {
@@ -137,6 +137,30 @@ export async function createScheduleVersion(
                 status: 'PREVISTO', // Default
                 liberar_ate_at: new Date(event.saida_programada_at.getTime() - 60 * 60 * 1000) // H-1
             };
+
+            // If vehicle was in the yard, inherit its status and details
+            if (yardStock) {
+                eventToCreate.at_yard = true;
+                if (yardStock.status === 'LIMPO') {
+                    eventToCreate.status = 'CONCLUIDO';
+                    eventToCreate.revisar = true;
+                    eventToCreate.check_interno = true;
+                    eventToCreate.check_externo = true;
+                    eventToCreate.check_pneus = true;
+                    eventToCreate.check_bagageiros = true;
+                    eventToCreate.check_latrina = true;
+                    eventToCreate.check_banheiro = true;
+                    eventToCreate.check_higiene = true;
+                    eventToCreate.check_ozonio = true;
+                    eventToCreate.started_at = yardStock.created_at;
+                    eventToCreate.finished_at = yardStock.last_cleaned_at || new Date();
+                    eventToCreate.cleaner_id = yardStock.last_cleaner_id;
+                } else if (yardStock.status === 'EM_ANDAMENTO') {
+                    eventToCreate.status = 'EM_ANDAMENTO';
+                    eventToCreate.started_at = yardStock.created_at || new Date();
+                    eventToCreate.cleaner_id = yardStock.last_cleaner_id;
+                }
+            }
 
             // PRESERVE STATE LOGIC
             if (oldEventsMap.has(businessKey)) {

@@ -23,6 +23,18 @@ export async function startEvent(eventId: string, userId: string, cleanerId?: st
         // mas muitas vezes 'start' na escala significa que querem re-verificar.
         
         if (yardItem.status === 'LIMPO' && event.status === 'PREVISTO') {
+            let cleanerName = 'Faxineiro não identificado';
+            if (yardItem.last_cleaner_id) {
+                const cleanerUser = await prisma.cleaner.findUnique({
+                    where: { id: yardItem.last_cleaner_id },
+                    select: { name: true }
+                });
+                if (cleanerUser) cleanerName = cleanerUser.name;
+            }
+            const cleanedTime = yardItem.last_cleaned_at
+                ? new Date(yardItem.last_cleaned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                : '--:--';
+
             const res = await prisma.cleaningEvent.update({
                 where: { id: eventId },
                 data: {
@@ -41,7 +53,8 @@ export async function startEvent(eventId: string, userId: string, cleanerId?: st
                     check_higiene: true,
                     check_ozonio: true,
                     at_yard: true,
-                    observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
+                    revisar: true,
+                    observacao_operacao: `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${event.observacao_operacao || ''}`.trim()
                 }
             });
             await prisma.yardInventory.delete({ where: { id: yardItem.id } });
@@ -181,14 +194,39 @@ export async function swapVehicle(
                 where: { vehicle_id: data.replacement_vehicle_id }
             });
 
-            const isAlreadyClean = yardItem?.status === 'LIMPO';
+            let eventUpdateData: any = {
+                vehicle_id: data.replacement_vehicle_id,
+                started_by_user_id: null,
+                completed_by_user_id: null,
+                cleaner_id: null,
+                started_at: null,
+                finished_at: null,
+                check_interno: false,
+                check_externo: false,
+                check_pneus: false,
+                check_bagageiros: false,
+                check_latrina: false,
+                check_banheiro: false,
+                check_higiene: false,
+                check_ozonio: false,
+            };
 
-            await tx.cleaningEvent.update({
-                where: { id: eventId },
-                data: {
-                    vehicle_id: data.replacement_vehicle_id,
-                    // Automated completion if pre-cleaned in yard
-                    ...(isAlreadyClean ? {
+            if (yardItem) {
+                if (yardItem.status === 'LIMPO') {
+                    let cleanerName = 'Faxineiro não identificado';
+                    if (yardItem.last_cleaner_id) {
+                        const cleanerUser = await tx.cleaner.findUnique({
+                            where: { id: yardItem.last_cleaner_id },
+                            select: { name: true }
+                        });
+                        if (cleanerUser) cleanerName = cleanerUser.name;
+                    }
+                    const cleanedTime = yardItem.last_cleaned_at
+                        ? new Date(yardItem.last_cleaned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                        : '--:--';
+
+                    eventUpdateData = {
+                        ...eventUpdateData,
                         status: 'CONCLUIDO',
                         finished_at: yardItem.last_cleaned_at || new Date(),
                         completed_by_user_id: userId,
@@ -203,26 +241,42 @@ export async function swapVehicle(
                         check_ozonio: true,
                         at_yard: true,
                         revisar: true,
-                        observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
-                    } : {
-                        status: 'PREVISTO',
+                        observacao_operacao: `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${event.observacao_operacao || ''}`.trim()
+                    };
+                } else if (yardItem.status === 'EM_ANDAMENTO') {
+                    eventUpdateData = {
+                        ...eventUpdateData,
+                        status: 'EM_ANDAMENTO',
+                        started_at: yardItem.created_at || new Date(),
+                        cleaner_id: yardItem.last_cleaner_id,
+                        at_yard: true,
                         revisar: false,
-                        started_at: null,
-                        finished_at: null,
-                        started_by_user_id: null,
-                        completed_by_user_id: null,
-                        cleaner_id: null,
-                        check_interno: false,
-                        check_externo: false,
-                        check_pneus: false,
-                        check_bagageiros: false,
-                        check_latrina: false,
-                        check_banheiro: false,
-                        check_higiene: false,
-                        check_ozonio: false,
-                        observacao_operacao: (event.observacao_operacao || '') + ' (Troca - Novo Carro Sujo)'.trim()
-                    })
+                        observacao_operacao: `(Troca - Carro em Andamento no Pátio). ${event.observacao_operacao || ''}`.trim()
+                    };
+                } else {
+                    // SUJO
+                    eventUpdateData = {
+                        ...eventUpdateData,
+                        status: 'PREVISTO',
+                        at_yard: true,
+                        revisar: false,
+                        observacao_operacao: `(Troca - Carro Sujo no Pátio). ${event.observacao_operacao || ''}`.trim()
+                    };
                 }
+            } else {
+                // Not in yard
+                eventUpdateData = {
+                    ...eventUpdateData,
+                    status: 'PREVISTO',
+                    at_yard: false,
+                    revisar: false,
+                    observacao_operacao: `(Troca - Novo Carro Fora do Pátio). ${event.observacao_operacao || ''}`.trim()
+                };
+            }
+
+            await tx.cleaningEvent.update({
+                where: { id: eventId },
+                data: eventUpdateData
             });
 
             // If we use a yard item in a swap, it MUST be removed from inventory

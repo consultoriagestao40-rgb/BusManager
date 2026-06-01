@@ -58,7 +58,67 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        // 4. Create Cleaning Event
+        // 4. Find if vehicle is in Yard Inventory
+        const yardStock = await prisma.yardInventory.findFirst({
+            where: { vehicle_id }
+        });
+
+        let finalStatus: any = 'PREVISTO';
+        let revisar = false;
+        let check_interno = null;
+        let check_externo = null;
+        let check_pneus = null;
+        let check_bagageiros = null;
+        let check_latrina = null;
+        let check_banheiro = null;
+        let check_higiene = null;
+        let check_ozonio = null;
+        let started_at = null;
+        let finished_at = null;
+        let cleaner_id = null;
+        let completed_by_user_id = null;
+
+        let baseObs = observacao || 'Adicionado manualmente do pátio';
+        let finalObservation = baseObs;
+
+        if (yardStock) {
+            if (yardStock.status === 'LIMPO') {
+                finalStatus = 'CONCLUIDO';
+                revisar = true;
+                check_interno = true;
+                check_externo = true;
+                check_pneus = true;
+                check_bagageiros = true;
+                check_latrina = true;
+                check_banheiro = true;
+                check_higiene = true;
+                check_ozonio = true;
+                started_at = yardStock.created_at;
+                finished_at = yardStock.last_cleaned_at || new Date();
+                cleaner_id = yardStock.last_cleaner_id;
+                completed_by_user_id = yardStock.last_cleaner_id || user.id;
+
+                let cleanerName = 'Faxineiro não identificado';
+                if (yardStock.last_cleaner_id) {
+                    const cleanerUser = await prisma.cleaner.findUnique({
+                        where: { id: yardStock.last_cleaner_id },
+                        select: { name: true }
+                    });
+                    if (cleanerUser) cleanerName = cleanerUser.name;
+                }
+                const cleanedTime = yardStock.last_cleaned_at
+                    ? new Date(yardStock.last_cleaned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                    : '--:--';
+
+                finalObservation = `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${baseObs}`.trim();
+            } else if (yardStock.status === 'EM_ANDAMENTO') {
+                finalStatus = 'EM_ANDAMENTO';
+                started_at = yardStock.created_at || new Date();
+                cleaner_id = yardStock.last_cleaner_id;
+            }
+        }
+
+        // Create Cleaning Event
         const event = await prisma.cleaningEvent.create({
             data: {
                 vehicle_id,
@@ -67,10 +127,23 @@ export async function POST(request: Request) {
                 hora_viagem: now,
                 saida_programada_at: now,
                 liberar_ate_at: addMinutes(now, 90),
-                status: 'PREVISTO',
+                status: finalStatus,
+                revisar,
+                check_interno,
+                check_externo,
+                check_pneus,
+                check_bagageiros,
+                check_latrina,
+                check_banheiro,
+                check_higiene,
+                check_ozonio,
+                started_at,
+                finished_at,
+                cleaner_id,
+                completed_by_user_id,
                 empresa: empresa || 'MANUAL',
                 motorista: motorista || '-',
-                observacao_cliente: observacao || 'Adicionado manualmente do pátio',
+                observacao_cliente: finalObservation,
                 observacao_operacao: 'Sem Escala, carro do pátio',
                 at_yard: true,
                 event_business_key: `MANUAL-${vehicle_id}-${activeVersion.id}`
@@ -80,14 +153,15 @@ export async function POST(request: Request) {
             }
         });
 
-        // 5. Update Yard Inventory status if it exists there (marcar como em andamento)
-        try {
-            await prisma.yardInventory.updateMany({
-                where: { vehicle_id },
-                data: { status: 'EM_ANDAMENTO' }
-            });
-        } catch (yardError) {
-            console.error('Failed to update yard status but event was created:', yardError);
+        // 5. Delete from Yard Inventory if it exists there (baixar do estoque)
+        if (yardStock) {
+            try {
+                await prisma.yardInventory.delete({
+                    where: { id: yardStock.id }
+                });
+            } catch (yardError) {
+                console.error('Failed to remove from yard but event was created:', yardError);
+            }
         }
 
         return NextResponse.json(event);
