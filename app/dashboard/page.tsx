@@ -1035,7 +1035,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                     <div className="bg-white p-5 rounded-2xl border-l-[6px] border-blue-600 shadow-xl shadow-blue-50/50 transform hover:-translate-y-1 transition-all">
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total</p>
-                        <p className="text-4xl font-black text-blue-900">{events.length}</p>
+                        <p className="text-4xl font-black text-blue-900">{events.length - cancelledList.length}</p>
                     </div>
                     <div className="bg-white p-5 rounded-2xl border-l-[6px] border-gray-400 shadow-xl shadow-gray-50/50 transform hover:-translate-y-1 transition-all">
                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Previstos</p>
