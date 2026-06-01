@@ -482,7 +482,7 @@ export default function WebEventList({
             {/* Finish Modal */}
             {finishModalOpen && selectedEvent && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" onClick={() => setFinishModalOpen(false)}>
-                    <div className="bg-white rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-white rounded-xl p-6 max-w-sm w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-4">Finalizar Limpeza</h3>
                         
                         {selectedEvent.started_at && (
@@ -530,9 +530,8 @@ export default function WebEventList({
                                                 style={{ width: `${currentPercentage}%` }}
                                             />
                                         </div>
-                                    </div>
-
-                                    <div className="space-y-3 mb-6">
+                                     </div>
+                                     <div className="space-y-3 mb-4 max-h-[35vh] overflow-y-auto pr-1">
                                         <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                                             <input type="checkbox" checked={checkInterno} onChange={(e) => setCheckInterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
                                             <span className="text-sm font-semibold text-gray-700">Limpeza Interna OK</span>
@@ -565,22 +564,22 @@ export default function WebEventList({
                                             <input type="checkbox" checked={checkOzonio} onChange={(e) => setCheckOzonio(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
                                             <span className="text-sm font-semibold text-gray-700">Jato de estabilizante ozônio no final ok?</span>
                                         </label>
+                                    </div>
 
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
-                                            <textarea
-                                                value={finishObs}
-                                                onChange={(e) => setFinishObs(e.target.value)}
-                                                placeholder="Opcional..."
-                                                rows={2}
-                                                className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            />
-                                            {isFinishDisabled && (
-                                                <p className="text-[10px] text-red-500 font-bold mt-1 animate-pulse">
-                                                    * Justificativa obrigatória caso a limpeza não esteja 100% concluída.
-                                                </p>
-                                            )}
-                                        </div>
+                                    <div className="mb-6">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
+                                        <textarea
+                                            value={finishObs}
+                                            onChange={(e) => setFinishObs(e.target.value)}
+                                            placeholder="Opcional..."
+                                            rows={2}
+                                            className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        />
+                                        {isFinishDisabled && (
+                                            <p className="text-[10px] text-red-500 font-bold mt-1 animate-pulse">
+                                                * Justificativa obrigatória caso a limpeza não esteja 100% concluída.
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div className="flex gap-2">

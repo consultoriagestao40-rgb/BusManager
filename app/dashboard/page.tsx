@@ -1987,7 +1987,7 @@ export default function DashboardPage() {
             {/* Yard Finish Modal */}
             {showYardFinishModal && selectedYardVehicle && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]" onClick={() => setShowYardFinishModal(false)}>
-                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-2xl font-black text-gray-800 tracking-tight">Finalizar Limpeza</h3>
                             <button onClick={() => setShowYardFinishModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
