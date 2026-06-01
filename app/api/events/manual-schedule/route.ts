@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { vehicle_number, saida_time } = await request.json();
+        const { vehicle_number, saida_time, motivo } = await request.json();
 
         if (!vehicle_number || !saida_time) {
             return NextResponse.json(
@@ -233,8 +233,9 @@ export async function POST(request: Request) {
                 completed_by_user_id,
                 empresa: 'MANUAL',
                 motorista: '-',
+                itinerario: motivo || 'Extra',
                 observacao_cliente: finalObservation,
-                observacao_operacao: 'Inserção manual — sem escala do cliente',
+                observacao_operacao: `Extra - ${motivo || 'Turismo'} — Inserção manual`,
                 at_yard: true,
                 event_business_key: businessKey
             },

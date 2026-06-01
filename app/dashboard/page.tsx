@@ -256,6 +256,7 @@ export default function DashboardPage() {
     const [showManualScheduleModal, setShowManualScheduleModal] = useState(false);
     const [manualVehicleNumber, setManualVehicleNumber] = useState('');
     const [manualSaidaTime, setManualSaidaTime] = useState('');
+    const [manualMotivo, setManualMotivo] = useState('Turismo');
     const [manualLoading, setManualLoading] = useState(false);
     const [manualError, setManualError] = useState<string | null>(null);
     const [manualSuccess, setManualSuccess] = useState<string | null>(null);
@@ -851,7 +852,8 @@ export default function DashboardPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     vehicle_number: manualVehicleNumber.trim(),
-                    saida_time: manualSaidaTime
+                    saida_time: manualSaidaTime,
+                    motivo: manualMotivo
                 })
             });
 
@@ -861,6 +863,7 @@ export default function DashboardPage() {
                 setManualSuccess(`Carro ${manualVehicleNumber} adicionado com sucesso à escala!`);
                 setManualVehicleNumber('');
                 setManualSaidaTime('');
+                setManualMotivo('Turismo');
                 fetchEvents();
                 // Auto-close modal after 2 seconds
                 setTimeout(() => {
@@ -1021,6 +1024,7 @@ export default function DashboardPage() {
                                 setManualSuccess(null);
                                 setManualVehicleNumber('');
                                 setManualSaidaTime('');
+                                setManualMotivo('Turismo');
                                 setShowManualScheduleModal(true);
                             }}
                             className="px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md shadow-amber-100 transition-all flex items-center gap-2"
@@ -2246,6 +2250,23 @@ export default function DashboardPage() {
                                     required
                                     className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 font-bold text-gray-800 text-lg transition-all"
                                 />
+                            </div>
+
+                            {/* Motivo do Carro Extra */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                                    Motivo do Carro Extra <span className="text-red-400">*</span>
+                                </label>
+                                <select
+                                    id="manual-motivo"
+                                    value={manualMotivo}
+                                    onChange={(e) => setManualMotivo(e.target.value)}
+                                    required
+                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 font-bold text-gray-800 text-base transition-all"
+                                >
+                                    <option value="Turismo">Turismo</option>
+                                    <option value="Baldeação">Baldeação</option>
+                                </select>
                             </div>
 
                             {/* Info box */}
