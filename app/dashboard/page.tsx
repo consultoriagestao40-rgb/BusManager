@@ -281,8 +281,25 @@ export default function DashboardPage() {
     const [yardCheckExterno, setYardCheckExterno] = useState(false);
     const [yardCheckPneus, setYardCheckPneus] = useState(false);
     const [yardCheckBagageiros, setYardCheckBagageiros] = useState(false);
+    const [yardCheckLatrina, setYardCheckLatrina] = useState(false);
+    const [yardCheckBanheiro, setYardCheckBanheiro] = useState(false);
+    const [yardCheckHigiene, setYardCheckHigiene] = useState(false);
+    const [yardCheckOzonio, setYardCheckOzonio] = useState(false);
     const [yardFinishObs, setYardFinishObs] = useState('');
     const [processing, setProcessing] = useState(false);
+
+    const getEventProgress = (e: any) => {
+        let count = 0;
+        if (e.check_interno) count++;
+        if (e.check_externo) count++;
+        if (e.check_pneus) count++;
+        if (e.check_bagageiros) count++;
+        if (e.check_latrina) count++;
+        if (e.check_banheiro) count++;
+        if (e.check_higiene) count++;
+        if (e.check_ozonio) count++;
+        return count;
+    };
 
     // Helper to extract all swaps
     const getAllSwaps = () => {
@@ -319,6 +336,11 @@ export default function DashboardPage() {
         check_interno: true,
         check_externo: true,
         check_pneus: true,
+        check_bagageiros: true,
+        check_latrina: true,
+        check_banheiro: true,
+        check_higiene: true,
+        check_ozonio: true,
         observacao_operacao: 'Limpeza de Pátio',
         origin: 'Pátio'
     }));
@@ -347,6 +369,11 @@ export default function DashboardPage() {
         check_interno: true,
         check_externo: true,
         check_pneus: true,
+        check_bagageiros: true,
+        check_latrina: true,
+        check_banheiro: true,
+        check_higiene: true,
+        check_ozonio: true,
         origin: 'Pátio'
     }));
 
@@ -774,6 +801,10 @@ export default function DashboardPage() {
                         check_externo: yardCheckExterno,
                         check_pneus: yardCheckPneus,
                         check_bagageiros: yardCheckBagageiros,
+                        check_latrina: yardCheckLatrina,
+                        check_banheiro: yardCheckBanheiro,
+                        check_higiene: yardCheckHigiene,
+                        check_ozonio: yardCheckOzonio,
                         cleaner_id: selectedCleaner,
                         observacao: yardFinishObs
                     }
@@ -787,6 +818,10 @@ export default function DashboardPage() {
                 setYardCheckExterno(false);
                 setYardCheckPneus(false);
                 setYardCheckBagageiros(false);
+                setYardCheckLatrina(false);
+                setYardCheckBanheiro(false);
+                setYardCheckHigiene(false);
+                setYardCheckOzonio(false);
                 setYardFinishObs('');
                 fetchYardItems();
                 fetchEvents();
@@ -1203,6 +1238,15 @@ export default function DashboardPage() {
                                                                     <button
                                                                         onClick={() => {
                                                                             setSelectedYardVehicle(item);
+                                                                            setYardCheckInterno(false);
+                                                                            setYardCheckExterno(false);
+                                                                            setYardCheckPneus(false);
+                                                                            setYardCheckBagageiros(false);
+                                                                            setYardCheckLatrina(false);
+                                                                            setYardCheckBanheiro(false);
+                                                                            setYardCheckHigiene(false);
+                                                                            setYardCheckOzonio(false);
+                                                                            setYardFinishObs('');
                                                                             setShowYardFinishModal(true);
                                                                         }}
                                                                         className="bg-green-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-green-700 flex items-center gap-1"
@@ -1583,9 +1627,7 @@ export default function DashboardPage() {
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Colaborador</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Início</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fim</th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Interno</th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Externo</th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pneus</th>
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Progresso da Limpeza</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Observação</th>
                                     </tr>
                                 </thead>
@@ -1612,13 +1654,21 @@ export default function DashboardPage() {
                                                 {event.finished_at ? format(new Date(event.finished_at), 'HH:mm') : '-'}
                                             </td>
                                             <td className="px-4 py-3 text-center">
-                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_interno ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_externo ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <div className={`mx-auto w-4 h-4 rounded-full border ${event.check_pneus ? 'bg-green-500 border-green-600' : 'bg-gray-100 border-gray-300'}`} />
+                                                {(() => {
+                                                    const progress = getEventProgress(event);
+                                                    const pct = Math.round((progress / 8) * 100);
+                                                    return (
+                                                        <div className="flex flex-col items-center justify-center gap-1">
+                                                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                                                                <div 
+                                                                    className={`h-2 rounded-full transition-all ${pct === 100 ? 'bg-green-500' : 'bg-amber-500'}`} 
+                                                                    style={{ width: `${pct}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-[10px] font-black text-gray-600">{pct}% ({progress}/8)</span>
+                                                        </div>
+                                                    );
+                                                })()}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-gray-500 max-w-xs break-words">
                                                 {event.observacao_operacao || '-'}
@@ -1769,7 +1819,7 @@ export default function DashboardPage() {
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Início</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Fim</th>
-                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Checks</th>
+                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Progresso</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Obs</th>
                                         </tr>
                                     </thead>
@@ -1792,11 +1842,18 @@ export default function DashboardPage() {
                                                     {item.cleaned_at ? format(new Date(item.cleaned_at), "HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
-                                                    <div className="flex justify-center gap-1">
-                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Interno"></div>
-                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Externo"></div>
-                                                        <div className={`w-3 h-3 rounded-full ${item.status === 'LIMPO' ? 'bg-green-500' : 'bg-gray-200'}`} title="Pneus"></div>
-                                                    </div>
+                                                    {(() => {
+                                                        const progress = 8;
+                                                        const pct = 100;
+                                                        return (
+                                                            <div className="flex flex-col items-center justify-center gap-1">
+                                                                <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                                                                    <div className="h-1.5 rounded-full bg-green-500" style={{ width: '100%' }} />
+                                                                </div>
+                                                                <span className="text-[9px] font-black text-gray-600">100% (8/8)</span>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
                                                 <td className="px-4 py-3 text-[10px] text-gray-400 font-medium max-w-[100px] truncate">
                                                     Pátio
@@ -1868,7 +1925,7 @@ export default function DashboardPage() {
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Colaborador</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Início</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Fim</th>
-                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Checks</th>
+                                            <th className="px-4 py-3 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Progresso</th>
                                             <th className="px-4 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Obs</th>
                                         </tr>
                                     </thead>
@@ -1893,11 +1950,18 @@ export default function DashboardPage() {
                                                     {item.finished_at ? format(new Date(item.finished_at), "HH:mm") : '-'}
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
-                                                    <div className="flex justify-center gap-1">
-                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Interno"></div>
-                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Externo"></div>
-                                                        <div className="w-3 h-3 rounded-full bg-green-500" title="Pneus"></div>
-                                                    </div>
+                                                    {(() => {
+                                                        const progress = 8;
+                                                        const pct = 100;
+                                                        return (
+                                                            <div className="flex flex-col items-center justify-center gap-1">
+                                                                <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                                                                    <div className="h-1.5 rounded-full bg-green-500" style={{ width: '100%' }} />
+                                                                </div>
+                                                                <span className="text-[9px] font-black text-gray-600">100% (8/8)</span>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
                                                 <td className="px-4 py-3 text-[10px] text-gray-400 font-medium max-w-[100px] truncate">
                                                     Estoque
@@ -1949,72 +2013,137 @@ export default function DashboardPage() {
                                 </select>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-3">
-                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={yardCheckInterno} 
-                                        onChange={(e) => setYardCheckInterno(e.target.checked)} 
-                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
-                                    />
-                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Interna OK</span>
-                                </label>
-                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={yardCheckExterno} 
-                                        onChange={(e) => setYardCheckExterno(e.target.checked)} 
-                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
-                                    />
-                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Externa OK</span>
-                                </label>
-                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={yardCheckPneus} 
-                                        onChange={(e) => setYardCheckPneus(e.target.checked)} 
-                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
-                                    />
-                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Pretinho Pneus OK</span>
-                                </label>
-                                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={yardCheckBagageiros} 
-                                        onChange={(e) => setYardCheckBagageiros(e.target.checked)} 
-                                        className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
-                                    />
-                                    <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza dos Bagajeiros OK</span>
-                                </label>
-                            </div>
+                             {(() => {
+                                 const yardCurrentProgress = [yardCheckInterno, yardCheckExterno, yardCheckPneus, yardCheckBagageiros, yardCheckLatrina, yardCheckBanheiro, yardCheckHigiene, yardCheckOzonio].filter(Boolean).length;
+                                 const yardCurrentPercentage = Math.round((yardCurrentProgress / 8) * 100);
+                                 const isYardFinishDisabled = yardCurrentProgress < 8 && !yardFinishObs.trim();
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Observações</label>
-                                <textarea
-                                    value={yardFinishObs}
-                                    onChange={(e) => setYardFinishObs(e.target.value)}
-                                    placeholder="Alguma observação importante?"
-                                    rows={2}
-                                    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 resize-none font-medium text-gray-700 transition-all"
-                                />
-                            </div>
-                        </div>
+                                 return (
+                                     <>
+                                         <div className="mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                             <div className="flex justify-between items-center mb-1.5">
+                                                 <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Evolução da Limpeza</span>
+                                                 <span className="text-xs font-black text-blue-600">{yardCurrentPercentage}% ({yardCurrentProgress}/8)</span>
+                                             </div>
+                                             <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                 <div 
+                                                     className={`h-2.5 rounded-full transition-all duration-300 ${yardCurrentPercentage === 100 ? 'bg-green-500' : 'bg-blue-600'}`} 
+                                                     style={{ width: `${yardCurrentPercentage}%` }}
+                                                 />
+                                             </div>
+                                         </div>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowYardFinishModal(false)}
-                                className="flex-1 py-4 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-gray-50 rounded-2xl transition-all"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleFinishYardCleaning}
-                                disabled={processing}
-                                className="flex-2 py-4 px-8 bg-green-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform active:scale-95"
-                            >
-                                Confirmar Finalização
-                            </button>
-                        </div>
+                                         <div className="grid grid-cols-1 gap-3 max-h-[35vh] overflow-y-auto pr-1">
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckInterno} 
+                                                     onChange={(e) => setYardCheckInterno(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Interna OK</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckExterno} 
+                                                     onChange={(e) => setYardCheckExterno(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza Externa OK</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckPneus} 
+                                                     onChange={(e) => setYardCheckPneus(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Pretinho Pneus OK</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckBagageiros} 
+                                                     onChange={(e) => setYardCheckBagageiros(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Limpeza do Bagajeiro/Comp. Cadeirante OK?</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckLatrina} 
+                                                     onChange={(e) => setYardCheckLatrina(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Esgotamento da latrina ok?</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckBanheiro} 
+                                                     onChange={(e) => setYardCheckBanheiro(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Lavagem do banheiro ok?</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckHigiene} 
+                                                     onChange={(e) => setYardCheckHigiene(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Reposição de produto de higiene ok?</span>
+                                             </label>
+                                             <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                 <input 
+                                                     type="checkbox" 
+                                                     checked={yardCheckOzonio} 
+                                                     onChange={(e) => setYardCheckOzonio(e.target.checked)} 
+                                                     className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                 />
+                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Jato de estabilizante ozônio no final ok?</span>
+                                             </label>
+                                         </div>
+
+                                         <div className="space-y-2">
+                                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Observações</label>
+                                             <textarea
+                                                 value={yardFinishObs}
+                                                 onChange={(e) => setYardFinishObs(e.target.value)}
+                                                 placeholder="Alguma observação importante?"
+                                                 rows={2}
+                                                 className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 resize-none font-medium text-gray-700 transition-all"
+                                             />
+                                             {isYardFinishDisabled && (
+                                                 <p className="text-[10px] text-red-500 font-bold mt-1 animate-pulse">
+                                                     * Justificativa obrigatória caso a limpeza não esteja 100% concluída.
+                                                 </p>
+                                             )}
+                                         </div>
+
+                                         <div className="flex gap-3 mt-4">
+                                             <button
+                                                 type="button"
+                                                 onClick={() => setShowYardFinishModal(false)}
+                                                 className="flex-1 py-4 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-gray-50 rounded-2xl transition-all"
+                                             >
+                                                 Cancelar
+                                             </button>
+                                             <button
+                                                 type="button"
+                                                 onClick={handleFinishYardCleaning}
+                                                 disabled={isYardFinishDisabled || processing}
+                                                 className="flex-2 py-4 px-8 bg-green-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl disabled:opacity-50 hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform active:scale-95 animate-pulse-slow"
+                                             >
+                                                 Confirmar Finalização
+                                             </button>
+                                         </div>
+                                     </>
+                                 );
+                             })()}
                     </div>
                 </div>
             )}

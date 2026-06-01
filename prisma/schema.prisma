@@ -91,7 +91,11 @@ model CleaningEvent {
   check_interno        Boolean?
   check_externo        Boolean?
   check_pneus          Boolean?
-  check_bagageiros      Boolean?
+  check_bagageiros     Boolean?
+  check_latrina        Boolean?
+  check_banheiro       Boolean?
+  check_higiene        Boolean?
+  check_ozonio         Boolean?
   observacao_operacao  String?
   at_yard             Boolean         @default(false)
   revisar             Boolean         @default(false)

@@ -36,6 +36,10 @@ export async function startEvent(eventId: string, userId: string, cleanerId?: st
                     check_externo: true,
                     check_pneus: true,
                     check_bagageiros: true,
+                    check_latrina: true,
+                    check_banheiro: true,
+                    check_higiene: true,
+                    check_ozonio: true,
                     at_yard: true,
                     observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
                 }
@@ -78,6 +82,10 @@ export async function completeEvent(
         check_externo: boolean;
         check_pneus: boolean;
         check_bagageiros: boolean;
+        check_latrina: boolean;
+        check_banheiro: boolean;
+        check_higiene: boolean;
+        check_ozonio: boolean;
         observacao_operacao?: string;
     }
 ) {
@@ -86,12 +94,20 @@ export async function completeEvent(
     if (event.status === 'CONCLUIDO') return event;
 
     // Business Rule: If checks are not ALL true, observation is mandatory
-    const allChecksPassed = data.check_interno && data.check_externo && data.check_pneus && data.check_bagageiros;
+    const allChecksPassed = 
+        data.check_interno && 
+        data.check_externo && 
+        data.check_pneus && 
+        data.check_bagageiros &&
+        data.check_latrina &&
+        data.check_banheiro &&
+        data.check_higiene &&
+        data.check_ozonio;
 
     if (!allChecksPassed) {
         // This check should ideally happen at API/Validation layer too, but double check here.
         if (!data.observacao_operacao?.trim()) {
-            throw new Error('Observação é obrigatória quando o checklist não está completo (todos os 3 itens).');
+            throw new Error('Observação é obrigatória quando o checklist não está completo (todos os 8 itens).');
         }
     }
 
@@ -105,6 +121,10 @@ export async function completeEvent(
             check_externo: data.check_externo,
             check_pneus: data.check_pneus,
             check_bagageiros: data.check_bagageiros,
+            check_latrina: data.check_latrina,
+            check_banheiro: data.check_banheiro,
+            check_higiene: data.check_higiene,
+            check_ozonio: data.check_ozonio,
             observacao_operacao: data.observacao_operacao,
             at_yard: true
         }
@@ -177,6 +197,10 @@ export async function swapVehicle(
                         check_externo: true,
                         check_pneus: true,
                         check_bagageiros: true,
+                        check_latrina: true,
+                        check_banheiro: true,
+                        check_higiene: true,
+                        check_ozonio: true,
                         at_yard: true,
                         revisar: true,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Recuperado de Pátio LIMPO)'.trim()
@@ -192,6 +216,10 @@ export async function swapVehicle(
                         check_externo: false,
                         check_pneus: false,
                         check_bagageiros: false,
+                        check_latrina: false,
+                        check_banheiro: false,
+                        check_higiene: false,
+                        check_ozonio: false,
                         observacao_operacao: (event.observacao_operacao || '') + ' (Troca - Novo Carro Sujo)'.trim()
                     })
                 }
@@ -248,6 +276,10 @@ export async function updateYardStatus(
         check_externo: boolean;
         check_pneus: boolean;
         check_bagageiros: boolean;
+        check_latrina: boolean;
+        check_banheiro: boolean;
+        check_higiene: boolean;
+        check_ozonio: boolean;
         cleaner_id?: string;
         observacao?: string;
     }
@@ -352,6 +384,10 @@ export async function updateYardStatus(
                     check_externo: checklist.check_externo,
                     check_pneus: checklist.check_pneus,
                     check_bagageiros: checklist.check_bagageiros,
+                    check_latrina: checklist.check_latrina,
+                    check_banheiro: checklist.check_banheiro,
+                    check_higiene: checklist.check_higiene,
+                    check_ozonio: checklist.check_ozonio,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
                     at_yard: true
                 },
@@ -372,6 +408,10 @@ export async function updateYardStatus(
                     check_externo: checklist.check_externo,
                     check_pneus: checklist.check_pneus,
                     check_bagageiros: checklist.check_bagageiros,
+                    check_latrina: checklist.check_latrina,
+                    check_banheiro: checklist.check_banheiro,
+                    check_higiene: checklist.check_higiene,
+                    check_ozonio: checklist.check_ozonio,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
                     at_yard: true,
                     event_business_key: eventBusinessKey

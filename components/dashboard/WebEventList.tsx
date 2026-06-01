@@ -53,6 +53,10 @@ export default function WebEventList({
     const [checkExterno, setCheckExterno] = useState(false);
     const [checkPneus, setCheckPneus] = useState(false);
     const [checkBagageiros, setCheckBagageiros] = useState(false);
+    const [checkLatrina, setCheckLatrina] = useState(false);
+    const [checkBanheiro, setCheckBanheiro] = useState(false);
+    const [checkHigiene, setCheckHigiene] = useState(false);
+    const [checkOzonio, setCheckOzonio] = useState(false);
     const [finishObs, setFinishObs] = useState('');
 
     useEffect(() => {
@@ -132,6 +136,19 @@ export default function WebEventList({
         } catch (e) {
             alert('Erro de conexão.');
         }
+    };
+
+    const getEventProgress = (e: any) => {
+        let count = 0;
+        if (e.check_interno) count++;
+        if (e.check_externo) count++;
+        if (e.check_pneus) count++;
+        if (e.check_bagageiros) count++;
+        if (e.check_latrina) count++;
+        if (e.check_banheiro) count++;
+        if (e.check_higiene) count++;
+        if (e.check_ozonio) count++;
+        return count;
     };
 
     const getSlaStatus = (event: Event) => {
@@ -240,6 +257,21 @@ export default function WebEventList({
                                             }`}>
                                             {event.status}
                                         </span>
+                                        {event.status === 'CONCLUIDO' && (() => {
+                                            const progress = getEventProgress(event);
+                                            const pct = Math.round((progress / 8) * 100);
+                                            return (
+                                                <div className="mt-1.5 flex flex-col items-center gap-0.5">
+                                                    <div className="w-16 bg-gray-200 rounded-full h-1">
+                                                        <div 
+                                                            className={`h-1 rounded-full ${pct === 100 ? 'bg-green-500' : 'bg-amber-500'}`} 
+                                                            style={{ width: `${pct}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-[9px] font-black text-gray-500">{pct}% ({progress}/8)</span>
+                                                </div>
+                                            );
+                                        })()}
                                         {event.status === 'EM_ANDAMENTO' && event.started_at && (
                                             <div className={(() => {
                                                 const diff = differenceInMinutes(new Date(new Date(event.started_at).getTime() + 60 * 60 * 1000), now);
@@ -273,7 +305,21 @@ export default function WebEventList({
                                                     {event.status === 'EM_ANDAMENTO' && (
                                                         <>
                                                             <button 
-                                                                onClick={() => { if (!isEditOrFinishDisabled) { setSelectedEvent(event); setFinishModalOpen(true); } }} 
+                                                                onClick={() => {
+                                                                    if (!isEditOrFinishDisabled) {
+                                                                        setSelectedEvent(event);
+                                                                        setCheckInterno(false);
+                                                                        setCheckExterno(false);
+                                                                        setCheckPneus(false);
+                                                                        setCheckBagageiros(false);
+                                                                        setCheckLatrina(false);
+                                                                        setCheckBanheiro(false);
+                                                                        setCheckHigiene(false);
+                                                                        setCheckOzonio(false);
+                                                                        setFinishObs('');
+                                                                        setFinishModalOpen(true);
+                                                                    }
+                                                                }} 
                                                                 disabled={isEditOrFinishDisabled}
                                                                 className={`p-1.5 rounded-lg transition-all ${isEditOrFinishDisabled ? 'text-gray-300 cursor-not-allowed opacity-40' : 'text-green-600 hover:bg-green-50'}`}
                                                                 title={isEditOrFinishDisabled ? "Bloqueado: pátio crítico pendente" : "Finalizar limpeza"}
@@ -466,52 +512,100 @@ export default function WebEventList({
                             </div>
                         )}
 
-                        <div className="space-y-3 mb-6">
-                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                                <input type="checkbox" checked={checkInterno} onChange={(e) => setCheckInterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
-                                <span className="text-sm font-semibold text-gray-700">Limpeza Interna OK</span>
-                            </label>
-                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                                <input type="checkbox" checked={checkExterno} onChange={(e) => setCheckExterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
-                                <span className="text-sm font-semibold text-gray-700">Limpeza Externa OK</span>
-                            </label>
-                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                                <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
-                                <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado OK</span>
-                            </label>
-                            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                                <input type="checkbox" checked={checkBagageiros} onChange={(e) => setCheckBagageiros(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
-                                <span className="text-sm font-semibold text-gray-700">Limpeza dos Bagajeiros OK</span>
-                            </label>
+                        {(() => {
+                            const currentProgress = [checkInterno, checkExterno, checkPneus, checkBagageiros, checkLatrina, checkBanheiro, checkHigiene, checkOzonio].filter(Boolean).length;
+                            const currentPercentage = Math.round((currentProgress / 8) * 100);
+                            const isFinishDisabled = currentProgress < 8 && !finishObs.trim();
 
-                            <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
-                                <textarea
-                                    value={finishObs}
-                                    onChange={(e) => setFinishObs(e.target.value)}
-                                    placeholder="Opcional..."
-                                    rows={2}
-                                    className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                />
-                            </div>
-                        </div>
+                            return (
+                                <>
+                                    <div className="mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <div className="flex justify-between items-center mb-1.5">
+                                            <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Evolução da Limpeza</span>
+                                            <span className="text-xs font-black text-blue-600">{currentPercentage}% ({currentProgress}/8)</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                            <div 
+                                                className={`h-2.5 rounded-full transition-all duration-300 ${currentPercentage === 100 ? 'bg-green-500' : 'bg-blue-600'}`} 
+                                                style={{ width: `${currentPercentage}%` }}
+                                            />
+                                        </div>
+                                    </div>
 
-                        <div className="flex gap-2">
-                            <button onClick={() => setFinishModalOpen(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
-                            <button
-                                onClick={() => handleAction(selectedEvent.id, 'finish', {
-                                    check_interno: checkInterno,
-                                    check_externo: checkExterno,
-                                    check_pneus: checkPneus,
-                                    check_bagageiros: checkBagageiros,
-                                    observacao_operacao: finishObs
-                                })}
-                                disabled={processing}
-                                className="flex-1 py-2 bg-green-600 text-white font-bold rounded-lg disabled:opacity-50"
-                            >
-                                {processing ? 'Finalizando...' : 'Finalizar'}
-                            </button>
-                        </div>
+                                    <div className="space-y-3 mb-6">
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkInterno} onChange={(e) => setCheckInterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Limpeza Interna OK</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkExterno} onChange={(e) => setCheckExterno(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Limpeza Externa OK</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkPneus} onChange={(e) => setCheckPneus(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Pretinho Pneus Aplicado OK</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkBagageiros} onChange={(e) => setCheckBagageiros(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Limpeza do Bagajeiro/Comp. Cadeirante OK?</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkLatrina} onChange={(e) => setCheckLatrina(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Esgotamento da latrina ok?</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkBanheiro} onChange={(e) => setCheckBanheiro(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Lavagem do banheiro ok?</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkHigiene} onChange={(e) => setCheckHigiene(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Reposição de produto de higiene ok?</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkOzonio} onChange={(e) => setCheckOzonio(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Jato de estabilizante ozônio no final ok?</span>
+                                        </label>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Observações</label>
+                                            <textarea
+                                                value={finishObs}
+                                                onChange={(e) => setFinishObs(e.target.value)}
+                                                placeholder="Opcional..."
+                                                rows={2}
+                                                className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                            />
+                                            {isFinishDisabled && (
+                                                <p className="text-[10px] text-red-500 font-bold mt-1 animate-pulse">
+                                                    * Justificativa obrigatória caso a limpeza não esteja 100% concluída.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setFinishModalOpen(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                                        <button
+                                            onClick={() => handleAction(selectedEvent.id, 'finish', {
+                                                check_interno: checkInterno,
+                                                check_externo: checkExterno,
+                                                check_pneus: checkPneus,
+                                                check_bagageiros: checkBagageiros,
+                                                check_latrina: checkLatrina,
+                                                check_banheiro: checkBanheiro,
+                                                check_higiene: checkHigiene,
+                                                check_ozonio: checkOzonio,
+                                                observacao_operacao: finishObs
+                                            })}
+                                            disabled={isFinishDisabled || processing}
+                                            className="flex-1 py-2 bg-green-600 text-white font-bold rounded-lg disabled:opacity-50"
+                                        >
+                                            {processing ? 'Finalizando...' : 'Finalizar'}
+                                        </button>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
                 </div>
             )}
