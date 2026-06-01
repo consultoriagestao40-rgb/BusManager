@@ -1050,10 +1050,7 @@ export default function DashboardPage() {
                         <p className="text-4xl font-black text-green-800">{escalaCount + patioCount}</p>
                         <p className="text-[10px] text-green-600 mt-1 font-bold">{escalaCount} escala + {patioCount} pátio</p>
                     </div>
-                    <div className="bg-[#FEF2F2] p-5 rounded-2xl border-l-[6px] border-red-500 shadow-xl shadow-red-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowCancelledModal(true)}>
-                        <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Cancelados</p>
-                        <p className="text-4xl font-black text-red-800">{cancelledList.length}</p>
-                    </div>
+
                     <div className="bg-[#FFFBEB] p-5 rounded-2xl border-l-[6px] border-amber-500 shadow-xl shadow-amber-100/50 transform hover:-translate-y-1 transition-all cursor-pointer" onClick={() => setShowSwapsModal(true)}>
                         <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Trocas</p>
                         <p className="text-4xl font-black text-amber-800">{swapsList.length}</p>

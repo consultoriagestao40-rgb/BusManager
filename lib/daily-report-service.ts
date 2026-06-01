@@ -204,7 +204,6 @@ export async function sendDailySummaryReport(targetDate: Date = subDays(new Date
         `   ▪️ Pátio: ${yardCleanedCount} carro(s)\n\n` +
         `⏱️ *Tempo Médio:* ${avgTime} min por veículo\n` +
         `⚠️ *Saídas com Atraso:* ${delayedCount}\n` +
-        `❌ *Cancelados:* ${cancelledCount}\n` +
         `🔄 *Trocas na Escala:* ${totalSwaps}\n` +
         `🛢️ *Limpezas de Pátio:* ${yardCleanedCount}\n\n` +
         `👤 *Produtividade por Equipe (Top 5):*\n` +
