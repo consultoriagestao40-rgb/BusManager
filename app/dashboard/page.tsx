@@ -106,7 +106,7 @@ export default function DashboardPage() {
     };
 
     const fetchYardItems = async () => {
-        setYardLoading(true);
+        if (yardItems.length === 0) setYardLoading(true);
         try {
             const res = await fetch('/api/yard');
             if (res.ok) {
@@ -138,12 +138,28 @@ export default function DashboardPage() {
     }, []);
 
     useEffect(() => {
-        const timer = setInterval(() => setNow(new Date()), 60000);
+        // Update the current time state every 10 seconds for smooth UI clock ticking
+        const timeTimer = setInterval(() => setNow(new Date()), 10000);
+        
+        // Initial fetch
         if (user) {
             fetchEvents();
             fetchYardItems();
         }
-        return () => clearInterval(timer);
+
+        // Set a polling interval to fetch fresh events and yard items automatically every 6 seconds!
+        // This keeps all clients synchronized and updated in real-time.
+        const pollTimer = setInterval(() => {
+            if (user) {
+                fetchEvents();
+                fetchYardItems();
+            }
+        }, 6000);
+
+        return () => {
+            clearInterval(timeTimer);
+            clearInterval(pollTimer);
+        };
     }, [currentDate, activeTab, user]);
 
     // Detect new events to play sound
