@@ -453,32 +453,31 @@ async function run() {
         for (const targetDateStr of datesToSync) {
             console.log(`\n--- Starting sync for date: ${targetDateStr} ---`);
 
-            // 3a. Set the travel date in the search filter fields
+            // 3a. Set the travel date in the search filter fields via native typing
             console.log(`Setting date to ${targetDateStr}...`);
-            await reportFrame.evaluate((dateVal: string) => {
-                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
-                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
-                
-                if (inputStart) {
-                    inputStart.value = '';
-                    inputStart.value = dateVal;
-                    const changeEvent = document.createEvent('Event');
-                    changeEvent.initEvent('change', true, true);
-                    inputStart.dispatchEvent(changeEvent);
-                } else {
-                    console.warn('txtPesqDtViagem input field not found');
-                }
-                
-                if (inputEnd) {
-                    inputEnd.value = '';
-                    inputEnd.value = dateVal;
-                    const changeEvent = document.createEvent('Event');
-                    changeEvent.initEvent('change', true, true);
-                    inputEnd.dispatchEvent(changeEvent);
-                } else {
-                    console.warn('txtPesqDtViagemFinal input field not found');
-                }
-            }, targetDateStr);
+            const inputStart = await reportFrame.$('#txtPesqDtViagem');
+            if (inputStart) {
+                await inputStart.click({ clickCount: 3 });
+                await new Promise(r => setTimeout(r, 200));
+                await inputStart.press('Backspace');
+                await new Promise(r => setTimeout(r, 200));
+                await inputStart.type(targetDateStr);
+                await new Promise(r => setTimeout(r, 200));
+            } else {
+                console.warn('txtPesqDtViagem input field not found');
+            }
+
+            const inputEnd = await reportFrame.$('#txtPesqDtViagemFinal');
+            if (inputEnd) {
+                await inputEnd.click({ clickCount: 3 });
+                await new Promise(r => setTimeout(r, 200));
+                await inputEnd.press('Backspace');
+                await new Promise(r => setTimeout(r, 200));
+                await inputEnd.type(targetDateStr);
+                await new Promise(r => setTimeout(r, 200));
+            } else {
+                console.warn('txtPesqDtViagemFinal input field not found');
+            }
 
             // 3b. Click "Pesquisar"
             console.log('Clicking Pesquisar...');
