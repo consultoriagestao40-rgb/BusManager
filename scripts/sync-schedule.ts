@@ -453,19 +453,30 @@ async function run() {
         for (const targetDateStr of datesToSync) {
             console.log(`\n--- Starting sync for date: ${targetDateStr} ---`);
 
-            // 3a. Set the travel date in the input field
+            // 3a. Set the travel date in the search filter fields
             console.log(`Setting date to ${targetDateStr}...`);
             await reportFrame.evaluate((dateVal: string) => {
-                const input = document.getElementById('txtDataViagem') as HTMLInputElement;
-                if (input) {
-                    input.value = '';
-                    input.value = dateVal;
-                    // Trigger change events
+                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+                
+                if (inputStart) {
+                    inputStart.value = '';
+                    inputStart.value = dateVal;
                     const changeEvent = document.createEvent('Event');
                     changeEvent.initEvent('change', true, true);
-                    input.dispatchEvent(changeEvent);
+                    inputStart.dispatchEvent(changeEvent);
                 } else {
-                    console.warn('txtDataViagem input field not found');
+                    console.warn('txtPesqDtViagem input field not found');
+                }
+                
+                if (inputEnd) {
+                    inputEnd.value = '';
+                    inputEnd.value = dateVal;
+                    const changeEvent = document.createEvent('Event');
+                    changeEvent.initEvent('change', true, true);
+                    inputEnd.dispatchEvent(changeEvent);
+                } else {
+                    console.warn('txtPesqDtViagemFinal input field not found');
                 }
             }, targetDateStr);
 
