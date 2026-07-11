@@ -461,8 +461,9 @@ async function run() {
                     input.value = '';
                     input.value = dateVal;
                     // Trigger change events
-                    const event = new Event('change', { bubbles: true });
-                    input.dispatchEvent(event);
+                    const changeEvent = document.createEvent('Event');
+                    changeEvent.initEvent('change', true, true);
+                    input.dispatchEvent(changeEvent);
                 } else {
                     console.warn('txtDataViagem input field not found');
                 }
