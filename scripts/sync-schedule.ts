@@ -421,95 +421,137 @@ async function run() {
         }
 
 
-        // --- 3. Execute Search ---
-        console.log('P4. Executing Search...');
+        // --- 3. Execute Search for Today and Tomorrow in Brazil Timezone ---
+        const getBrazilDateString = (offsetDays: number = 0) => {
+            const date = new Date();
+            const brDateStr = date.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' });
+            const brDate = new Date(brDateStr);
+            brDate.setDate(brDate.getDate() + offsetDays);
+            
+            const day = String(brDate.getDate()).padStart(2, '0');
+            const month = String(brDate.getMonth() + 1).padStart(2, '0');
+            const year = brDate.getFullYear();
+            return `${day}/${month}/${year}`;
+        };
 
-        // Click "Pesquisar" in the correct frame
-        await reportFrame.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
-            const searchBtn = buttons.find(b => {
-                const val = (b as HTMLInputElement).value || b.textContent || '';
-                return val.includes('Pesquisar');
-            });
-            if (searchBtn) {
-                console.log('Clicking Pesquisar...');
-                (searchBtn as HTMLElement).click();
-            } else {
-                console.warn('Pesquisar button not found in report frame');
-            }
-        });
+        const datesToSync = [getBrazilDateString(0), getBrazilDateString(1)];
+        console.log(`Dates to sync: ${JSON.stringify(datesToSync)}`);
 
-        // Wait for results
-        await new Promise(r => setTimeout(r, 5000));
-
-        // --- 4. Print/Export ---
-        console.log('P5. Exporting PDF...');
-
-        // Handle Print Popup
-        const newTargetPromise = browser.waitForTarget(target => target.opener() === page.target());
-
-        const printClicked = await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
-            const printBtn = buttons.find(b => {
-                const val = (b as HTMLInputElement).value || b.textContent || '';
-                return val.includes('Imprimir');
-            });
-            if (printBtn) {
-                (printBtn as HTMLElement).click();
-                return true;
-            }
-            return false;
-        });
-
-        if (!printClicked) throw new Error('Print button not found');
-
-        const newTarget = await newTargetPromise;
-        const printPage = await newTarget.page();
-
-        if (!printPage) throw new Error('Print popup captured but page object is null.');
-
-        await printPage.bringToFront();
-        // Wait for PDF content to render
-        await new Promise(r => setTimeout(r, 3000));
-
-        const pdfPath = path.join(process.cwd(), 'schedule.pdf');
-
-        await printPage.pdf({
-            path: pdfPath,
-            format: 'A4',
-            printBackground: true,
-            landscape: true
-        });
-
-        console.log(`PDF Generated at ${pdfPath}`);
-
-        // --- 5. Upload to BusManager ---
-        console.log('P6. Uploading to BusManager...');
-
-        // 5a. Login to BusManager to get Token
+        // Authenticate once with BusManager to get Token
+        console.log('P4. Authenticating with BusManager...');
         const authRes = await axios.post(`${APP_URL}/api/auth/login`, {
             email: APP_EMAIL,
             password: APP_PASSWORD
         });
 
         // Extract token from cookie or response
-        const cookies = authRes.headers['set-cookie'];
-        if (!cookies) throw new Error('Failed to retrieve auth cookie from BusManager login.');
+        const cookiesList = authRes.headers['set-cookie'];
+        if (!cookiesList) throw new Error('Failed to retrieve auth cookie from BusManager login.');
 
-        const cookieHeader = cookies.join('; ');
+        const cookieHeader = cookiesList.join('; ');
 
-        // 5b. Upload File
-        const form = new FormData();
-        form.append('file', fs.createReadStream(pdfPath));
+        for (const targetDateStr of datesToSync) {
+            console.log(`\n--- Starting sync for date: ${targetDateStr} ---`);
 
-        const uploadRes = await axios.post(`${APP_URL}/api/schedule/import`, form, {
-            headers: {
-                ...form.getHeaders(),
-                'Cookie': cookieHeader
+            // 3a. Set the travel date in the input field
+            console.log(`Setting date to ${targetDateStr}...`);
+            await reportFrame.evaluate((dateVal: string) => {
+                const input = document.getElementById('txtDataViagem') as HTMLInputElement;
+                if (input) {
+                    input.value = '';
+                    input.value = dateVal;
+                    // Trigger change events
+                    const event = new Event('change', { bubbles: true });
+                    input.dispatchEvent(event);
+                } else {
+                    console.warn('txtDataViagem input field not found');
+                }
+            }, targetDateStr);
+
+            // 3b. Click "Pesquisar"
+            console.log('Clicking Pesquisar...');
+            await reportFrame.evaluate(() => {
+                const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
+                const searchBtn = buttons.find(b => {
+                    const val = (b as HTMLInputElement).value || b.textContent || '';
+                    return val.includes('Pesquisar');
+                });
+                if (searchBtn) {
+                    (searchBtn as HTMLElement).click();
+                } else {
+                    console.warn('Pesquisar button not found in report frame');
+                }
+            });
+
+            // Wait for results to load
+            await new Promise(r => setTimeout(r, 6000));
+
+            // 4. Print/Export
+            console.log('Exporting PDF...');
+            const newTargetPromise = browser.waitForTarget(target => target.opener() === page.target());
+
+            const printClicked = await page.evaluate(() => {
+                const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
+                const printBtn = buttons.find(b => {
+                    const val = (b as HTMLInputElement).value || b.textContent || '';
+                    return val.includes('Imprimir');
+                });
+                if (printBtn) {
+                    (printBtn as HTMLElement).click();
+                    return true;
+                }
+                return false;
+            });
+
+            if (!printClicked) {
+                console.warn(`Print button not found for date ${targetDateStr}. Skip upload for this date.`);
+                continue;
             }
-        });
 
-        console.log('Upload Success:', uploadRes.data);
+            const newTarget = await newTargetPromise;
+            const printPage = await newTarget.page();
+
+            if (!printPage) {
+                console.error(`Print popup captured but page object is null for date ${targetDateStr}.`);
+                continue;
+            }
+
+            await printPage.bringToFront();
+            // Wait for PDF content to render
+            await new Promise(r => setTimeout(r, 3000));
+
+            const safeDateStr = targetDateStr.replace(/\//g, '-');
+            const pdfPath = path.join(process.cwd(), `schedule-${safeDateStr}.pdf`);
+
+            await printPage.pdf({
+                path: pdfPath,
+                format: 'A4',
+                printBackground: true,
+                landscape: true
+            });
+
+            console.log(`PDF Generated at ${pdfPath}`);
+            await printPage.close();
+
+            // 5. Upload to BusManager
+            console.log('Uploading PDF to BusManager...');
+            const form = new FormData();
+            form.append('file', fs.createReadStream(pdfPath));
+
+            const uploadRes = await axios.post(`${APP_URL}/api/schedule/import`, form, {
+                headers: {
+                    ...form.getHeaders(),
+                    'Cookie': cookieHeader
+                }
+            });
+
+            console.log(`Upload Success for date ${targetDateStr}:`, uploadRes.data);
+
+            // Clean up temporary PDF file
+            try {
+                fs.unlinkSync(pdfPath);
+            } catch (err) { }
+        }
 
         await browser.close();
 
