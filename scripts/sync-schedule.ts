@@ -453,31 +453,27 @@ async function run() {
         for (const targetDateStr of datesToSync) {
             console.log(`\n--- Starting sync for date: ${targetDateStr} ---`);
 
-            // 3a. Set the travel date in the search filter fields via native typing
-            console.log(`Setting date to ${targetDateStr}...`);
-            const inputStart = await reportFrame.$('#txtPesqDtViagem');
-            if (inputStart) {
-                await inputStart.click({ clickCount: 3 });
-                await new Promise(r => setTimeout(r, 200));
-                await inputStart.press('Backspace');
-                await new Promise(r => setTimeout(r, 200));
-                await inputStart.type(targetDateStr);
-                await new Promise(r => setTimeout(r, 200));
-            } else {
-                console.warn('txtPesqDtViagem input field not found');
-            }
+            // 3a. Set the travel date in the search filter fields via DOM events and jQuery trigger
+            console.log(`Setting date to ${targetDateStr} programmatically...`);
+            await reportFrame.evaluate((dateVal: string) => {
+                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
 
-            const inputEnd = await reportFrame.$('#txtPesqDtViagemFinal');
-            if (inputEnd) {
-                await inputEnd.click({ clickCount: 3 });
-                await new Promise(r => setTimeout(r, 200));
-                await inputEnd.press('Backspace');
-                await new Promise(r => setTimeout(r, 200));
-                await inputEnd.type(targetDateStr);
-                await new Promise(r => setTimeout(r, 200));
-            } else {
-                console.warn('txtPesqDtViagemFinal input field not found');
-            }
+                const updateFieldProgrammatically = (input: HTMLInputElement | null, value: string) => {
+                    if (!input) return;
+                    input.value = value;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+                    const win = window as any;
+                    if (typeof win.jQuery !== 'undefined') {
+                        win.jQuery(input).val(value).trigger('change').trigger('blur');
+                    }
+                };
+
+                updateFieldProgrammatically(inputStart, dateVal);
+                updateFieldProgrammatically(inputEnd, dateVal);
+            }, targetDateStr);
 
             // 3b. Click "Pesquisar"
             console.log('Clicking Pesquisar...');
