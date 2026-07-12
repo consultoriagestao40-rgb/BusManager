@@ -304,6 +304,7 @@ export default function DashboardPage() {
     const [yardCheckOzonio, setYardCheckOzonio] = useState(false);
     const [yardFinishObs, setYardFinishObs] = useState('');
     const [processing, setProcessing] = useState(false);
+    const [syncing, setSyncing] = useState(false);
 
     const getEventProgress = (e: any) => {
         let count = 0;
@@ -965,6 +966,28 @@ export default function DashboardPage() {
         }
     };
 
+    const handleSync = async () => {
+        if (!confirm('Deseja iniciar a sincronização automática da escala? Este processo leva cerca de 1 a 2 minutos no servidor.')) return;
+        setSyncing(true);
+        try {
+            const res = await fetch('/api/schedule/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (res.ok) {
+                alert('Sincronização iniciada com sucesso no GitHub Actions! Aguarde 1 a 2 minutos para que os novos dados apareçam no painel.');
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(`Erro ao iniciar sincronização: ${errorData.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            console.error('Error triggering sync:', error);
+            alert('Erro de conexão ao iniciar sincronização.');
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {hasYardLock && (
@@ -1028,6 +1051,17 @@ export default function DashboardPage() {
                         </button>
                     </div>
                     <div className="flex flex-col items-end gap-2">
+                        {user?.role === 'ADMIN' && (
+                            <button
+                                onClick={handleSync}
+                                disabled={syncing}
+                                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:bg-indigo-400 shadow-md shadow-indigo-100 transition-all flex items-center gap-2"
+                                title="Disparar robô de sincronização no GitHub Actions"
+                            >
+                                <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+                                {syncing ? 'Sincronizando...' : 'Sincronizar Escala'}
+                            </button>
+                        )}
                         {canEdit && (
                             <a href="/dashboard/import" className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
                                 Nova Importação
