@@ -467,25 +467,40 @@ async function run() {
 
             // 3a. Set the travel date in the search filter fields via DOM events and jQuery trigger
             console.log(`Setting date to ${targetDateStr} programmatically...`);
-            await reportFrame.evaluate(async (dateVal: string) => {
+            await reportFrame.evaluate((dateVal: string) => {
                 const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
                 const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
 
                 const updateFieldProgrammatically = (input: HTMLInputElement | null, value: string) => {
                     if (!input) return;
-                    input.value = value;
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                    input.dispatchEvent(new Event('change', { bubbles: true }));
-
+                    
                     const win = window as any;
+                    let datepickerSet = false;
+                    
                     if (typeof win.jQuery !== 'undefined') {
-                        win.jQuery(input).val(value).trigger('change').trigger('blur');
+                        const $input = win.jQuery(input);
+                        if (typeof $input.datepicker === 'function') {
+                            try {
+                                $input.datepicker('setDate', value);
+                                $input.trigger('change');
+                                datepickerSet = true;
+                            } catch (e) {
+                                console.warn('Failed to set date via datepicker API:', e);
+                            }
+                        }
+                    }
+                    
+                    if (!datepickerSet) {
+                        input.value = value;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        if (typeof win.jQuery !== 'undefined') {
+                            win.jQuery(input).val(value).trigger('change').trigger('blur');
+                        }
                     }
                 };
 
                 updateFieldProgrammatically(inputStart, dateVal);
-                // Wait 200ms for async datepicker sync handlers to run
-                await new Promise(resolve => setTimeout(resolve, 200));
                 updateFieldProgrammatically(inputEnd, dateVal);
             }, targetDateStr);
 
