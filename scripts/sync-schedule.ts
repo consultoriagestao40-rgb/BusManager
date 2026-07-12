@@ -467,7 +467,7 @@ async function run() {
 
             // 3a. Set the travel date in the search filter fields via DOM events and jQuery trigger
             console.log(`Setting date to ${targetDateStr} programmatically...`);
-            await reportFrame.evaluate((dateVal: string) => {
+            await reportFrame.evaluate(async (dateVal: string) => {
                 const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
                 const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
 
@@ -484,6 +484,8 @@ async function run() {
                 };
 
                 updateFieldProgrammatically(inputStart, dateVal);
+                // Wait 200ms for async datepicker sync handlers to run
+                await new Promise(resolve => setTimeout(resolve, 200));
                 updateFieldProgrammatically(inputEnd, dateVal);
             }, targetDateStr);
 
@@ -503,15 +505,19 @@ async function run() {
             });
 
             // Wait for results to load by waiting for loading message to disappear and table to appear
-            console.log('Waiting for search results to load...');
+            console.log('Waiting for search results to load (up to 90s)...');
             try {
                 await reportFrame.waitForFunction(() => {
                     const div = document.getElementById('divResultado');
-                    return div && div.innerHTML.includes('table') && !div.innerHTML.includes('Aguarde');
-                }, { timeout: 30000 });
+                    if (!div) return false;
+                    const html = div.innerHTML;
+                    // It must not contain the loading indicator, and must contain some loaded content
+                    return html.length > 10 && !html.includes('Aguarde') && !html.includes('CARREGANDO');
+                }, { timeout: 90000 });
                 console.log('Search results loaded successfully.');
             } catch (waitErr) {
-                console.warn('Timeout or error waiting for search results to load. Proceeding anyway.');
+                console.error('Timeout waiting for search results to load. Aborting execution to prevent empty PDF upload.');
+                throw new Error(`Timeout waiting for search results to load for date ${targetDateStr}.`);
             }
 
             // 4. Print/Export
