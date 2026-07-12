@@ -475,10 +475,11 @@ async function run() {
                     if (!input) return;
                     
                     const win = window as any;
+                    const $ = win.$J || win.jQuery || win.$;
                     let datepickerSet = false;
                     
-                    if (typeof win.jQuery !== 'undefined') {
-                        const $input = win.jQuery(input);
+                    if ($) {
+                        const $input = $(input);
                         if (typeof $input.datepicker === 'function') {
                             try {
                                 $input.datepicker('setDate', value);
@@ -494,8 +495,8 @@ async function run() {
                         input.value = value;
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                         input.dispatchEvent(new Event('change', { bubbles: true }));
-                        if (typeof win.jQuery !== 'undefined') {
-                            win.jQuery(input).val(value).trigger('change').trigger('blur');
+                        if ($) {
+                            $(input).val(value).trigger('change').trigger('blur');
                         }
                     }
                 };
