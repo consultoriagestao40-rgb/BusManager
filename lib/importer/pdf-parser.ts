@@ -136,8 +136,8 @@ export async function parsePdf(buffer: Buffer): Promise<ParseResult> {
         // FIX: Use non-greedy capture for ID (\d+?) to prevent it from eating the first digit of the date
         // if the columns are merged (e.g. "6410512/02/2026").
         // Also enforcing \d{2} for day/month to encourage backtracking if needed.
-        // UPDATE: Make vehicle ID optional ((\d+?)?) to handle events with empty vehicle number field
-        const eventStartRegex = /^(\d+?)?\s*(\d{2}\/\d{2}\/\d{4})\s*(\d{1,2}:\d{2})(.*)$/;
+        // UPDATE: Make vehicle ID optional using greedy-but-optional capture (\d+)? to capture correctly
+        const eventStartRegex = /^(\d+)?\s*(\d{2}\/\d{2}\/\d{4})\s*(\d{1,2}:\d{2})(.*)$/;
 
         // Broader regex to detect lines that MIGHT be events but failed the strict check
         // Matches anything looking like a date d/m/yyyy or dd/mm/yyyy
