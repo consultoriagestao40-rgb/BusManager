@@ -1050,7 +1050,7 @@ export default function DashboardPage() {
                             <RefreshCw size={20} />
                         </button>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-2">
                         {user?.role === 'ADMIN' && (
                             <button
                                 onClick={handleSync}
@@ -1077,7 +1077,7 @@ export default function DashboardPage() {
                                 setManualMotivo('Turismo');
                                 setShowManualScheduleModal(true);
                             }}
-                            className="px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md shadow-amber-100 transition-all flex items-center gap-2"
+                            className="px-6 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 shadow-md shadow-amber-100 transition-all flex items-center gap-2"
                         >
                             <Plus size={16} />
                             Extra - Escala
