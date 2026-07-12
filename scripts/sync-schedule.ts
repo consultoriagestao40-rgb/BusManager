@@ -468,41 +468,56 @@ async function run() {
             // 3a. Set the travel date in the search filter fields via DOM events and jQuery trigger
             console.log(`Setting date to ${targetDateStr} programmatically...`);
             await reportFrame.evaluate((dateVal: string) => {
-                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
-                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+                const win = window as any;
+                const $ = win.$J || win.jQuery || win.$;
 
-                const updateFieldProgrammatically = (input: HTMLInputElement | null, value: string) => {
-                    if (!input) return;
-                    
-                    const win = window as any;
-                    const $ = win.$J || win.jQuery || win.$;
+                // 1. Set start date
+                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                if (inputStart) {
                     let datepickerSet = false;
-                    
                     if ($) {
-                        const $input = $(input);
+                        const $input = $(inputStart);
                         if (typeof $input.datepicker === 'function') {
                             try {
-                                $input.datepicker('setDate', value);
+                                $input.datepicker('setDate', dateVal);
                                 $input.trigger('change');
                                 datepickerSet = true;
-                            } catch (e) {
-                                console.warn('Failed to set date via datepicker API:', e);
-                            }
+                            } catch (e) {}
                         }
                     }
-                    
                     if (!datepickerSet) {
-                        input.value = value;
-                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        inputStart.value = dateVal;
+                        inputStart.dispatchEvent(new Event('input', { bubbles: true }));
+                        inputStart.dispatchEvent(new Event('change', { bubbles: true }));
                         if ($) {
-                            $(input).val(value).trigger('change').trigger('blur');
+                            $(inputStart).val(dateVal).trigger('change').trigger('blur');
                         }
                     }
-                };
+                }
 
-                updateFieldProgrammatically(inputStart, dateVal);
-                updateFieldProgrammatically(inputEnd, dateVal);
+                // 2. Set end date
+                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+                if (inputEnd) {
+                    let datepickerSet = false;
+                    if ($) {
+                        const $input = $(inputEnd);
+                        if (typeof $input.datepicker === 'function') {
+                            try {
+                                $input.datepicker('setDate', dateVal);
+                                $input.trigger('change');
+                                datepickerSet = true;
+                            } catch (e) {}
+                        }
+                    }
+                    if (!datepickerSet) {
+                        inputEnd.value = dateVal;
+                        inputEnd.dispatchEvent(new Event('input', { bubbles: true }));
+                        inputEnd.dispatchEvent(new Event('change', { bubbles: true }));
+                        if ($) {
+                            $(inputEnd).val(dateVal).trigger('change').trigger('blur');
+                        }
+                    }
+                }
             }, targetDateStr);
 
             // 3b. Click "Pesquisar"
