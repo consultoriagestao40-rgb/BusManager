@@ -420,6 +420,18 @@ async function run() {
             }
         }
 
+        // --- 2.5 Switch to "Consulta" Tab ---
+        console.log('Switching to Consulta tab...');
+        await reportFrame.evaluate(() => {
+            const tab = Array.from(document.querySelectorAll('a')).find(a => (a.textContent || '').includes('Consulta'));
+            if (tab) {
+                (tab as HTMLElement).click();
+            } else {
+                console.warn('Consulta tab link not found');
+            }
+        });
+        await new Promise(r => setTimeout(r, 1000));
+
 
         // --- 3. Execute Search for Today and Tomorrow in Brazil Timezone ---
         const getBrazilDateString = (offsetDays: number = 0) => {
@@ -490,14 +502,23 @@ async function run() {
                 }
             });
 
-            // Wait for results to load
-            await new Promise(r => setTimeout(r, 6000));
+            // Wait for results to load by waiting for loading message to disappear and table to appear
+            console.log('Waiting for search results to load...');
+            try {
+                await reportFrame.waitForFunction(() => {
+                    const div = document.getElementById('divResultado');
+                    return div && div.innerHTML.includes('table') && !div.innerHTML.includes('Aguarde');
+                }, { timeout: 30000 });
+                console.log('Search results loaded successfully.');
+            } catch (waitErr) {
+                console.warn('Timeout or error waiting for search results to load. Proceeding anyway.');
+            }
 
             // 4. Print/Export
             console.log('Exporting PDF...');
             const newTargetPromise = browser.waitForTarget(target => target.opener() === page.target());
 
-            const printClicked = await page.evaluate(() => {
+            const printClicked = await reportFrame.evaluate(() => {
                 const buttons = Array.from(document.querySelectorAll('input[type="button"], button, input[type="submit"], a'));
                 const printBtn = buttons.find(b => {
                     const val = (b as HTMLInputElement).value || b.textContent || '';
