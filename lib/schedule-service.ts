@@ -45,6 +45,7 @@ export async function createScheduleVersion(
         const processedEvents: any[] = [];
         const keyCounts = new Map<string, number>();
         const duplicates: string[] = [];
+        const matchedOldEventIds = new Set<string>();
 
         // Map old events for quick lookup
         const oldEventsMap = new Map();
@@ -56,6 +57,26 @@ export async function createScheduleVersion(
 
         for (const event of events) {
             let businessKey = event.event_business_key;
+
+            let oldEvent = oldEventsMap.get(businessKey);
+
+            // Fallback match: if exact key doesn't match, find an unmatched old event with same travel time and service number
+            if (!oldEvent && previousVersion?.events) {
+                oldEvent = previousVersion.events.find(oe => 
+                    !matchedOldEventIds.has(oe.id) &&
+                    oe.saida_programada_at.getTime() === event.saida_programada_at.getTime() &&
+                    oe.numero_servico === event.numero_servico &&
+                    event.numero_servico !== undefined && event.numero_servico !== null && event.numero_servico !== ''
+                );
+                
+                if (oldEvent) {
+                    console.log(`[Sync Fallback] Matched old event ${oldEvent.id} (time: ${oldEvent.saida_programada_at.toISOString()}) to new event for vehicle ${event.client_vehicle_number}`);
+                }
+            }
+
+            if (oldEvent) {
+                matchedOldEventIds.add(oldEvent.id);
+            }
 
             // Check for duplicates
             if (keyCounts.has(businessKey)) {
@@ -162,29 +183,66 @@ export async function createScheduleVersion(
                 }
             }
 
+            let shouldCreateAutoSwap = false;
+            let autoSwapOriginalVehicleId = '';
+            let autoSwapReplacementVehicleId = '';
+
             // PRESERVE STATE LOGIC
-            if (oldEventsMap.has(businessKey)) {
-                const oldEvent = oldEventsMap.get(businessKey);
-                // Check if event has interactions: Status is not PREVISTO OR has Swaps
-                // Note: oldEvent.swaps comes from the include above
+            if (oldEvent) {
                 const hasSwaps = oldEvent.swaps && oldEvent.swaps.length > 0;
                 const isInteracted = oldEvent.status !== 'PREVISTO' || hasSwaps || oldEvent.at_yard;
 
                 if (isInteracted) {
                     // COPY OPERATIONAL STATE
                     eventToCreate.status = oldEvent.status;
-                    eventToCreate.vehicle_id = oldEvent.vehicle_id; // Keep swapped vehicle
+                    
+                    // Check if vehicle has changed in the new scale compared to the old event's current vehicle
+                    if (oldEvent.vehicle_id !== vehicle.id) {
+                        shouldCreateAutoSwap = true;
+                        autoSwapOriginalVehicleId = oldEvent.vehicle_id;
+                        autoSwapReplacementVehicleId = vehicle.id;
+                        eventToCreate.vehicle_id = vehicle.id;
+                    } else {
+                        eventToCreate.vehicle_id = oldEvent.vehicle_id;
+                    }
+                    
                     eventToCreate.cleaner_id = oldEvent.cleaner_id;
                     eventToCreate.started_at = oldEvent.started_at;
                     eventToCreate.finished_at = oldEvent.finished_at;
                     eventToCreate.started_by_user_id = oldEvent.started_by_user_id;
                     eventToCreate.completed_by_user_id = oldEvent.completed_by_user_id;
+                    
+                    // Copy checklists
                     eventToCreate.check_interno = oldEvent.check_interno;
                     eventToCreate.check_externo = oldEvent.check_externo;
                     eventToCreate.check_pneus = oldEvent.check_pneus;
+                    eventToCreate.check_bagageiros = oldEvent.check_bagageiros;
+                    eventToCreate.check_latrina = oldEvent.check_latrina;
+                    eventToCreate.check_banheiro = oldEvent.check_banheiro;
+                    eventToCreate.check_higiene = oldEvent.check_higiene;
+                    eventToCreate.check_ozonio = oldEvent.check_ozonio;
+                    
                     eventToCreate.at_yard = oldEvent.at_yard;
                     eventToCreate.observacao_operacao = oldEvent.observacao_operacao;
+                } else {
+                    // If not interacted, but vehicle is different, we can still record CCO swap!
+                    if (oldEvent.vehicle_id !== vehicle.id) {
+                        shouldCreateAutoSwap = true;
+                        autoSwapOriginalVehicleId = oldEvent.vehicle_id;
+                        autoSwapReplacementVehicleId = vehicle.id;
+                    }
                 }
+            }
+
+            if (shouldCreateAutoSwap) {
+                eventToCreate.autoSwap = {
+                    original_vehicle_id: autoSwapOriginalVehicleId,
+                    replacement_vehicle_id: autoSwapReplacementVehicleId
+                };
+            }
+
+            if (oldEvent) {
+                eventToCreate.matchedOldEvent = oldEvent;
             }
 
             processedEvents.push(eventToCreate);
@@ -192,19 +250,57 @@ export async function createScheduleVersion(
 
         // Bulk Create Events
         if (processedEvents.length > 0) {
+            // Find the userId who imported the schedule
+            const importRecord = await tx.scheduleImport.findUnique({
+                where: { id: importId },
+                select: { imported_by_user_id: true }
+            });
+            let userId = importRecord?.imported_by_user_id;
+            if (!userId) {
+                const defaultUser = await tx.user.findFirst({
+                    where: { role: 'ADMIN' },
+                    select: { id: true }
+                });
+                userId = defaultUser?.id || '';
+            }
+
+            const nowSP = new Date().toLocaleTimeString('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
             for (const evt of processedEvents) {
-                // Determine if we need to migrate swaps
-                const businessKey = evt.event_business_key;
-                const oldEvent = oldEventsMap.get(businessKey);
+                // Determine if we need to migrate swaps or create auto swap
+                const oldEvent = evt.matchedOldEvent;
                 const hasSwaps = oldEvent?.swaps && oldEvent.swaps.length > 0;
+                const autoSwap = evt.autoSwap;
+
+                // Delete temp fields before DB creation
+                delete evt.matchedOldEvent;
+                delete evt.autoSwap;
 
                 const newEvent = await tx.cleaningEvent.create({ data: evt });
 
-                // MIGRATE SWAPS
+                // MIGRATE EXISTING SWAPS
                 if (hasSwaps) {
                     await tx.swap.updateMany({
                         where: { original_event_id: oldEvent.id },
                         data: { original_event_id: newEvent.id }
+                    });
+                }
+
+                // CREATE AUTO SWAP FROM CCO
+                if (autoSwap) {
+                    await tx.swap.create({
+                        data: {
+                            original_event_id: newEvent.id,
+                            original_vehicle_id: autoSwap.original_vehicle_id,
+                            replacement_vehicle_id: autoSwap.replacement_vehicle_id,
+                            motivo: 'OUTROS',
+                            observacao: `Troca Realizada pelo CCO na atualização das ${nowSP}`,
+                            created_by_user_id: userId
+                        }
                     });
                 }
             }
@@ -212,14 +308,14 @@ export async function createScheduleVersion(
 
         // 4. Calculate Diffs
         if (previousVersion) {
-            await calculateDiffs(tx, previousVersion, newVersion, processedEvents);
+            await calculateDiffs(tx, previousVersion, newVersion, processedEvents, matchedOldEventIds);
         }
 
         return { version: newVersion, duplicates };
     });
 }
 
-async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEvents: any[]) {
+async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEvents: any[], matchedOldEventIds: Set<string>) {
     const oldEventsMap = new Map(oldVersion.events.map((e: any) => [e.event_business_key, e]));
     const newEventsMap = new Map(newEvents.map((e: any) => [e.event_business_key, e]));
 
@@ -265,7 +361,7 @@ async function calculateDiffs(tx: any, oldVersion: any, newVersion: any, newEven
 
     // B. REMOVED Events
     for (const oldEvent of oldVersion.events) {
-        if (!newEventsMap.has((oldEvent as any).event_business_key)) {
+        if (!matchedOldEventIds.has(oldEvent.id)) {
             // Mark as CANCELLED in the *previous* version context (conceptually) 
             // OR explicitly create a Cancelled event in the START? 
             // Requirement: "evento anterior deve ser marcado como CANCELADO por atualização"
