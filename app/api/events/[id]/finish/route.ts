@@ -74,7 +74,7 @@ export async function POST(
         }
 
         const body = await request.json();
-        const { check_interno, check_externo, check_pneus, check_bagageiros, check_latrina, check_banheiro, check_higiene, check_ozonio, observacao_operacao } = body;
+        const { check_interno, check_externo, check_pneus, check_bagageiros, check_latrina, check_banheiro, check_higiene, check_ozonio, check_poltronas, observacao_operacao } = body;
 
         const updatedEvent = await completeEvent(id, user.id, {
             check_interno,
@@ -85,6 +85,7 @@ export async function POST(
             check_banheiro,
             check_higiene,
             check_ozonio,
+            check_poltronas,
             observacao_operacao
         });
 

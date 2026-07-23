@@ -96,6 +96,7 @@ model CleaningEvent {
   check_banheiro       Boolean?
   check_higiene        Boolean?
   check_ozonio         Boolean?
+  check_poltronas      Boolean?
   observacao_operacao  String?
   at_yard             Boolean         @default(false)
   revisar             Boolean         @default(false)

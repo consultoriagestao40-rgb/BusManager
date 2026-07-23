@@ -52,6 +52,7 @@ export async function startEvent(eventId: string, userId: string, cleanerId?: st
                     check_banheiro: true,
                     check_higiene: true,
                     check_ozonio: true,
+                    check_poltronas: true,
                     at_yard: true,
                     revisar: true,
                     observacao_operacao: `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${event.observacao_operacao || ''}`.trim()
@@ -99,6 +100,7 @@ export async function completeEvent(
         check_banheiro: boolean;
         check_higiene: boolean;
         check_ozonio: boolean;
+        check_poltronas: boolean;
         observacao_operacao?: string;
     }
 ) {
@@ -115,12 +117,13 @@ export async function completeEvent(
         data.check_latrina &&
         data.check_banheiro &&
         data.check_higiene &&
-        data.check_ozonio;
+        data.check_ozonio &&
+        data.check_poltronas;
 
     if (!allChecksPassed) {
         // This check should ideally happen at API/Validation layer too, but double check here.
         if (!data.observacao_operacao?.trim()) {
-            throw new Error('Observação é obrigatória quando o checklist não está completo (todos os 8 itens).');
+            throw new Error('Observação é obrigatória quando o checklist não está completo (todos os 9 itens).');
         }
     }
 
@@ -138,6 +141,7 @@ export async function completeEvent(
             check_banheiro: data.check_banheiro,
             check_higiene: data.check_higiene,
             check_ozonio: data.check_ozonio,
+            check_poltronas: data.check_poltronas,
             observacao_operacao: data.observacao_operacao,
             at_yard: true
         }
@@ -209,6 +213,7 @@ export async function swapVehicle(
                 check_banheiro: false,
                 check_higiene: false,
                 check_ozonio: false,
+                check_poltronas: false,
             };
 
             if (yardItem) {
@@ -239,6 +244,7 @@ export async function swapVehicle(
                         check_banheiro: true,
                         check_higiene: true,
                         check_ozonio: true,
+                        check_poltronas: true,
                         at_yard: true,
                         revisar: true,
                         observacao_operacao: `⚠️ Revisar carro - Limpo no Pátio (Limpo por ${cleanerName} às ${cleanedTime}). ${event.observacao_operacao || ''}`.trim()
@@ -334,6 +340,7 @@ export async function updateYardStatus(
         check_banheiro: boolean;
         check_higiene: boolean;
         check_ozonio: boolean;
+        check_poltronas: boolean;
         cleaner_id?: string;
         observacao?: string;
     }
@@ -442,6 +449,7 @@ export async function updateYardStatus(
                     check_banheiro: checklist.check_banheiro,
                     check_higiene: checklist.check_higiene,
                     check_ozonio: checklist.check_ozonio,
+                    check_poltronas: checklist.check_poltronas,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
                     at_yard: true
                 },
@@ -466,6 +474,7 @@ export async function updateYardStatus(
                     check_banheiro: checklist.check_banheiro,
                     check_higiene: checklist.check_higiene,
                     check_ozonio: checklist.check_ozonio,
+                    check_poltronas: checklist.check_poltronas,
                     observacao_operacao: checklist.observacao || 'Limpeza de Pátio',
                     at_yard: true,
                     event_business_key: eventBusinessKey

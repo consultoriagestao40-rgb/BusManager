@@ -173,6 +173,7 @@ export async function createScheduleVersion(
                     eventToCreate.check_banheiro = true;
                     eventToCreate.check_higiene = true;
                     eventToCreate.check_ozonio = true;
+                    eventToCreate.check_poltronas = true;
                     eventToCreate.started_at = yardStock.created_at;
                     eventToCreate.finished_at = yardStock.last_cleaned_at || new Date();
                     eventToCreate.cleaner_id = yardStock.last_cleaner_id;
@@ -221,6 +222,7 @@ export async function createScheduleVersion(
                     eventToCreate.check_banheiro = oldEvent.check_banheiro;
                     eventToCreate.check_higiene = oldEvent.check_higiene;
                     eventToCreate.check_ozonio = oldEvent.check_ozonio;
+                    eventToCreate.check_poltronas = oldEvent.check_poltronas;
                     
                     eventToCreate.at_yard = oldEvent.at_yard;
                     eventToCreate.observacao_operacao = oldEvent.observacao_operacao;

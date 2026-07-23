@@ -73,6 +73,7 @@ export async function POST(request: Request) {
         let check_banheiro = null;
         let check_higiene = null;
         let check_ozonio = null;
+        let check_poltronas = null;
         let started_at = null;
         let finished_at = null;
         let cleaner_id = null;
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
                 check_banheiro = true;
                 check_higiene = true;
                 check_ozonio = true;
+                check_poltronas = true;
                 started_at = yardStock.created_at;
                 finished_at = yardStock.last_cleaned_at || new Date();
                 cleaner_id = yardStock.last_cleaner_id;
@@ -137,6 +139,7 @@ export async function POST(request: Request) {
                 check_banheiro,
                 check_higiene,
                 check_ozonio,
+                check_poltronas,
                 started_at,
                 finished_at,
                 cleaner_id,

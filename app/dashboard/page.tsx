@@ -302,6 +302,7 @@ export default function DashboardPage() {
     const [yardCheckBanheiro, setYardCheckBanheiro] = useState(false);
     const [yardCheckHigiene, setYardCheckHigiene] = useState(false);
     const [yardCheckOzonio, setYardCheckOzonio] = useState(false);
+    const [yardCheckPoltronas, setYardCheckPoltronas] = useState(false);
     const [yardFinishObs, setYardFinishObs] = useState('');
     const [processing, setProcessing] = useState(false);
     const [syncing, setSyncing] = useState(false);
@@ -316,6 +317,7 @@ export default function DashboardPage() {
         if (e.check_banheiro) count++;
         if (e.check_higiene) count++;
         if (e.check_ozonio) count++;
+        if (e.check_poltronas) count++;
         return count;
     };
 
@@ -359,6 +361,7 @@ export default function DashboardPage() {
         check_banheiro: true,
         check_higiene: true,
         check_ozonio: true,
+        check_poltronas: true,
         observacao_operacao: 'Limpeza de Pátio',
         origin: 'Pátio'
     }));
@@ -392,6 +395,7 @@ export default function DashboardPage() {
         check_banheiro: true,
         check_higiene: true,
         check_ozonio: true,
+        check_poltronas: true,
         origin: 'Pátio'
     }));
 
@@ -823,6 +827,7 @@ export default function DashboardPage() {
                         check_banheiro: yardCheckBanheiro,
                         check_higiene: yardCheckHigiene,
                         check_ozonio: yardCheckOzonio,
+                        check_poltronas: yardCheckPoltronas,
                         cleaner_id: selectedCleaner,
                         observacao: yardFinishObs
                     }
@@ -840,6 +845,7 @@ export default function DashboardPage() {
                 setYardCheckBanheiro(false);
                 setYardCheckHigiene(false);
                 setYardCheckOzonio(false);
+                setYardCheckPoltronas(false);
                 setYardFinishObs('');
                 fetchYardItems();
                 fetchEvents();
@@ -2065,16 +2071,16 @@ export default function DashboardPage() {
                             </div>
 
                              {(() => {
-                                 const yardCurrentProgress = [yardCheckInterno, yardCheckExterno, yardCheckPneus, yardCheckBagageiros, yardCheckLatrina, yardCheckBanheiro, yardCheckHigiene, yardCheckOzonio].filter(Boolean).length;
-                                 const yardCurrentPercentage = Math.round((yardCurrentProgress / 8) * 100);
-                                 const isYardFinishDisabled = yardCurrentProgress < 8 && !yardFinishObs.trim();
+                                 const yardCurrentProgress = [yardCheckInterno, yardCheckExterno, yardCheckPneus, yardCheckBagageiros, yardCheckLatrina, yardCheckBanheiro, yardCheckHigiene, yardCheckOzonio, yardCheckPoltronas].filter(Boolean).length;
+                                 const yardCurrentPercentage = Math.round((yardCurrentProgress / 9) * 100);
+                                 const isYardFinishDisabled = yardCurrentProgress < 9 && !yardFinishObs.trim();
 
                                  return (
                                      <>
                                          <div className="mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                                              <div className="flex justify-between items-center mb-1.5">
                                                  <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Evolução da Limpeza</span>
-                                                 <span className="text-xs font-black text-blue-600">{yardCurrentPercentage}% ({yardCurrentProgress}/8)</span>
+                                                 <span className="text-xs font-black text-blue-600">{yardCurrentPercentage}% ({yardCurrentProgress}/9)</span>
                                              </div>
                                              <div className="w-full bg-gray-200 rounded-full h-2.5">
                                                  <div 
@@ -2157,6 +2163,15 @@ export default function DashboardPage() {
                                                  />
                                                  <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Jato de estabilizante ozônio no final ok?</span>
                                              </label>
+                                              <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-all border border-transparent hover:border-blue-200 group">
+                                                  <input 
+                                                      type="checkbox" 
+                                                      checked={yardCheckPoltronas} 
+                                                      onChange={(e) => setYardCheckPoltronas(e.target.checked)} 
+                                                      className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all" 
+                                                  />
+                                                  <span className="text-sm font-bold text-gray-700 group-hover:text-blue-700">Foi colocado capas de identificação de poltronas preferencial?</span>
+                                              </label>
                                          </div>
 
                                          <div className="space-y-2">

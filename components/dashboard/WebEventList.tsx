@@ -57,6 +57,7 @@ export default function WebEventList({
     const [checkBanheiro, setCheckBanheiro] = useState(false);
     const [checkHigiene, setCheckHigiene] = useState(false);
     const [checkOzonio, setCheckOzonio] = useState(false);
+    const [checkPoltronas, setCheckPoltronas] = useState(false);
     const [finishObs, setFinishObs] = useState('');
 
     useEffect(() => {
@@ -316,6 +317,7 @@ export default function WebEventList({
                                                                         setCheckBanheiro(false);
                                                                         setCheckHigiene(false);
                                                                         setCheckOzonio(false);
+                                                                        setCheckPoltronas(false);
                                                                         setFinishObs('');
                                                                         setFinishModalOpen(true);
                                                                     }
@@ -513,16 +515,16 @@ export default function WebEventList({
                         )}
 
                         {(() => {
-                            const currentProgress = [checkInterno, checkExterno, checkPneus, checkBagageiros, checkLatrina, checkBanheiro, checkHigiene, checkOzonio].filter(Boolean).length;
-                            const currentPercentage = Math.round((currentProgress / 8) * 100);
-                            const isFinishDisabled = currentProgress < 8 && !finishObs.trim();
+                            const currentProgress = [checkInterno, checkExterno, checkPneus, checkBagageiros, checkLatrina, checkBanheiro, checkHigiene, checkOzonio, checkPoltronas].filter(Boolean).length;
+                            const currentPercentage = Math.round((currentProgress / 9) * 100);
+                            const isFinishDisabled = currentProgress < 9 && !finishObs.trim();
 
                             return (
                                 <>
                                     <div className="mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                                         <div className="flex justify-between items-center mb-1.5">
                                             <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Evolução da Limpeza</span>
-                                            <span className="text-xs font-black text-blue-600">{currentPercentage}% ({currentProgress}/8)</span>
+                                            <span className="text-xs font-black text-blue-600">{currentPercentage}% ({currentProgress}/9)</span>
                                         </div>
                                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                                             <div 
@@ -564,6 +566,10 @@ export default function WebEventList({
                                             <input type="checkbox" checked={checkOzonio} onChange={(e) => setCheckOzonio(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
                                             <span className="text-sm font-semibold text-gray-700">Jato de estabilizante ozônio no final ok?</span>
                                         </label>
+                                        <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                                            <input type="checkbox" checked={checkPoltronas} onChange={(e) => setCheckPoltronas(e.target.checked)} className="w-4 h-4 rounded text-blue-600" />
+                                            <span className="text-sm font-semibold text-gray-700">Foi colocado capas de identificação de poltronas preferencial?</span>
+                                        </label>
                                     </div>
 
                                     <div className="mb-6">
@@ -594,6 +600,7 @@ export default function WebEventList({
                                                 check_banheiro: checkBanheiro,
                                                 check_higiene: checkHigiene,
                                                 check_ozonio: checkOzonio,
+                                                check_poltronas: checkPoltronas,
                                                 observacao_operacao: finishObs
                                             })}
                                             disabled={isFinishDisabled || processing}
