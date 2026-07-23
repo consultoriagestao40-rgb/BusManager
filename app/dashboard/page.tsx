@@ -2331,6 +2331,7 @@ export default function DashboardPage() {
                                 >
                                     <option value="Turismo">Turismo</option>
                                     <option value="Baldeação">Baldeação</option>
+                                    <option value="Carro Extra">Carro Extra</option>
                                 </select>
                             </div>
 
