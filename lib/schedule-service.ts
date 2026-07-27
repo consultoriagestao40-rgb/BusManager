@@ -54,9 +54,22 @@ export async function createScheduleVersion(
                 oldEventsMap.set(evt.event_business_key, evt);
             }
         }
-
         for (const event of events) {
             let businessKey = event.event_business_key;
+
+            // Find or Create Vehicle
+            let vehicle = await tx.vehicle.findUnique({
+                where: { client_vehicle_number: event.client_vehicle_number }
+            });
+
+            if (!vehicle) {
+                vehicle = await tx.vehicle.create({
+                    data: {
+                        client_vehicle_number: event.client_vehicle_number,
+                        created_from_import_version_id: newVersion.id
+                    }
+                });
+            }
 
             let oldEvent = oldEventsMap.get(businessKey);
 
@@ -71,6 +84,19 @@ export async function createScheduleVersion(
                 
                 if (oldEvent) {
                     console.log(`[Sync Fallback] Matched old event ${oldEvent.id} (time: ${oldEvent.saida_programada_at.toISOString()}) to new event for vehicle ${event.client_vehicle_number}`);
+                }
+            }
+
+            // Fallback 2: if still not matched, match by same vehicle and departure time within 4 hours
+            if (!oldEvent && previousVersion?.events) {
+                oldEvent = previousVersion.events.find(oe => 
+                    !matchedOldEventIds.has(oe.id) &&
+                    oe.vehicle_id === vehicle.id &&
+                    Math.abs(oe.saida_programada_at.getTime() - event.saida_programada_at.getTime()) <= 4 * 60 * 60 * 1000
+                );
+                
+                if (oldEvent) {
+                    console.log(`[Sync Fallback Vehicle-Time] Matched old event ${oldEvent.id} (vehicle: ${event.client_vehicle_number}, old time: ${oldEvent.saida_programada_at.toISOString()}) to new event (new time: ${event.saida_programada_at.toISOString()})`);
                 }
             }
 
@@ -92,19 +118,7 @@ export async function createScheduleVersion(
                 keyCounts.set(businessKey, 1);
             }
 
-            // Find or Create Vehicle
-            let vehicle = await tx.vehicle.findUnique({
-                where: { client_vehicle_number: event.client_vehicle_number }
-            });
-
-            if (!vehicle) {
-                vehicle = await tx.vehicle.create({
-                    data: {
-                        client_vehicle_number: event.client_vehicle_number,
-                        created_from_import_version_id: newVersion.id
-                    }
-                });
-            }
+            // Check if vehicle is in Yard Inventory and if it's already CLEAN
 
             // Check if vehicle is in Yard Inventory and if it's already CLEAN
             const yardStock = await tx.yardInventory.findFirst({
@@ -195,7 +209,7 @@ export async function createScheduleVersion(
 
                 if (isInteracted) {
                     // COPY OPERATIONAL STATE
-                    eventToCreate.status = oldEvent.status;
+                    eventToCreate.status = oldEvent.status === 'CANCELADO' ? 'PREVISTO' : oldEvent.status;
                     
                     // Check if vehicle has changed in the new scale compared to the old event's current vehicle
                     if (oldEvent.vehicle_id !== vehicle.id) {
