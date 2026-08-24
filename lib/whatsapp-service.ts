@@ -183,49 +183,8 @@ export async function sendStartAlert(eventId: string) {
  * Envia alerta de conclusão de limpeza (Exclusivo para Tráfego Penha Curitiba)
  */
 export async function sendCompletionAlert(eventId: string) {
-    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) return;
-
-    try {
-        const event = await prisma.cleaningEvent.findUnique({
-            where: { id: eventId },
-            include: { 
-                vehicle: true,
-                completed_by: true,
-                cleaner: true
-            }
-        });
-
-        if (!event || !event.vehicle) return;
-
-        const meta = new Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'America/Sao_Paulo',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(new Date(event.liberar_ate_at));
-
-        const concluido = new Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'America/Sao_Paulo',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(new Date());
-        
-        const isYard = event.event_business_key?.startsWith('YARD-');
-        const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
-        const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
-
-        const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
-            `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
-            `🕒 *Meta (H-1):* ${meta}\n` +
-            `🏁 *Concluído às:* ${concluido}\n` +
-            `👤 *${cargoLabel}:* ${responsavel}\n\n` +
-            `Equipe de limpeza finalizando! 🚌`;
-
-        // Envia exclusivamente para o grupo Tráfego Penha Curitiba
-        const targetGroup = process.env.WHATSAPP_TRAFEGO_GROUP_ID || '554199141946-1454964770';
-        await sendWhatsAppMessage(message, targetGroup);
-    } catch (error) {
-        console.error('[WhatsApp] Erro ao preparar alerta de conclusão:', error);
-    }
+    // DESATIVADO: Envio bloqueado para preservação do canal com o cliente
+    return;
 }
 
 /**
