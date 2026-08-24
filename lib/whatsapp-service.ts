@@ -180,10 +180,10 @@ export async function sendStartAlert(eventId: string) {
 }
 
 /**
- * Envia alerta de conclusão de limpeza
+ * Envia alerta de conclusão de limpeza (Exclusivo para Tráfego Penha Curitiba)
  */
 export async function sendCompletionAlert(eventId: string) {
-    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) return;
+    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) return;
 
     try {
         const event = await prisma.cleaningEvent.findUnique({
@@ -220,7 +220,9 @@ export async function sendCompletionAlert(eventId: string) {
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
 
-        await sendWhatsAppMessage(message);
+        // Envia exclusivamente para o grupo Tráfego Penha Curitiba
+        const targetGroup = process.env.WHATSAPP_GROUP_ID || '554199141946-1454964770';
+        await sendWhatsAppMessage(message, targetGroup);
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de conclusão:', error);
     }
