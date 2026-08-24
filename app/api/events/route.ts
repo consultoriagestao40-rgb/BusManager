@@ -172,9 +172,7 @@ export async function GET(request: Request) {
                         `Por favor, confirme a presença do veículo no pátio ou realize a substituição (Troca) no BusManager para liberar a operação.`;
 
                     try {
-                        // Envia para o grupo operacional padrão
-                        await sendWhatsAppMessage(text);
-                        // Envia também para o grupo VIP da Liderança Penha
+                        // Envia exclusivamente para o grupo VIP da Liderança Penha
                         await sendWhatsAppMessage(text, '120363421745459340-group');
 
                         // Atualiza no banco de dados para marcar como enviado
