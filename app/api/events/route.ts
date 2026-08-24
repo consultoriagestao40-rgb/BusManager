@@ -142,13 +142,18 @@ export async function GET(request: Request) {
                 // Rule: status is 'PREVISTO', not at_yard, not yard_bypass
                 if (event.status !== 'PREVISTO' || event.at_yard || event.yard_bypass) return false;
                 
+                // Ignore empty / unassigned placeholder vehicles
+                const vehicleNumber = event.vehicle?.client_vehicle_number?.toString() || '';
+                if (!vehicleNumber || vehicleNumber.startsWith('EMPTY_')) return false;
+
                 // Calculate time difference in minutes
                 const limitDate = new Date(event.liberar_ate_at);
                 const diff = differenceInMinutes(limitDate, nowTime);
                 
-                // Active alerts: when difference is <= 90 minutes (1h30m)
+                // Active alerts: when difference is between -30 and +90 minutes
+                // (diff >= -30 prevents blasting ancient morning alerts if system reconnects late in the afternoon)
                 // And whatsapp_yard_alert_sent is false (to prevent duplicates)
-                return diff <= 90 && !event.whatsapp_yard_alert_sent;
+                return diff >= -30 && diff <= 90 && !event.whatsapp_yard_alert_sent;
             });
 
             if (criticalYardEvents.length > 0) {
