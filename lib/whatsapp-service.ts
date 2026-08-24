@@ -12,7 +12,7 @@ const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID;
  * Verifica eventos em atraso (SLA de 1h) - DESATIVADO PARA ESTABILIZAÇÃO
  */
 export async function checkAndSendSLAAlerts() {
-    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN || !WHATSAPP_GROUP_ID) {
+    if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) {
         console.warn('[WhatsApp] Configurações de Z-API incompletas. Abortando alertas.');
         return { success: false, reason: 'Missing configuration' };
     }
@@ -221,7 +221,7 @@ export async function sendCompletionAlert(eventId: string) {
             `Equipe de limpeza finalizando! 🚌`;
 
         // Envia exclusivamente para o grupo Tráfego Penha Curitiba
-        const targetGroup = process.env.WHATSAPP_GROUP_ID || '554199141946-1454964770';
+        const targetGroup = process.env.WHATSAPP_TRAFEGO_GROUP_ID || '554199141946-1454964770';
         await sendWhatsAppMessage(message, targetGroup);
     } catch (error) {
         console.error('[WhatsApp] Erro ao preparar alerta de conclusão:', error);
