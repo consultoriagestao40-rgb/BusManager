@@ -197,25 +197,31 @@ export async function sendCompletionAlert(eventId: string) {
 
         if (!event || !event.vehicle) return;
 
-        const meta = new Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'America/Sao_Paulo',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(new Date(event.liberar_ate_at));
+        const isYard = event.event_business_key?.startsWith('YARD-');
+        const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
+        const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
+
+        let metaLine = '';
+        if (isYard) {
+            metaLine = `🕒 *Origem:* Pátio (Extra / Sem Escala)\n`;
+        } else {
+            const meta = new Intl.DateTimeFormat('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(new Date(event.liberar_ate_at));
+            metaLine = `🕒 *Meta (H-1):* ${meta}\n`;
+        }
 
         const concluido = new Intl.DateTimeFormat('pt-BR', {
             timeZone: 'America/Sao_Paulo',
             hour: '2-digit',
             minute: '2-digit',
         }).format(new Date(event.finished_at || new Date()));
-        
-        const isYard = event.event_business_key?.startsWith('YARD-');
-        const cargoLabel = isYard ? 'Faxineiro' : 'Colaborador';
-        const responsavel = event.cleaner?.name || event.completed_by?.name || 'Sistema';
 
         const message = `✅ *LIMPEZA CONCLUÍDA*\n\n` +
             `🚌 *Carro:* ${event.vehicle.client_vehicle_number}\n` +
-            `🕒 *Meta (H-1):* ${meta}\n` +
+            metaLine +
             `🏁 *Concluído às:* ${concluido}\n` +
             `👤 *${cargoLabel}:* ${responsavel}\n\n` +
             `Equipe de limpeza finalizando! 🚌`;
