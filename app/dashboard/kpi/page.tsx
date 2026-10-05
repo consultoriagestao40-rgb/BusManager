@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { format, subDays, startOfMonth, endOfMonth, parseISO, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, ChevronDown, Filter } from 'lucide-react';
+import { Loader2, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, ChevronDown, Filter, Download } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     LineChart, Line, AreaChart, Area, ComposedChart
@@ -46,6 +46,10 @@ export default function KPIDashboard() {
                 end = format(endOfMonth(today), 'yyyy-MM-dd');
                 setShowAccumulated(false); // Default to daily view for monthly filter
                 break;
+            case 'q3':
+                start = '2026-07-01';
+                end = '2026-09-30';
+                break;
             case 'custom':
                 return; // Don't fetch yet, wait for user dates
         }
@@ -54,6 +58,11 @@ export default function KPIDashboard() {
             setStartDate(start);
             setEndDate(end);
         }
+    };
+
+    const handleExport = (formatType: 'csv' | 'json' = 'csv') => {
+        const params = new URLSearchParams({ startDate, endDate, format: formatType });
+        window.open(`/api/kpi/export?${params.toString()}`, '_blank');
     };
 
     const fetchData = async () => {
@@ -104,7 +113,7 @@ export default function KPIDashboard() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div className="flex justify-between items-center bg-white p-4 rounded shadow">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded shadow">
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                     <TrendingUp className="h-6 w-6 text-blue-600" />
                     Dashboard de Performance (KPIs)
@@ -122,6 +131,7 @@ export default function KPIDashboard() {
                             <option value="14d">Últimos 14 dias</option>
                             <option value="30d">Últimos 30 dias</option>
                             <option value="month">Este Mês</option>
+                            <option value="q3">3º Trimestre (Jul - Set)</option>
                             <option value="custom">Período Personalizado</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 pointer-events-none" />
@@ -150,6 +160,17 @@ export default function KPIDashboard() {
                             </button>
                         </div>
                     )}
+
+                    <div className="flex items-center gap-1.5 ml-auto">
+                        <button
+                            onClick={() => handleExport('csv')}
+                            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
+                            title="Exportar planilha CSV com todos os dados do período para Claude e Excel"
+                        >
+                            <Download className="h-4 w-4" />
+                            <span>Exportar Dados (CSV)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

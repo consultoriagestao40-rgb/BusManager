@@ -48,3 +48,6 @@ next-env.d.ts
 prisma/*.db
 prisma/*.sqlite
 .env*.local
+
+# exports
+export_claude/
