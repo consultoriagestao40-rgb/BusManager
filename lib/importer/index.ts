@@ -64,9 +64,38 @@ export async function processImport(
         // 5. Create Version & Events
         const events = parseResult.events;
 
-        // Determine data_viagem from events or file date. 
-        // For now, take the data_viagem of the first event, or today if missing.
-        const dataViagem = events.length > 0 ? events[0].data_viagem : new Date();
+        // Determine data_viagem:
+        // Priority 1: Check if filename contains a date like schedule-DD-MM-YYYY or DD-MM-YYYY
+        let dataViagem: Date | null = null;
+        const filenameMatch = filename.match(/(\d{2})[-_.](\d{2})[-_.](\d{4})/);
+        if (filenameMatch) {
+            const [, d, m, y] = filenameMatch;
+            dataViagem = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
+        }
+
+        // Priority 2: Statistical mode (most frequent date) among parsed events
+        if (!dataViagem || isNaN(dataViagem.getTime())) {
+            if (events.length > 0) {
+                const dateCounts = new Map<string, { count: number; date: Date }>();
+                for (const evt of events) {
+                    const key = evt.data_viagem.toISOString().substring(0, 10);
+                    const current = dateCounts.get(key) || { count: 0, date: evt.data_viagem };
+                    current.count++;
+                    dateCounts.set(key, current);
+                }
+                let bestDate = events[0].data_viagem;
+                let maxCount = 0;
+                for (const item of dateCounts.values()) {
+                    if (item.count > maxCount) {
+                        maxCount = item.count;
+                        bestDate = item.date;
+                    }
+                }
+                dataViagem = bestDate;
+            } else {
+                dataViagem = new Date();
+            }
+        }
 
         // Call Schedule Service
         // We need to dynamic import to avoid circular checks if any,/

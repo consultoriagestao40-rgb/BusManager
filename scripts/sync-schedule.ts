@@ -469,56 +469,51 @@ async function run() {
             console.log(`Setting date to ${targetDateStr} programmatically...`);
             await reportFrame.evaluate((dateVal: string) => {
                 const win = window as any;
-                const $ = win.$J || win.jQuery || win.$;
-
-                // 1. Set start date
                 const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+
                 if (inputStart) {
-                    let datepickerSet = false;
-                    if ($) {
-                        const $input = $(inputStart);
-                        if (typeof $input.datepicker === 'function') {
-                            try {
-                                $input.datepicker('setDate', dateVal);
-                                $input.trigger('change');
-                                datepickerSet = true;
-                            } catch (e) {}
+                    inputStart.value = dateVal;
+                    inputStart.dispatchEvent(new Event('input', { bubbles: true }));
+                    inputStart.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                if (inputEnd) {
+                    inputEnd.value = dateVal;
+                    inputEnd.dispatchEvent(new Event('input', { bubbles: true }));
+                    inputEnd.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                // If jQuery UI datepicker is attached via $J or jQuery
+                const $ = win.$J || (typeof win.jQuery === 'function' ? win.jQuery : null);
+                if ($) {
+                    try {
+                        if (inputStart && typeof $(inputStart).datepicker === 'function') {
+                            $(inputStart).datepicker('setDate', dateVal);
+                            $(inputStart).trigger('change');
                         }
+                    } catch (e) {
+                        console.warn('Error setting datepicker on inputStart:', e);
                     }
-                    if (!datepickerSet) {
-                        inputStart.value = dateVal;
-                        inputStart.dispatchEvent(new Event('input', { bubbles: true }));
-                        inputStart.dispatchEvent(new Event('change', { bubbles: true }));
-                        if ($) {
-                            $(inputStart).val(dateVal).trigger('change').trigger('blur');
+                    try {
+                        if (inputEnd && typeof $(inputEnd).datepicker === 'function') {
+                            $(inputEnd).datepicker('setDate', dateVal);
+                            $(inputEnd).trigger('change');
                         }
+                    } catch (e) {
+                        console.warn('Error setting datepicker on inputEnd:', e);
                     }
                 }
 
-                // 2. Set end date
-                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
-                if (inputEnd) {
-                    let datepickerSet = false;
-                    if ($) {
-                        const $input = $(inputEnd);
-                        if (typeof $input.datepicker === 'function') {
-                            try {
-                                $input.datepicker('setDate', dateVal);
-                                $input.trigger('change');
-                                datepickerSet = true;
-                            } catch (e) {}
-                        }
-                    }
-                    if (!datepickerSet) {
-                        inputEnd.value = dateVal;
-                        inputEnd.dispatchEvent(new Event('input', { bubbles: true }));
-                        inputEnd.dispatchEvent(new Event('change', { bubbles: true }));
-                        if ($) {
-                            $(inputEnd).val(dateVal).trigger('change').trigger('blur');
-                        }
-                    }
+                // CRITICAL: Clear results div so waitForFunction does not resolve immediately with previous search results!
+                const div = document.getElementById('divResultado');
+                if (div) {
+                    div.innerHTML = '';
+                    div.setAttribute('data-search-target', dateVal);
                 }
             }, targetDateStr);
+
+            // Brief wait for events to propagate
+            await new Promise(r => setTimeout(r, 500));
 
             // 3b. Click "Pesquisar"
             console.log('Clicking Pesquisar...');
@@ -543,13 +538,24 @@ async function run() {
                     if (!div) return false;
                     const html = div.innerHTML;
                     // It must not contain the loading indicator, and must contain some loaded content
-                    return html.length > 10 && !html.includes('Aguarde') && !html.includes('CARREGANDO');
+                    return html.length > 50 && !html.includes('Aguarde') && !html.includes('CARREGANDO');
                 }, { timeout: 90000 });
                 console.log('Search results loaded successfully.');
             } catch (waitErr) {
                 console.error('Timeout waiting for search results to load. Aborting execution to prevent empty PDF upload.');
                 throw new Error(`Timeout waiting for search results to load for date ${targetDateStr}.`);
             }
+
+            // Settle time for tables and scripts
+            await new Promise(r => setTimeout(r, 2000));
+
+            // Verify inputs still have the correct target date before printing
+            const verifiedDate = await reportFrame.evaluate(() => {
+                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+                return { start: inputStart?.value, end: inputEnd?.value };
+            });
+            console.log(`Verified form dates before printing: ${JSON.stringify(verifiedDate)}`);
 
             // 4. Print/Export
             console.log('Exporting PDF...');

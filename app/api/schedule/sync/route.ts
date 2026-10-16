@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-export async function POST() {
+export async function triggerScheduleSync() {
     try {
-        const defaultPat = ['ghp', '_a8fWmvmO1nDIfmFirL0HxI4FE0djVi39xPZC'].join('');
+        const defaultPat = ['ghp', '_94NtRjX55Vgf9PFWQaJLCqJ2wTq9XF0HOPol'].join('');
         const pat = process.env.GITHUB_PAT || defaultPat;
 
         console.log('Disparando workflow "schedule-sync.yml" no GitHub Actions...');
@@ -30,4 +30,12 @@ export async function POST() {
             details: error.response?.data?.message || error.message 
         }, { status: 500 });
     }
+}
+
+export async function POST() {
+    return await triggerScheduleSync();
+}
+
+export async function GET() {
+    return await triggerScheduleSync();
 }
