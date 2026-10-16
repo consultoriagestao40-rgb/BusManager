@@ -465,47 +465,57 @@ async function run() {
         for (const targetDateStr of datesToSync) {
             console.log(`\n--- Starting sync for date: ${targetDateStr} ---`);
 
-            // 3a. Set the travel date in the search filter fields via DOM events and jQuery trigger
+            // 3a. Set the travel date in the search filter fields safely
             console.log(`Setting date to ${targetDateStr} programmatically...`);
             await reportFrame.evaluate((dateVal: string) => {
                 const win = window as any;
-                const inputStart = document.getElementById('txtPesqDtViagem') as HTMLInputElement;
-                const inputEnd = document.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
+                const doc = win.document;
+                const inputStart = doc.getElementById('txtPesqDtViagem') as HTMLInputElement;
+                const inputEnd = doc.getElementById('txtPesqDtViagemFinal') as HTMLInputElement;
 
                 if (inputStart) {
                     inputStart.value = dateVal;
-                    inputStart.dispatchEvent(new Event('input', { bubbles: true }));
-                    inputStart.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 if (inputEnd) {
                     inputEnd.value = dateVal;
-                    inputEnd.dispatchEvent(new Event('input', { bubbles: true }));
-                    inputEnd.dispatchEvent(new Event('change', { bubbles: true }));
                 }
 
-                // If jQuery UI datepicker is attached via $J or jQuery
-                const $ = win.$J || (typeof win.jQuery === 'function' ? win.jQuery : null);
-                if ($) {
+                if (doc.frm) {
+                    if (doc.frm.txtPesqDtViagem) doc.frm.txtPesqDtViagem.value = dateVal;
+                    if (doc.frm.txtPesqDtViagemFinal) doc.frm.txtPesqDtViagemFinal.value = dateVal;
+                }
+
+                // If jQuery UI datepicker is attached via $J
+                if (win.$J) {
                     try {
-                        if (inputStart && typeof $(inputStart).datepicker === 'function') {
-                            $(inputStart).datepicker('setDate', dateVal);
-                            $(inputStart).trigger('change');
+                        win.$J('#txtPesqDtViagem').val(dateVal);
+                        win.$J('#txtPesqDtViagemFinal').val(dateVal);
+                        if (typeof win.$J('#txtPesqDtViagem').datepicker === 'function') {
+                            win.$J('#txtPesqDtViagem').datepicker('setDate', dateVal);
+                        }
+                        if (typeof win.$J('#txtPesqDtViagemFinal').datepicker === 'function') {
+                            win.$J('#txtPesqDtViagemFinal').datepicker('setDate', dateVal);
                         }
                     } catch (e) {
-                        console.warn('Error setting datepicker on inputStart:', e);
-                    }
-                    try {
-                        if (inputEnd && typeof $(inputEnd).datepicker === 'function') {
-                            $(inputEnd).datepicker('setDate', dateVal);
-                            $(inputEnd).trigger('change');
-                        }
-                    } catch (e) {
-                        console.warn('Error setting datepicker on inputEnd:', e);
+                        console.warn('Error setting datepicker via $J:', e);
                     }
                 }
+
+                // Dispatch change event safely across Prototype.js and modern DOM
+                try {
+                    if (doc.createEvent) {
+                        const ev1 = doc.createEvent('HTMLEvents');
+                        ev1.initEvent('change', true, true);
+                        inputStart?.dispatchEvent(ev1);
+
+                        const ev2 = doc.createEvent('HTMLEvents');
+                        ev2.initEvent('change', true, true);
+                        inputEnd?.dispatchEvent(ev2);
+                    }
+                } catch (e) {}
 
                 // CRITICAL: Clear results div so waitForFunction does not resolve immediately with previous search results!
-                const div = document.getElementById('divResultado');
+                const div = doc.getElementById('divResultado');
                 if (div) {
                     div.innerHTML = '';
                     div.setAttribute('data-search-target', dateVal);
